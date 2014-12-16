@@ -14,8 +14,8 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 public abstract class AbstractMarketUser extends Agent {
 	protected AID marketAgentID;
 	
-	private final Logger logger =
-			Logger.getLogger(MarketAgent.class.getName());
+	protected Logger logger =
+			Logger.getLogger(AbstractMarketUser.class.getName());
 	
 	@Override
 	protected void setup()
