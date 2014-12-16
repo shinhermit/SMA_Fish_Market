@@ -7,29 +7,39 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.WaitAuctio
 import jade.core.behaviours.FSMBehaviour;
 
 @SuppressWarnings("serial")
+/**
+ * The FSM behavior of the market agent.
+ * 
+ * @author Josuah Aron
+ *
+ */
 public class SellerManagementBehaviour extends FSMBehaviour
 {
 	/** The state in which the agent waits for auction creation requests. */
 	private static final String STATE_WAIT_AUCTION_CREATION_REQUEST =
 			"STATE_WAIT_AUCTION_CREATION_REQUEST";
+	
 	/** The state in which the agent evaluates auction creation requests. */
 	private static final String STATE_EVALUATE_AUCTION_CREATION_REQUEST =
 			"STATE_EVALUATE_AUCTION_CREATION_REQUEST";
+	
 	/** The state in which the agent evaluates auction creation requests. */
 	private static final String STATE_CONFIRM_AUCTION_CREATION_REQUEST =
 			"STATE_CONFIRM_AUCTION_CREATION_REQUEST";
 	
 	/** Return code which activates the transition to the wait new requests after
 	 * the last evaluation resulted in a reject. */
-	static final int TRANSITION_REFUSE_AUCTION_CREATION_REQUEST = 0;
+	public static final int TRANSITION_REFUSE_AUCTION_CREATION_REQUEST = 0;
+	
 	/** Return code which activates the transition to confirm the creation of a new auction
 	 * after the last evaluation resulted in an approval. */
-	static final int TRANSITION_CONFIRM_AUCTION_CREATION = 1;
+	public static final int TRANSITION_CONFIRM_AUCTION_CREATION = 1;
 	
 	/**
 	 * Create the behavior of a market agent which is responsible for creating new auction and registering them.
 	 * 
-	 * @param myMarketAgent the agent to which this behavior is added.
+	 * @param myMarketAgent
+	 * 			the agent to which this behavior is added.
 	 */
 	public SellerManagementBehaviour(MarketAgent myMarketAgent)
 	{

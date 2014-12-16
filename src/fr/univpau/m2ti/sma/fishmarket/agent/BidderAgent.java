@@ -13,7 +13,7 @@ public class BidderAgent extends AbstractMarketUser
 	@Override
 	protected void takeDown()
 	{
-		// Cancel auctions
+		// Cancel auction
 		super.takeDown();
 	}
 }

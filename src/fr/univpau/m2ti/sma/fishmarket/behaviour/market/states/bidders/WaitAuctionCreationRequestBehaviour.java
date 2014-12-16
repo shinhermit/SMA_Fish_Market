@@ -11,10 +11,16 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
+/**
+ * A behavior which is to be associated with a state of the marker agent's FSM behaviour.
+ * 
+ * @author Josuah Aron
+ *
+ */
 public class WaitAuctionCreationRequestBehaviour extends Behaviour
 {
 	/** Tells whether this behavior is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone = false;
+	private boolean isDone;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -22,8 +28,10 @@ public class WaitAuctionCreationRequestBehaviour extends Behaviour
 	
 	/**
 	 * Creates a behavior which is to be associated with a MarketAgent FSMBehaviour's state.
-	 * @param myMarketAgent the market agent to which the composite FSM behavior
-	 * (which contains the state to which this behavior is associated) is added.
+	 * 
+	 * @param myMarketAgent
+	 * 			the market agent to which the composite FSM behavior
+	 * 			(which contains the state to which this behavior is associated) is added.
 	 */
 	public WaitAuctionCreationRequestBehaviour(MarketAgent myMarketAgent)
 	{
@@ -34,6 +42,8 @@ public class WaitAuctionCreationRequestBehaviour extends Behaviour
 	{
 		// Wait that myAgent receives message
 		this.block();
+		
+		this.isDone = false;
 		
 		// Create message filter (template)
 		MessageTemplate filter = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
