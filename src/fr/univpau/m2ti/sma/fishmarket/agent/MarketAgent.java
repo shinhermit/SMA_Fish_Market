@@ -5,12 +5,19 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 
 @SuppressWarnings("serial")
 public class MarketAgent extends Agent
 {
+	private boolean isDone = false;
+	
 	private static final Logger LOGGER =
 			Logger.getLogger(MarketAgent.class.getName());
 	
@@ -31,6 +38,9 @@ public class MarketAgent extends Agent
         }
         
         // Add behaviors
+        this.addBehaviour(new BidderManagementBehaviour(this));
+        this.addBehaviour(new SellerManagementBehaviour(this));
+        this.addBehaviour(new AuctionManagementBehaviour(this));
 	}
 	
 	@Override
@@ -48,6 +58,24 @@ public class MarketAgent extends Agent
         }
         
         super.takeDown();
+	}
+	
+	/**
+	 * Defines whether this agent reached a end state.
+	 * @param isDone true to tag this agent as a ended agent (which reached a ending state in his FSMBehaviour).
+	 */
+	public void setIsDone(boolean isDone)
+	{
+		this.isDone = isDone;
+	}
+	
+	/**
+	 * Tells whether this agent reached a end state or not.
+	 * @return true if this agent reached a end state in his FSMBehaviour, false otherwise.
+	 */
+	public boolean isDone()
+	{
+		return this.isDone;
 	}
     
     /**

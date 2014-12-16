@@ -4,14 +4,14 @@ import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import jade.core.behaviours.Behaviour;
 
 @SuppressWarnings("serial")
-public class SellerManagementBehaviour extends Behaviour
+public class BidderManagementBehaviour extends Behaviour
 {
-	public SellerManagementBehaviour(MarketAgent myMarketAgent)
+	public BidderManagementBehaviour(MarketAgent myMarketAgent)
 	{
 	}
 	
 	@Override
-	public void action() 
+	public void action()
 	{
 	}
 
@@ -23,5 +23,4 @@ public class SellerManagementBehaviour extends Behaviour
 		
 		return myMarketAgent.isDone();
 	}
-
 }

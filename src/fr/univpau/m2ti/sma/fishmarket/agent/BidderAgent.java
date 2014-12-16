@@ -13,7 +13,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 @SuppressWarnings("serial")
 public class BidderAgent extends Agent
 {
-	private AID marketAgent;
+	private AID marketAgentID;
 	
 	private static final Logger LOGGER =
 			Logger.getLogger(MarketAgent.class.getName());
@@ -22,6 +22,7 @@ public class BidderAgent extends Agent
 	protected void setup()
 	{
 		// Look up market
+		this.marketAgentID = this.lookupMarketAgent();
 	}
 	
 	@Override
@@ -30,11 +31,11 @@ public class BidderAgent extends Agent
 		// Un-suscribe auctions
 	}
     
-    /**
-     * Retrives the agents (AIDs) with which this agent needs to communicate.
-     * Searches for TravelAgency and ClientView agents
-     */
-    private AID getMarketAgent()
+	/**
+	 * Retrieves the AID of the market agent.
+	 * @return the AID of the market agent.
+	 */
+    private AID lookupMarketAgent()
     {
     	AID marketAgent = null;
     	
