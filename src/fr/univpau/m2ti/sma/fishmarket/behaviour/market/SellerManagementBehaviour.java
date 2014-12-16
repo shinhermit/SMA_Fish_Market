@@ -13,6 +13,9 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	private static final String STATE_RESPOND_AUCTION_CREATION_REQUEST =
 			"STATE_RESPOND_AUCTION_CREATION_REQUEST";
 	
+//	private static final int TRANSITION_REFUSE_AUCTION_CREATION_REQUEST = 0;
+//	private static final int TRANSITION_REFUSE_AUCTION_CREATION_REQUEST = 0;
+	
 	public SellerManagementBehaviour(MarketAgent myMarketAgent)
 	{
 		super(myMarketAgent);
@@ -24,5 +27,12 @@ public class SellerManagementBehaviour extends FSMBehaviour
 				STATE_RESPOND_AUCTION_CREATION_REQUEST);
 		
 		// Register transitions
+		this.registerDefaultTransition(STATE_WAIT_AUCTION_CREATION_REQUEST,
+				STATE_RESPOND_AUCTION_CREATION_REQUEST);
+		
+//		this.registerDefaultTransition(STATE_WAIT_AUCTION_CREATION_REQUEST,
+//				STATE_RESPOND_AUCTION_CREATION_REQUEST);
+//		this.registerDefaultTransition(STATE_WAIT_AUCTION_CREATION_REQUEST,
+//				STATE_RESPOND_AUCTION_CREATION_REQUEST);
 	}
 }
