@@ -1,19 +1,19 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
-import jade.core.Agent;
-
 @SuppressWarnings("serial")
-public class SellerAgent extends Agent
+public class SellerAgent extends AbstractMarketUser
 {
 	@Override
 	protected void setup()
 	{
 		// Look up market
+		super.setup();
 	}
 	
 	@Override
 	protected void takeDown()
 	{
-		// Calcel auctions
+		// Cancel auctions
+		super.takeDown();
 	}
 }
