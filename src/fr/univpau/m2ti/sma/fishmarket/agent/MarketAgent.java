@@ -33,7 +33,6 @@ public class MarketAgent extends Agent
         }
         catch (FIPAException ex)
         {
-            System.err.println("TravelAgency::setup : DF registration error. "+ex);
             MarketAgent.LOGGER.log(Level.SEVERE, null, ex);
         }
         
@@ -53,7 +52,6 @@ public class MarketAgent extends Agent
         }
         catch (FIPAException fe)
         {
-            System.err.println("TravelAgency::takeDown : DF de-registration error. "+fe);
             MarketAgent.LOGGER.log(Level.SEVERE, null, fe);
         }
         

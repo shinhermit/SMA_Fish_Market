@@ -61,7 +61,6 @@ public class BidderAgent extends Agent
         }
         catch (FIPAException fe)
         {
-            System.err.println("CasomClient::_searchDF : DF lookup error. "+fe.getLocalizedMessage());
             BidderAgent.LOGGER.log(Level.SEVERE, null, fe);
         }
         
