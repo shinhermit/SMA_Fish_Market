@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 
 @SuppressWarnings("serial")
 public class MarketAgent extends Agent
@@ -74,6 +75,11 @@ public class MarketAgent extends Agent
 	public boolean isDone()
 	{
 		return this.isDone;
+	}
+	
+	public void registerAuctionCreationRequest(Auction auction)
+	{
+		
 	}
     
     /**
