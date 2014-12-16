@@ -1,27 +1,28 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import jade.core.behaviours.Behaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.RespondAuctionCreationResquestState;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.WaitAuctionCreationRequestBehaviour;
+import jade.core.behaviours.FSMBehaviour;
 
 @SuppressWarnings("serial")
-public class SellerManagementBehaviour extends Behaviour
+public class SellerManagementBehaviour extends FSMBehaviour
 {
+	private static final String STATE_WAIT_AUCTION_CREATION_REQUEST =
+			"STATE_WAIT_AUCTION_CREATION_REQUEST";
+	private static final String STATE_RESPOND_AUCTION_CREATION_REQUEST =
+			"STATE_RESPOND_AUCTION_CREATION_REQUEST";
+	
 	public SellerManagementBehaviour(MarketAgent myMarketAgent)
 	{
-	}
-	
-	@Override
-	public void action() 
-	{
-	}
-
-	@Override
-	public boolean done()
-	{
-		MarketAgent myMarketAgent =
-				(MarketAgent) myAgent;
+		super(myMarketAgent);
 		
-		return myMarketAgent.isDone();
+		// Register states
+		this.registerFirstState(new WaitAuctionCreationRequestBehaviour(),
+				STATE_WAIT_AUCTION_CREATION_REQUEST);
+		this.registerState(new RespondAuctionCreationResquestState(),
+				STATE_RESPOND_AUCTION_CREATION_REQUEST);
+		
+		// Register transitions
 	}
-
 }
