@@ -1,10 +1,12 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -17,6 +19,9 @@ import jade.lang.acl.ACLMessage;
  */
 public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 {
+	/** The FSM behaviour to which this representative state is attached. */
+	private SellerManagementBehaviour myFSM;
+	
 	/** Allows logging. */
 	private static final Logger LOGGER =
 			Logger.getLogger(MarketAgent.class.getName());
@@ -28,8 +33,13 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 	 * @param myMarketAgent
 	 * 			the market agent of which FSM behavior's state this behavior is to be associated.
 	 */
-	public ConfirmAuctionCreationBehaviour(MarketAgent myMarketAgent)
+	public ConfirmAuctionCreationBehaviour(
+			MarketAgent myMarketAgent,
+			SellerManagementBehaviour myFSM)
 	{
+		super(myMarketAgent);
+		
+		this.myFSM = myFSM;
 	}
 	
 	@Override
@@ -37,16 +47,18 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.CONFIRM);
 		
-		MarketAgent myMarketAgent = (MarketAgent)myAgent;
-		
 		try
 		{
-			msg.setContentObject(myMarketAgent.getAuctionCreationRequest());
+			Auction auction =
+					this.myFSM.getAuctionCreationRequest();
+			
+			msg.addReceiver(auction.getSellerID());
+			msg.setContentObject(auction);
 			
 			// De-register auction request
-			myMarketAgent.registerAuctionCreationRequest(null);
+			this.myFSM.registerAuctionCreationRequest(null);
 			
-			myAgent.send(msg);
+			super.myAgent.send(msg);
 		}
 		catch (IOException e)
 		{

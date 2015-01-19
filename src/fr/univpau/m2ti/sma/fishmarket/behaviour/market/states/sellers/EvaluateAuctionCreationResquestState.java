@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
@@ -14,8 +14,11 @@ import jade.core.behaviours.OneShotBehaviour;
  */
 public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
 {
+	/** The FSM behaviour to which this representative state is attached. */
+	private SellerManagementBehaviour myFSM;
+	
 	/** Tells whether the creation of the auction is confirmed or not. */
-	private boolean isAuctionConfirmed;
+	private boolean isCreationAccepted;
 	
 	/**
 	 * Creates a behavior which is to be associated with a state of the 
@@ -24,8 +27,13 @@ public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
 	 * @param myMarketAgent
 	 * 			the market agent of which FSM behavior's state this behavior is to be associated.
 	 */
-	public EvaluateAuctionCreationResquestState(MarketAgent myMarketAgent)
+	public EvaluateAuctionCreationResquestState(
+			MarketAgent myMarketAgent,
+			SellerManagementBehaviour myFSM)
 	{
+		super(myMarketAgent);
+		
+		this.myFSM = myFSM;
 	}
 	
 	@Override
@@ -33,28 +41,30 @@ public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
 	{
 		MarketAgent myMarketAgent = (MarketAgent)myAgent;
 		
-		Auction auction = myMarketAgent.getAuctionCreationRequest();
+		Auction auction = this.myFSM.getAuctionCreationRequest();
 		
 		if(! myMarketAgent.isRegisteredAuction(auction))
 		{
 			myMarketAgent.registerAuction(auction);
 			
-			this.isAuctionConfirmed = true;
+			this.isCreationAccepted = true;
+			
+			// Do not de-register creation request: used later for confirmation message.
 		}
 		else
 		{
-			this.isAuctionConfirmed = false;
+			this.isCreationAccepted = false;
 			
 			// De-register auction creation request
-			myMarketAgent.registerAuctionCreationRequest(null);
+			this.myFSM.registerAuctionCreationRequest(null);
 		}
 	}
 	
 	@Override
 	public int onEnd()
 	{
-		return this.isAuctionConfirmed ?
-				SellerManagementBehaviour.TRANSITION_CONFIRM_AUCTION_CREATION :
-					SellerManagementBehaviour.TRANSITION_REFUSE_AUCTION_CREATION_REQUEST;
+		return this.isCreationAccepted ?
+				SellerManagementBehaviour.TRANSITION_CONFIRM_AUCTION_REGISTRATION :
+					SellerManagementBehaviour.TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST;
 	}
 }

@@ -25,9 +25,6 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
  */
 public class MarketAgent extends Agent
 {
-	/** Registers the last auction creation request. */
-	private Auction auctionCreationRequest;
-	
 	/** The set of registered auction. */
 	private Set<Auction> auctions;
 	
@@ -103,27 +100,6 @@ public class MarketAgent extends Agent
 	public boolean isDone()
 	{
 		return this.isDone;
-	}
-	
-	/**
-	 * Used in the auction creation behavior, register the request
-	 * for access by the other states of the behavior.
-	 * 
-	 * @param auction the requested auction.
-	 */
-	public void registerAuctionCreationRequest(Auction auction)
-	{
-		this.auctionCreationRequest = auction;
-	}
-	
-	/**
-	 * Used in the auction creation behavior, provides the last request auction creation.
-	 * 
-	 * @return the last requested auction.
-	 */
-	public Auction getAuctionCreationRequest()
-	{
-		return this.auctionCreationRequest;
 	}
 	
 	/**
