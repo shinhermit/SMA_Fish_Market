@@ -61,16 +61,17 @@ public class MarketAgent extends Agent
             MarketAgent.LOGGER.log(Level.SEVERE, null, ex);
         }
         
-        // Add behaviors
+        // Add behaviours
         this.addBehaviour(new BidderManagementBehaviour(this));
         this.addBehaviour(new SellerManagementBehaviour(this));
-//        this.addBehaviour(new AuctionManagementBehaviour(this)); // TODO : add in seller management behaviour (auction registration)
+        // Auction management behaviour are add by SellerManagementBehaviour
+        // sub-behaviour (confirm auction registration behaviour)
 	}
 	
 	@Override
 	protected void takeDown()
 	{
-		// De-register service from DF
+		// Unregister service from DF
         try
         {
             DFService.deregister(this);

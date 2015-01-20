@@ -61,7 +61,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		super(myMarketAgent);
 		
 		// Register states
-		// TODO: The last state must call myMarketAgent.setIsDone(true);	
+		// The last state must call myMarketAgent.setIsDone(true);	
 		this.registerFirstState(new WaitRegistrationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
 		
