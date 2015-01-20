@@ -71,6 +71,8 @@ public class ConfirmSubscriptionBehaviour extends OneShotBehaviour
 		reply.setPerformative(
 				FishMarket.Performatives.CONFIRM_BIDDER_SUBSCRIPTION);
 		
+		reply.addReceiver(sellerAID); // also notify the seller (he can now start to announce).
+		
 		try
 		{
 			reply.setContentObject((AID)mess.getContentObject());

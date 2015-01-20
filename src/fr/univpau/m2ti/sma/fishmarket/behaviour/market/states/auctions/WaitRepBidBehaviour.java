@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.ServiceException;
@@ -80,18 +78,44 @@ public class WaitRepBidBehaviour extends Behaviour
 			
 			this.isDone = true;
 			
-			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
+			int performative = mess.getPerformative();
+			
+			if( performative ==
+					FishMarket.Performatives.REP_BID)
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
+						AuctionManagementBehaviour.TRANSITION_REP_BID_NOK_RECEIVED;
+				
+				Object content = mess.getContent();
+				
+				if(content != null)
+				{
+					if(content instanceof AID) // REP_BID(OK) == REP_BID(selectedBidderAID)
+					{
+						AID selectedBidder = (AID) content;
+						
+						this.myFSM.setSelectedBidder(selectedBidder);
+						
+						this.transition =
+								AuctionManagementBehaviour.TRANSITION_REP_BID_OK_RECEIVED;
+					}
+				}
 			}
-			else
+			
+			else if(performative ==
+					FishMarket.Performatives.TO_BID)
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+						AuctionManagementBehaviour
+						.TRANSITION_TO_BID_RECEIVED;
+			}
+			
+			else if(performative ==
+					FishMarket.Performatives.AUCTION_CANCELLED)
+			{
+				this.transition =
+						AuctionManagementBehaviour
+						.TRANSITION_AUCTION_CANCELLED_RECEIVED;
 			}
 		}
 	}
@@ -99,15 +123,13 @@ public class WaitRepBidBehaviour extends Behaviour
 	@Override
 	public boolean done()
 	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		return isDone;
 	}
 
 	@Override
 	public int onEnd()
 	{
-		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
-					this.transition;
+		return this.transition;
 	}
 
 	/**
@@ -136,9 +158,12 @@ public class WaitRepBidBehaviour extends Behaviour
 					MessageTemplate.MatchTopic(topic),
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_AUCTION_LIST),
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+									FishMarket.Performatives.REP_BID),
+							MessageTemplate.or(
+									MessageTemplate.MatchPerformative(
+											FishMarket.Performatives.TO_BID),
+									MessageTemplate.MatchPerformative(
+											FishMarket.Performatives.AUCTION_CANCELLED))));
 		}
 		catch (ServiceException e)
 		{

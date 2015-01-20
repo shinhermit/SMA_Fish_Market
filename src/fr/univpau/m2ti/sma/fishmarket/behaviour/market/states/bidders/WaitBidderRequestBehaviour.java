@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.ServiceException;
@@ -105,7 +104,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	public int onEnd()
 	{
 		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
+				BidderManagementBehaviour.TRANSITION_USER_TERMINATE :
 					this.transition;
 	}
 

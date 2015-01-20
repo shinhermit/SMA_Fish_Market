@@ -1,13 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -22,10 +17,6 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private AuctionManagementBehaviour myFSM;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(RelayToAnnounceBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -47,20 +38,27 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		MarketAgent myMarketAgent = (MarketAgent)
+				super.myAgent;
 		
-		ACLMessage reply = this.myFSM.getRequest().createReply();
+		ACLMessage toRelay = this.myFSM.getRequest();
 		
-		try
+		toRelay.clearAllReceiver();
+		
+		// Put back message topic
+		toRelay.addReceiver(this.myFSM.getTopic());
+		
+		// Add all subscribers as receivers
+		for(AID subscriber : myMarketAgent.getSubscribers(
+				this.myFSM.getSeller()))
 		{
-			reply.setContentObject(
-					(HashSet<Auction>)
-					((MarketAgent)myAgent).getRegisteredAuctions());
-			
-			myAgent.send(reply);
+			toRelay.addReceiver(subscriber);
 		}
-		catch (IOException e)
-		{
-			RelayToAnnounceBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
+		
+		// Send
+		myMarketAgent.send(toRelay);
+		
+		// delete request
+		this.myFSM.setRequest(null);
 	}
 }

@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.ServiceException;
@@ -81,17 +79,24 @@ public class WaitToBidBehaviour extends Behaviour
 			this.isDone = true;
 			
 			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
+					FishMarket.Performatives.TO_BID)
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
+						AuctionManagementBehaviour
+						.TRANSITION_TO_BID_RECEIVED;
+			}
+			else if(mess.getPerformative() ==
+					FishMarket.Performatives.TO_ANNOUNCE)
+			{
+				this.transition =
+						AuctionManagementBehaviour
+						.TRANSITION_TO_ANNOUNCE_RECEIVED;
 			}
 			else
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+						AuctionManagementBehaviour
+						.TRANSITION_AUCTION_CANCELLED_RECEIVED;
 			}
 		}
 	}
@@ -99,15 +104,13 @@ public class WaitToBidBehaviour extends Behaviour
 	@Override
 	public boolean done()
 	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		return this.isDone;
 	}
 
 	@Override
 	public int onEnd()
 	{
-		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
-					this.transition;
+		return this.transition;
 	}
 
 	/**
@@ -136,9 +139,12 @@ public class WaitToBidBehaviour extends Behaviour
 					MessageTemplate.MatchTopic(topic),
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_AUCTION_LIST),
+									FishMarket.Performatives.TO_BID),
+							MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+									FishMarket.Performatives.TO_ANNOUNCE),
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.AUCTION_CANCELLED))));
 		}
 		catch (ServiceException e)
 		{

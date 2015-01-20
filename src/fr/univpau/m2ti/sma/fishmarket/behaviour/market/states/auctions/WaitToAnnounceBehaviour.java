@@ -5,8 +5,6 @@ import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.ServiceException;
@@ -29,9 +27,6 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
-	
-	/** Will hold the selected transition among those to the next possible states. */
-	private int transition;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -79,20 +74,6 @@ public class WaitToAnnounceBehaviour extends Behaviour
 			this.myFSM.setRequest(mess);
 			
 			this.isDone = true;
-			
-			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
-			{
-				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
-			}
-			else
-			{
-				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
-			}
 		}
 	}
 
@@ -100,14 +81,6 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	public boolean done()
 	{
 		return isDone || ((MarketAgent)myAgent).isDone();
-	}
-
-	@Override
-	public int onEnd()
-	{
-		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
-					this.transition;
 	}
 
 	/**
@@ -119,8 +92,8 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	{
 		MessageTemplate filter = null;
 		
-		// Create message filter
 		TopicManagementHelper topicHelper;
+		
 		try
 		{
 			topicHelper = (TopicManagementHelper) myAgent.getHelper(
@@ -134,11 +107,8 @@ public class WaitToAnnounceBehaviour extends Behaviour
 			
 			filter = MessageTemplate.and(
 					MessageTemplate.MatchTopic(topic),
-					MessageTemplate.or(
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_AUCTION_LIST),
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+					MessageTemplate.MatchPerformative(
+							FishMarket.Performatives.TO_ANNOUNCE));
 		}
 		catch (ServiceException e)
 		{

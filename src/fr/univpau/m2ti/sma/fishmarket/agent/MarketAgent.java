@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
@@ -207,6 +206,18 @@ public class MarketAgent extends Agent
 				this.auctions.get(new Auction(sellerAID));
 		
 		return suscribers.contains(bidderAID);
+	}
+	
+	/**
+	 * Provides the subscribers of an auction.
+	 * 
+	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * 
+	 * @return the list of subscribers for the given auction.
+	 */
+	public Set<AID> getSubscribers(AID sellerAID)
+	{
+		return this.auctions.get(new Auction(sellerAID));
 	}
     
     /**

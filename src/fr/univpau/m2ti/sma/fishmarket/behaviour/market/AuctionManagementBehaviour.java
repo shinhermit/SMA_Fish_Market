@@ -1,9 +1,15 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions.*;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
+import jade.core.ServiceException;
 import jade.core.behaviours.FSMBehaviour;
+import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -25,6 +31,19 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	
 	/** Holds the last auction creation request. */
 	private ACLMessage request;
+
+	/** The topic of the conversations managed by this behaviour. */
+	private final AID topic;
+	
+	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
+	public static final long BID_WAIT_DELAY = 10000; // 10 sec
+	
+	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
+	public static final long CANCELLETION_WAIT_DELAY = 500; // 0.5 sec
+	
+	/** Allows logging. */
+	private static final Logger LOGGER =
+			Logger.getLogger(AuctionManagementBehaviour.class.getName());
 	
 	/** The state in which the agent waits for a first announcement from the seller. */
 	private static final String STATE_WAIT_TO_ANNOUNCE =
@@ -108,7 +127,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	public static final int TRANSITION_AUCTION_CANCELLED_RECEIVED;
 	
 	/** Return code to activates the appropriate transitions when <i>auction_cancelled</i> is received. */
-	public static final int TRANSITION_AUCTION_CANCELLED_NOT_RECEIVED;
+	public static final int TRANSITION_TO_BID_RELAYED;
 	
 	/** Return code to activates the appropriate transitions when <i>rep_bid_ok</i> is received. */
 	public static final int TRANSITION_REP_BID_OK_RECEIVED;
@@ -123,7 +142,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		TRANSITION_TO_ANNOUNCE_RECEIVED = ++start;
 		TRANSITION_TO_BID_RECEIVED = ++start;
 		TRANSITION_AUCTION_CANCELLED_RECEIVED = ++start;
-		TRANSITION_AUCTION_CANCELLED_NOT_RECEIVED = ++start;
+		TRANSITION_TO_BID_RELAYED = ++start;
 		TRANSITION_REP_BID_OK_RECEIVED = ++start;
 		TRANSITION_REP_BID_NOK_RECEIVED = ++start;
 	}
@@ -142,8 +161,9 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		
 		this.mySeller = mySeller;
 		
+		this.topic = this.createTopic();
+		
 		// Register states
-		// TODO: The last states must call myMarketAgent.setIsDone(true);
 		this.registerFirstState(new WaitToAnnounceBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_ANNOUNCE);
 		
@@ -252,7 +272,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_RELAY_TO_BID,
 				STATE_WAIT_REP_BID,
-				TRANSITION_AUCTION_CANCELLED_NOT_RECEIVED);
+				TRANSITION_TO_BID_RELAYED);
 		
 		this.registerTransition(STATE_RELAY_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
@@ -320,5 +340,38 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	public void setSelectedBidder(AID selectedBidder)
 	{
 		this.selectedBidder = selectedBidder;
+	}
+	
+	/**
+	 * 
+	 * @return the topic of the conversation which are managed by this FSM behaviour.
+	 */
+	public AID getTopic()
+	{
+		return this.topic;
+	}
+	
+	/**
+	 * Creates the topic of the conversation which are managed by this FSM behaviour.
+	 * 
+	 * @return the topic of the conversation which are managed by this FSM behaviour.
+	 */
+	private final AID createTopic()
+	{
+		TopicManagementHelper topicHelper = null;
+		
+		try
+		{
+			topicHelper =
+					(TopicManagementHelper) super.myAgent.getHelper(
+							TopicManagementHelper.SERVICE_NAME);
+		}
+		catch (ServiceException e)
+		{
+			AuctionManagementBehaviour.LOGGER.log(Level.SEVERE, null, e);
+		}
+		
+		return topicHelper.createTopic(
+				FishMarket.Topics.TOPIC_AUCTION_MANAGEMENT);
 	}
 }
