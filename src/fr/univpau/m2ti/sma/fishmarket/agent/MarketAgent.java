@@ -26,7 +26,7 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 public class MarketAgent extends Agent
 {
 	/** The set of registered auction. */
-	private Set<Auction> auctions;
+	private Set<Auction> auctions = new HashSet<Auction>();
 	
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
@@ -42,9 +42,7 @@ public class MarketAgent extends Agent
 	 * Creates a market agent for a fish market protocol.
 	 */
 	public MarketAgent()
-	{
-		this.auctions = new HashSet<Auction>();
-	}
+	{}
 	
 	@Override
 	protected void setup()
@@ -127,9 +125,19 @@ public class MarketAgent extends Agent
 		}
 	}
 	
+	/**
+	 * Registers a new auction.
+	 * 
+	 * @param auction the auction which is to be registered.
+	 */
 	public void registerAuction(Auction auction)
 	{
 		this.auctions.add(auction);
+	}
+	
+	public Set<Auction> getRegisteredAuctions()
+	{
+		return new HashSet<Auction>(this.auctions);
 	}
     
     /**

@@ -2,15 +2,15 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmAuctionCreationBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateAuctionCreationResquestState;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagement;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateCreationResquestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitAuctionCreationRequestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import jade.core.behaviours.FSMBehaviour;
 
 @SuppressWarnings("serial")
 /**
- * The FSM behavior of the market agent.
+ * The FSM behaviour of the market agent which is responsible of handling seller's auction creation requests.
  * 
  * @author Josuah Aron
  *
@@ -36,7 +36,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	private static final String STATE_TERMINATE =
 			"STATE_TERMINATE";
 	
-	/** Return code which activates the transition to evaluate an auction creation request. */
+	/** Return code which activates the transition to evaluate an auction registration request. */
 	public static final int TRANSITION_AUCTION_REQUEST_RECEIVED = 0;
 	
 	/** Return code which activates the transition to terminate this finite state machine. */
@@ -46,7 +46,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	 * the last evaluation resulted in a reject. */
 	public static final int TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST = 2;
 	
-	/** Return code which activates the transition to confirm the creation of a new auction
+	/** Return code which activates the transition to confirm the registration of a new auction
 	 * after the last evaluation resulted in an approval. */
 	public static final int TRANSITION_CONFIRM_AUCTION_REGISTRATION = 3;
 	
@@ -63,11 +63,14 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		// Register states
 		this.registerFirstState(new WaitAuctionCreationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
-		this.registerState(new EvaluateAuctionCreationResquestState(myMarketAgent, this),
+		
+		this.registerState(new EvaluateCreationResquestBehaviour(myMarketAgent, this),
 				STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST);
+		
 		this.registerState(new ConfirmAuctionCreationBehaviour(myMarketAgent, this),
 				STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST);
-		this.registerLastState(new TerminateSellerManagement(myMarketAgent),
+		
+		this.registerLastState(new TerminateSellerManagementBehaviour(myMarketAgent),
 				STATE_TERMINATE);
 		
 		// Register transitions
@@ -97,7 +100,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	 * 
 	 * @param auction the requested auction.
 	 */
-	public void registerAuctionCreationRequest(Auction auction)
+	public void setAuctionCreationRequest(Auction auction)
 	{
 		this.auctionCreationRequest = auction;
 	}

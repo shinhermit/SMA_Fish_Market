@@ -28,7 +28,7 @@ public class WaitAuctionCreationRequestBehaviour extends Behaviour
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(MarketAgent.class.getName());
+			Logger.getLogger(EvaluateCreationResquestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -36,6 +36,7 @@ public class WaitAuctionCreationRequestBehaviour extends Behaviour
 	 * @param myMarketAgent
 	 * 			the market agent to which the composite FSM behaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
+	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
 	public WaitAuctionCreationRequestBehaviour(
 			MarketAgent myMarketAgent,
@@ -67,7 +68,7 @@ public class WaitAuctionCreationRequestBehaviour extends Behaviour
 			
 			if(content instanceof Auction)
 			{
-				this.myFSM.registerAuctionCreationRequest(
+				this.myFSM.setAuctionCreationRequest(
 						(Auction)content);
 				
 				this.isDone = true;

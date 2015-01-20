@@ -7,12 +7,12 @@ import jade.core.behaviours.OneShotBehaviour;
 
 @SuppressWarnings("serial")
 /**
- * A behavior which is to be associated with a state of the marker agent's FSM behaviour.
+ * A behaviour which is to be associated with a state of the marker agent's FSM behaviour.
  * 
  * @author Josuah Aron
  *
  */
-public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
+public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -21,13 +21,14 @@ public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
 	private boolean isCreationAccepted;
 	
 	/**
-	 * Creates a behavior which is to be associated with a state of the 
-	 * market agent's FSM behavior.
+	 * Creates a behaviour which is to be associated with a state of the 
+	 * market agent's FSM behaviour.
 	 * 
 	 * @param myMarketAgent
-	 * 			the market agent of which FSM behavior's state this behavior is to be associated.
+	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
+	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public EvaluateAuctionCreationResquestState(
+	public EvaluateCreationResquestBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -56,7 +57,7 @@ public class EvaluateAuctionCreationResquestState extends OneShotBehaviour
 			this.isCreationAccepted = false;
 			
 			// De-register auction creation request
-			this.myFSM.registerAuctionCreationRequest(null);
+			this.myFSM.setAuctionCreationRequest(null);
 		}
 	}
 	

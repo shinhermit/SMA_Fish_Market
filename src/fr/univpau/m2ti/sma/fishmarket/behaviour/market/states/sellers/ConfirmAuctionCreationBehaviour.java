@@ -24,14 +24,15 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(MarketAgent.class.getName());
+			Logger.getLogger(ConfirmAuctionCreationBehaviour.class.getName());
 	
 	/**
-	 * Creates a behavior which is to be associated with a state of the 
-	 * market agent's FSM behavior.
+	 * Creates a behaviour which is to be associated with a state of the 
+	 * market agent's FSM behaviour.
 	 * 
 	 * @param myMarketAgent
-	 * 			the market agent of which FSM behavior's state this behavior is to be associated.
+	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
+	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
 	public ConfirmAuctionCreationBehaviour(
 			MarketAgent myMarketAgent,
@@ -56,7 +57,7 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 			msg.setContentObject(auction);
 			
 			// De-register auction request
-			this.myFSM.registerAuctionCreationRequest(null);
+			this.myFSM.setAuctionCreationRequest(null);
 			
 			super.myAgent.send(msg);
 		}

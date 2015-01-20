@@ -10,7 +10,7 @@ import jade.core.behaviours.OneShotBehaviour;
  * @author Josuah Aron
  *
  */
-public class TerminateSellerManagement extends OneShotBehaviour
+public class TerminateSellerManagementBehaviour extends OneShotBehaviour
 {
 	/**
 	 * Creates a terminating behaviour which is to be associated with a state of the 
@@ -19,7 +19,7 @@ public class TerminateSellerManagement extends OneShotBehaviour
 	 * @param myMarketAgent
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 */
-	public TerminateSellerManagement(MarketAgent myMarketAgent)
+	public TerminateSellerManagementBehaviour(MarketAgent myMarketAgent)
 	{
 		super(myMarketAgent);
 	}
