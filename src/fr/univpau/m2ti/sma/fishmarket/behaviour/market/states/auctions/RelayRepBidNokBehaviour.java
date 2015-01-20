@@ -46,7 +46,8 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 		toRelay.clearAllReceiver();
 		
 		// Put back message topic
-		toRelay.addReceiver(this.myFSM.getTopic());
+		toRelay.addReceiver(
+				AuctionManagementBehaviour.MESSAGE_TOPIC);
 		
 		for(AID subscriber : myMarketAgent.getSubscribers(
 				this.myFSM.getSeller()))

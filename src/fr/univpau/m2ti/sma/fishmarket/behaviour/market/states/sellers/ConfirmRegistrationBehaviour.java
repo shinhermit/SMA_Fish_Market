@@ -78,6 +78,9 @@ public class ConfirmRegistrationBehaviour extends OneShotBehaviour
 		ACLMessage reply = msg.createReply();
 		reply.setPerformative(
 				FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION);
+		reply.setConversationId(
+				AuctionManagementBehaviour.createConversationId(
+						msg.getSender()));
 		
 		myMarketAgent.send(reply);
 	}

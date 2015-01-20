@@ -1,15 +1,11 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions.*;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
-import jade.core.ServiceException;
 import jade.core.behaviours.FSMBehaviour;
-import jade.core.messaging.TopicManagementHelper;
+import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -26,6 +22,9 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	/** The AID of the seller agent who created the auction which is managed by this behaviour. */
 	private final AID mySeller;
 	
+	/** The ID of the conversation associated with the auction that this behaviour manages. */
+	private final String conversationId;
+	
 	/** The AID of the bidder to which the fish supply has been attributed. */
 	private AID selectedBidder = null;
 	
@@ -33,17 +32,14 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	private ACLMessage request;
 
 	/** The topic of the conversations managed by this behaviour. */
-	private final AID topic;
+	public static final AID MESSAGE_TOPIC = TopicUtility.createTopic(
+			FishMarket.Topics.TOPIC_AUCTION_MANAGEMENT);
 	
 	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
 	public static final long BID_WAIT_DELAY = 10000; // 10 sec
 	
 	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
 	public static final long CANCELLETION_WAIT_DELAY = 500; // 0.5 sec
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(AuctionManagementBehaviour.class.getName());
 	
 	/** The state in which the agent waits for a first announcement from the seller. */
 	private static final String STATE_WAIT_TO_ANNOUNCE =
@@ -161,7 +157,9 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		
 		this.mySeller = mySeller;
 		
-		this.topic = this.createTopic();
+		this.conversationId =
+				AuctionManagementBehaviour.createConversationId(
+						this.mySeller);
 		
 		// Register states
 		this.registerFirstState(new WaitToAnnounceBehaviour(myMarketAgent, this),
@@ -341,37 +339,25 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	{
 		this.selectedBidder = selectedBidder;
 	}
-	
+
 	/**
 	 * 
-	 * @return the topic of the conversation which are managed by this FSM behaviour.
+	 * @return the ID of the conversation associated with the auction that this behaviour manages.
 	 */
-	public AID getTopic()
+	public String getConversationId()
 	{
-		return this.topic;
+		return conversationId;
 	}
 	
 	/**
-	 * Creates the topic of the conversation which are managed by this FSM behaviour.
+	 * Creates a unique conversation id based on the AID of the seller agent which initiated and auction.
 	 * 
-	 * @return the topic of the conversation which are managed by this FSM behaviour.
+	 * @param sellerAID AID of the seller agent which initiated and auction.
+	 * 
+	 * @return a conversation if for the auction.
 	 */
-	private final AID createTopic()
+	public static String createConversationId(AID sellerAID)
 	{
-		TopicManagementHelper topicHelper = null;
-		
-		try
-		{
-			topicHelper =
-					(TopicManagementHelper) super.myAgent.getHelper(
-							TopicManagementHelper.SERVICE_NAME);
-		}
-		catch (ServiceException e)
-		{
-			AuctionManagementBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
-		
-		return topicHelper.createTopic(
-				FishMarket.Topics.TOPIC_AUCTION_MANAGEMENT);
+		return sellerAID.toString();
 	}
 }
