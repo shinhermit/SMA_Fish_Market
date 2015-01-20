@@ -34,7 +34,7 @@ public class FishMarket
 		public static final int REFUSE_AUCTION_SUBSCRIPTION = ACLMessage.REFUSE;
 		
 		/** Confirms the subscription to an auction, from the market agent to a bidder agent. */
-		public static final int CONFIRM_AUCTION_SUBSCRIPTION = ACLMessage.INFORM;
+		public static final int CONFIRM_BIDDER_SUBSCRIPTION = ACLMessage.INFORM;
 		
 		/** Announces a price for a fish supply, from a seller agent to the market agent, or the market agent to a bidder agent. */
 		public static final int TO_ANNOUNCE = ACLMessage.CFP;

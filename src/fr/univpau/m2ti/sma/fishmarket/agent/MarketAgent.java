@@ -1,12 +1,16 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +30,8 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 public class MarketAgent extends Agent
 {
 	/** The set of registered auction. */
-	private Set<Auction> auctions = new HashSet<Auction>();
+	private Map<Auction, Set<AID>> auctions =
+			new HashMap<Auction, Set<AID>>();
 	
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
@@ -114,7 +119,7 @@ public class MarketAgent extends Agent
 			return false;
 		}
 		
-		else if(this.auctions.contains(auction))
+		else if(this.auctions.keySet().contains(auction))
 		{
 			return true;
 		}
@@ -132,12 +137,76 @@ public class MarketAgent extends Agent
 	 */
 	public void registerAuction(Auction auction)
 	{
-		this.auctions.add(auction);
+		this.auctions.put(auction, new HashSet<AID>());
 	}
 	
+	/**
+	 * 
+	 * @return the list registered auction.
+	 */
 	public Set<Auction> getRegisteredAuctions()
 	{
-		return new HashSet<Auction>(this.auctions);
+		return new HashSet<Auction>(this.auctions.keySet());
+	}
+	
+	/**
+	 * Retrieves a registered auction by the AID the the seller who created it.
+	 * 
+	 * @param sellerAID the AID the the seller who created the looked-up auction (uniquely identifies the auction).
+	 * 
+	 * @return the looked-up auction if found, null otherwise.
+	 */
+	public Auction findAuction(AID sellerAID)
+	{
+		Auction auction = null;
+		boolean found = false;
+		
+		Iterator<Auction> it =
+				this.auctions.keySet().iterator();
+		
+		while(it.hasNext() && !found)
+		{
+			auction = it.next();
+			
+			found = auction.getSellerID().equals(sellerAID);
+		}
+		
+		if(!found)
+		{
+			auction = null;
+		}
+		
+		return auction;
+	}
+	
+	/**
+	 * Adds an agent to the set of registered bidder for an auction.
+	 * 
+	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param bidderAID the AID of the bidder agent who wants to subscribe to the auction.
+	 */
+	public void addSuscriber(AID sellerAID, AID bidderAID)
+	{
+		Set<AID> suscribers =
+				this.auctions.get(new Auction(sellerAID));
+		
+		suscribers.add(bidderAID);
+	}
+	
+	/**
+	 * Tells whether a bidder agent is a subscriber on an auction.
+	 * 
+	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param bidderAID the AID of the bidder agent which is checked.
+	 * 
+	 * @return true if the bidder agent is found in the subscriber list of the auction represented by it's seller AID.
+	 */
+	public boolean isSuscriber(AID sellerAID, AID bidderAID)
+	{
+		Set<AID> suscribers =
+				this.auctions.get(new Auction(sellerAID));
+		
+		return suscribers.contains(bidderAID);
 	}
     
     /**

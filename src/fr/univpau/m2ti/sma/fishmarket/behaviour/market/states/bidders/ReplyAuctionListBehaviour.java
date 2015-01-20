@@ -12,6 +12,12 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
+/**
+ * A behaviour which is to be associated with a state of the market agent's FSM behaviour.
+ * 
+ * @author Josuah Aron
+ *
+ */
 public class ReplyAuctionListBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */

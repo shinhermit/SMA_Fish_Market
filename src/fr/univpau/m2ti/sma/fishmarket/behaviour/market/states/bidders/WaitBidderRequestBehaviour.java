@@ -16,7 +16,7 @@ import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 /**
- * A behaviour which is to be associated with a state of the marker agent's FSM behaviour.
+ * A behaviour which is to be associated with a state of the market agent's FSM behaviour.
  * 
  * @author Josuah Aron
  *
