@@ -28,7 +28,7 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 	/** Return code which activates the transition to wait for an auction list. */
 	public static final int TRANSITION_REQUEST_AUCTION_LIST;
 
-	/** Return code which activates the transition to the state where auction subscriptions are sent. */
+	/** Return code which activates the transition to the state where auctions are picked. */
 	public static final int TRANSITION_AUCTION_LIST_RECEIVED;
 
 	/** Return code which activates the transition to wait for a subscription response. */
@@ -51,6 +51,8 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 
 	/** Used to pass the auction list to pick auctions from.  */
 	private ACLMessage request;
+
+	private AID lastSubscribedAuction;
 
 	private Set<AID> subscribedAuctions = new HashSet<AID>();
 
@@ -167,6 +169,11 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 				SubsribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
 		);
 
+		this.registerDefaultTransition(
+				STATE_CREATE_BIDDER_FSM,
+				STATE_PICK_AUCTION
+		);
+
 		//transitions to subscription process end
 		this.registerTransition(
 				STATE_SUBSCRIPTION_PROCESS_START,
@@ -222,5 +229,15 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 	public boolean hasSubscribedToAuction(AID seller)
 	{
 		return this.subscribedAuctions.contains(seller);
+	}
+
+	public void setLastSubscribedAuction(AID auction)
+	{
+		this.lastSubscribedAuction = auction;
+	}
+
+	public AID getLastSubscribedAuction()
+	{
+		return this.lastSubscribedAuction;
 	}
 }
