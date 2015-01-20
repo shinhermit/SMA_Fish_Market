@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
@@ -69,10 +70,17 @@ public class ConfirmRegistrationBehaviour extends OneShotBehaviour
 		// Register auction
 		myMarketAgent.registerAuction(auction);
 		
+		// Create FSM Behaviour to manage the auction
+		myMarketAgent.addBehaviour(
+				new AuctionManagementBehaviour(myMarketAgent, msg.getSender()));
+		
 		// Send reply
 		ACLMessage reply = msg.createReply();
 		reply.setPerformative(
 				FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION);
+		reply.setConversationId(
+				AuctionManagementBehaviour.createConversationId(
+						msg.getSender()));
 		
 		myMarketAgent.send(reply);
 	}

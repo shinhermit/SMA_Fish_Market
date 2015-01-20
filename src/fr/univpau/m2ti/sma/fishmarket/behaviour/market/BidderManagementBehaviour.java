@@ -103,6 +103,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 		super(myMarketAgent);
 		
 		// Register states
+		// The last state should call myMarketAgent.setIsDone(true);	
 		this.registerFirstState(new WaitBidderRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_BIDDER_REQUEST);
 		

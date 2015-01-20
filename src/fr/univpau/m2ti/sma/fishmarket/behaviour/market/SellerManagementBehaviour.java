@@ -61,6 +61,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		super(myMarketAgent);
 		
 		// Register states
+		// The last state must call myMarketAgent.setIsDone(true);	
 		this.registerFirstState(new WaitRegistrationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
 		
@@ -95,8 +96,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	}
 	
 	/**
-	 * Used in the auction creation behaviour, register the request
-	 * for access by the other states of the behaviour.
+	 * Maintains the provided request (considered as the last received).
 	 * 
 	 * @param auction the request.
 	 */
@@ -106,7 +106,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	}
 	
 	/**
-	 * Used in the auction creation behaviour, provides the last request auction creation.
+	 * Provides the last received request.
 	 * 
 	 * @return the last request.
 	 */

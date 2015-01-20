@@ -1,11 +1,9 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -16,10 +14,10 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitBidderRequestBehaviour extends Behaviour
+public class WaitToBidBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderManagementBehaviour myFSM;
+	private AuctionManagementBehaviour myFSM;
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
@@ -28,23 +26,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	private int transition;
 	
 	/** Allows filtering incoming messages. */
-	private static final MessageTemplate MESSAGE_FILTER;
-	
-	static
-	{
-		final AID topic =
-				TopicUtility.createTopic(
-						FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
-		
-		MESSAGE_FILTER =
-				MessageTemplate.and(
-						MessageTemplate.MatchTopic(topic),
-						MessageTemplate.or(
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.REQUEST_AUCTION_LIST),
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
-	}
+	private final MessageTemplate messageFilter;
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -54,13 +36,15 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public WaitBidderRequestBehaviour(
+	public WaitToBidBehaviour(
 			MarketAgent myMarketAgent,
-			BidderManagementBehaviour myFSM)
+			AuctionManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
 		this.myFSM = myFSM;
+		
+		this.messageFilter = this.createMessageFilter();
 	}
 	
 	@Override
@@ -76,7 +60,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
-				WaitBidderRequestBehaviour.MESSAGE_FILTER);
+				this.messageFilter);
 		
 		if(mess != null)
 		{
@@ -85,17 +69,24 @@ public class WaitBidderRequestBehaviour extends Behaviour
 			this.isDone = true;
 			
 			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
+					FishMarket.Performatives.TO_BID)
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
+						AuctionManagementBehaviour
+						.TRANSITION_TO_BID_RECEIVED;
+			}
+			else if(mess.getPerformative() ==
+					FishMarket.Performatives.TO_ANNOUNCE)
+			{
+				this.transition =
+						AuctionManagementBehaviour
+						.TRANSITION_TO_ANNOUNCE_RECEIVED;
 			}
 			else
 			{
 				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+						AuctionManagementBehaviour
+						.TRANSITION_AUCTION_CANCELLED_RECEIVED;
 			}
 		}
 	}
@@ -103,14 +94,35 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	@Override
 	public boolean done()
 	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		return this.isDone;
 	}
 
 	@Override
 	public int onEnd()
 	{
-		return ((MarketAgent)myAgent).isDone() ?
-				BidderManagementBehaviour.TRANSITION_USER_TERMINATE :
-					this.transition;
+		return this.transition;
+	}
+	
+	/**
+	 * Creates a filter for incoming message.
+	 * 
+	 * @return the filter for incoming messages.
+	 */
+	private MessageTemplate createMessageFilter()
+	{
+		return MessageTemplate.and(
+						MessageTemplate.MatchTopic(
+								AuctionManagementBehaviour.MESSAGE_TOPIC),
+						MessageTemplate.and(
+								MessageTemplate.MatchConversationId(
+										this.myFSM.getConversationId()),
+										MessageTemplate.or(
+												MessageTemplate.MatchPerformative(
+														FishMarket.Performatives.TO_BID),
+												MessageTemplate.or(
+												MessageTemplate.MatchPerformative(
+														FishMarket.Performatives.TO_ANNOUNCE),
+												MessageTemplate.MatchPerformative(
+														FishMarket.Performatives.AUCTION_CANCELLED)))));
 	}
 }

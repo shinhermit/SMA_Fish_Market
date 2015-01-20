@@ -27,6 +27,7 @@ public class TerminateSellerManagementBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		((MarketAgent)super.myAgent).setIsDone(true);
 		// Say bye !
 	}
 }

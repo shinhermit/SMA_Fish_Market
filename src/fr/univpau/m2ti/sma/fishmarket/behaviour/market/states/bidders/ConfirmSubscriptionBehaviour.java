@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -70,10 +71,15 @@ public class ConfirmSubscriptionBehaviour extends OneShotBehaviour
 		// Reply confirm
 		reply.setPerformative(
 				FishMarket.Performatives.CONFIRM_BIDDER_SUBSCRIPTION);
+		reply.setConversationId(
+				AuctionManagementBehaviour.createConversationId(
+						sellerAID));
+		
+		reply.addReceiver(sellerAID); // also notify the seller (he can now start to announce).
 		
 		try
 		{
-			reply.setContentObject((AID)mess.getContentObject());
+			reply.setContentObject(sellerAID);
 		}
 		catch (Exception e)
 		{
