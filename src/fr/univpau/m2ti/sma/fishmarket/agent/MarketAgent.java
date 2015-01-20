@@ -65,7 +65,7 @@ public class MarketAgent extends Agent
         // Add behaviors
         this.addBehaviour(new BidderManagementBehaviour(this));
         this.addBehaviour(new SellerManagementBehaviour(this));
-        this.addBehaviour(new AuctionManagementBehaviour(this));
+//        this.addBehaviour(new AuctionManagementBehaviour(this)); // TODO : add in seller management behaviour (auction registration)
 	}
 	
 	@Override

@@ -46,7 +46,7 @@ public class FishMarket
 		public static final int TO_ATTRIBUTE = ACLMessage.ACCEPT_PROPOSAL;
 		
 		/** Rejects a bid of a bidder, from a seller agent to the market agent or the market agent to a bidder agent. */
-		public static final int REP_BID_NOK = ACLMessage.REJECT_PROPOSAL;
+		public static final int REP_BID = ACLMessage.INFORM;
 		
 		/** Provides a fish supply to a bidder agent, from a seller agent to the market agent or the market agent to a bidder agent. */
 		public static final int TO_GIVE = ACLMessage.AGREE;
@@ -72,7 +72,7 @@ public class FishMarket
 				FishMarket.Topics.class.getName()+":TOPIC_BIDDERS_SUBSCRIPTION";
 
 		/** The topic of the conversations of the bidders with the fish market outside auction. */
-		public static final String TOPIC_RUNNING_AUCTION = 
+		public static final String TOPIC_AUCTION_MANAGEMENT = 
 				FishMarket.Topics.class.getName()+":TOPIC_RUNNING_AUCTION";
 	}
 }
