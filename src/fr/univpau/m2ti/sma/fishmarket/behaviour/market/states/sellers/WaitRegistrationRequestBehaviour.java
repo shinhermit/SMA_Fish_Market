@@ -8,9 +8,8 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
-import jade.core.ServiceException;
 import jade.core.behaviours.Behaviour;
-import jade.core.messaging.TopicManagementHelper;
+import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -29,13 +28,28 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
-	
+
 	/** Allows filtering incoming messages. */
-	private final MessageTemplate messageFilter;
+	private static final MessageTemplate MESSAGE_FILTER;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
 			Logger.getLogger(WaitRegistrationRequestBehaviour.class.getName());
+	
+	static
+	{
+		final AID topic =
+				TopicUtility.createTopic(
+						FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
+		MESSAGE_FILTER =
+				MessageTemplate.and(
+					MessageTemplate.MatchTopic(topic),
+					MessageTemplate.or(
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.REQUEST_AUCTION_LIST),
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+	}
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -52,8 +66,6 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 		super(myMarketAgent);
 		
 		this.myFSM = myFSM;
-		
-		this.messageFilter = this.createFilter();
 	}
 	
 	@Override
@@ -69,7 +81,7 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
-				this.messageFilter);
+				WaitRegistrationRequestBehaviour.MESSAGE_FILTER);
 		
 		if(mess != null)
 		{
@@ -112,40 +124,5 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 		return ((MarketAgent)myAgent).isDone() ?
 				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
 					SellerManagementBehaviour.TRANSITION_AUCTION_REQUEST_RECEIVED;
-	}
-
-	/**
-	 * Creates a filter for incoming messages.
-	 * 
-	 * @return a message template which can be used to filter incoming messages.
-	 */
-	private MessageTemplate createFilter()
-	{
-		MessageTemplate filter = null;
-		
-		// Create message filter
-		TopicManagementHelper topicHelper;
-		try
-		{
-			topicHelper = (TopicManagementHelper) myAgent.getHelper(
-					TopicManagementHelper.SERVICE_NAME);
-			
-			final AID topic =
-					topicHelper.createTopic(
-							FishMarket.Topics.TOPIC_AUCTION_REGISTRATION);
-			
-			topicHelper.register(topic);
-			
-			filter = MessageTemplate.and(
-					MessageTemplate.MatchTopic(topic),
-					MessageTemplate.MatchPerformative(
-							FishMarket.Performatives.REQUEST_AUCTION_REGISTRATION));
-		}
-		catch (ServiceException e)
-		{
-			WaitRegistrationRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
-		
-		return filter;
 	}
 }
