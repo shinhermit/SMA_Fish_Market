@@ -67,8 +67,6 @@ public class ConfirmSubscriptionBehaviour extends OneShotBehaviour
 		
 		myMarketAgent.addSuscriber(sellerAID, bidderAID);
 		
-		this.myFSM.setRequest(null);
-		
 		// Reply confirm
 		reply.setPerformative(
 				FishMarket.Performatives.CONFIRM_BIDDER_SUBSCRIPTION);

@@ -1,11 +1,11 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.ServiceException;
@@ -13,31 +13,29 @@ import jade.core.behaviours.Behaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 /**
- * A behaviour which is to be associated with a state of the market agent's FSM behaviour.
+ * A behaviour which is to be associated with a state of the marker agent's FSM behaviour.
  * 
  * @author Josuah Aron
  *
  */
-public class WaitBidderRequestBehaviour extends Behaviour
+public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderManagementBehaviour myFSM;
+	private SellerManagementBehaviour myFSM;
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
 	
-	/** Will hold the selected transition among those to the next possible states. */
-	private int transition;
+	/** Allows filtering incoming messages. */
+	private final MessageTemplate messageFilter;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(WaitBidderRequestBehaviour.class.getName());
-	
-	/** Allows filtering incoming messages. */
-	private final MessageTemplate messageFilter;
+			Logger.getLogger(WaitAuctionRegistrationRequestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -47,9 +45,9 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public WaitBidderRequestBehaviour(
+	public WaitAuctionRegistrationRequestBehaviour(
 			MarketAgent myMarketAgent,
-			BidderManagementBehaviour myFSM)
+			SellerManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -75,22 +73,29 @@ public class WaitBidderRequestBehaviour extends Behaviour
 		
 		if(mess != null)
 		{
-			this.myFSM.setRequest(mess);
-			
-			this.isDone = true;
-			
-			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
+			try
 			{
-				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
-			}
-			else
+				Object content = mess.getContentObject();
+				
+				if(content != null)
+				{
+					if(content instanceof Auction)
+					{
+						this.myFSM.setRequest(mess);
+						
+						this.isDone = true;
+					}
+					else
+					{
+						ACLMessage reply = mess.createReply();
+						reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+						
+						super.myAgent.send(reply);
+					}
+				}
+			} catch (UnreadableException e)
 			{
-				this.transition =
-						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+				WaitAuctionRegistrationRequestBehaviour.LOGGER.log(Level.WARNING, null, e);
 			}
 		}
 	}
@@ -100,13 +105,13 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	{
 		return isDone || ((MarketAgent)myAgent).isDone();
 	}
-
+	
 	@Override
 	public int onEnd()
 	{
 		return ((MarketAgent)myAgent).isDone() ?
 				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
-					this.transition;
+					SellerManagementBehaviour.TRANSITION_AUCTION_REQUEST_RECEIVED;
 	}
 
 	/**
@@ -127,21 +132,18 @@ public class WaitBidderRequestBehaviour extends Behaviour
 			
 			final AID topic =
 					topicHelper.createTopic(
-							FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
+							FishMarket.Topics.TOPIC_AUCTION_REGISTRATION);
 			
 			topicHelper.register(topic);
 			
 			filter = MessageTemplate.and(
 					MessageTemplate.MatchTopic(topic),
-					MessageTemplate.or(
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_AUCTION_LIST),
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+					MessageTemplate.MatchPerformative(
+							FishMarket.Performatives.REQUEST_AUCTION_REGISTRATION));
 		}
 		catch (ServiceException e)
 		{
-			WaitBidderRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
+			WaitAuctionRegistrationRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
 		
 		return filter;

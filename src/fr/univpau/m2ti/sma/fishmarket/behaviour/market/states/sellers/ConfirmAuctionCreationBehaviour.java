@@ -1,14 +1,15 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 /**
@@ -46,24 +47,33 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		ACLMessage msg = new ACLMessage(ACLMessage.CONFIRM);
+		ACLMessage msg = this.myFSM.getRequest();
+		MarketAgent myMarketAgent = (MarketAgent)
+				super.myAgent;
+		
+		Auction auction = null;
 		
 		try
 		{
-			Auction auction =
-					this.myFSM.getAuctionCreationRequest();
-			
-			msg.addReceiver(auction.getSellerID());
-			msg.setContentObject(auction);
-			
-			// De-register auction request
-			this.myFSM.setAuctionCreationRequest(null);
-			
-			super.myAgent.send(msg);
+			auction = (Auction)
+					msg.getContentObject();
 		}
-		catch (IOException e)
+		catch (UnreadableException e)
 		{
 			ConfirmAuctionCreationBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
+		
+		auction.setStatus(
+				Auction.STATUS_RUNNING);
+		
+		// Register auction
+		myMarketAgent.registerAuction(auction);
+		
+		// Send reply
+		ACLMessage reply = msg.createReply();
+		reply.setPerformative(
+				FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION);
+		
+		myMarketAgent.send(reply);
 	}
 }

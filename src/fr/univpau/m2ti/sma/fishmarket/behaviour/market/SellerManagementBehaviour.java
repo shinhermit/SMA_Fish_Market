@@ -4,9 +4,9 @@ import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmAuctionCreationBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateCreationResquestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitAuctionCreationRequestBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitAuctionRegistrationRequestBehaviour;
 import jade.core.behaviours.FSMBehaviour;
+import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 /**
@@ -17,8 +17,8 @@ import jade.core.behaviours.FSMBehaviour;
  */
 public class SellerManagementBehaviour extends FSMBehaviour
 {
-	/** Registers the last auction creation request. */
-	private Auction auctionCreationRequest;
+	/** Holds the last auction creation request. */
+	private ACLMessage request;
 	
 	/** The state in which the agent waits for auction creation requests. */
 	private static final String STATE_WAIT_AUCTION_REGISTRATION_REQUEST =
@@ -32,7 +32,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	private static final String STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST =
 			"STATE_CONFIRM_AUCTION_CREATION_REQUEST";
 	
-	/** The ending state fo the behaviour (user properly stopped the market). */
+	/** The ending state for the behaviour (user properly stopped the market). */
 	private static final String STATE_TERMINATE =
 			"STATE_TERMINATE";
 	
@@ -61,7 +61,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		super(myMarketAgent);
 		
 		// Register states
-		this.registerFirstState(new WaitAuctionCreationRequestBehaviour(myMarketAgent, this),
+		this.registerFirstState(new WaitAuctionRegistrationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
 		
 		this.registerState(new EvaluateCreationResquestBehaviour(myMarketAgent, this),
@@ -95,23 +95,23 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	}
 	
 	/**
-	 * Used in the auction creation behavior, register the request
-	 * for access by the other states of the behavior.
+	 * Used in the auction creation behaviour, register the request
+	 * for access by the other states of the behaviour.
 	 * 
-	 * @param auction the requested auction.
+	 * @param auction the request.
 	 */
-	public void setAuctionCreationRequest(Auction auction)
+	public void setRequest(ACLMessage request)
 	{
-		this.auctionCreationRequest = auction;
+		this.request = request;
 	}
 	
 	/**
-	 * Used in the auction creation behavior, provides the last request auction creation.
+	 * Used in the auction creation behaviour, provides the last request auction creation.
 	 * 
-	 * @return the last requested auction.
+	 * @return the last request.
 	 */
-	public Auction getAuctionCreationRequest()
+	public ACLMessage getRequest()
 	{
-		return this.auctionCreationRequest;
+		return this.request;
 	}
 }

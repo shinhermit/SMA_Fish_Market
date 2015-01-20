@@ -138,13 +138,13 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	/**
 	 * Replies to the request by a refuse.
 	 * 
-	 * @return the refuse status code.
+	 * @return the code of the transition after a refusal of the registration of an auction.
 	 */
 	private int replyRefuse()
 	{
-		ACLMessage mess = this.myFSM.getRequest();
-		
-		ACLMessage reply = mess.createReply();
+		// Reply
+		ACLMessage reply =
+				this.myFSM.getRequest().createReply();
 		
 		try
 		{
@@ -156,8 +156,6 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 		}
 		
 		super.myAgent.send(reply);
-		
-		this.myFSM.setRequest(null);
 		
 		return BidderManagementBehaviour.TRANSITION_REFUSE_SUBSCRIPTION;
 	}

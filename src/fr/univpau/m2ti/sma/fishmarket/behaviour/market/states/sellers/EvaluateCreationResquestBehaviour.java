@@ -1,9 +1,15 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 /**
@@ -19,6 +25,10 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 	
 	/** Tells whether the creation of the auction is confirmed or not. */
 	private boolean isCreationAccepted;
+	
+	/** Allows logging. */
+	private static final Logger LOGGER =
+			Logger.getLogger(EvaluateCreationResquestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a state of the 
@@ -42,22 +52,25 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 	{
 		MarketAgent myMarketAgent = (MarketAgent)myAgent;
 		
-		Auction auction = this.myFSM.getAuctionCreationRequest();
+		Auction auction = null;
+		
+		try
+		{
+			auction = (Auction)
+					this.myFSM.getRequest().getContentObject();
+		}
+		catch (UnreadableException e)
+		{
+			EvaluateCreationResquestBehaviour.LOGGER.log(Level.SEVERE, null, e);
+		}
 		
 		if(! myMarketAgent.isRegisteredAuction(auction))
 		{
-			myMarketAgent.registerAuction(auction);
-			
 			this.isCreationAccepted = true;
-			
-			// Do not de-register creation request: used later for confirmation message.
 		}
 		else
 		{
 			this.isCreationAccepted = false;
-			
-			// De-register auction creation request
-			this.myFSM.setAuctionCreationRequest(null);
 		}
 	}
 	
@@ -66,6 +79,25 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 	{
 		return this.isCreationAccepted ?
 				SellerManagementBehaviour.TRANSITION_CONFIRM_AUCTION_REGISTRATION :
-					SellerManagementBehaviour.TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST;
+					this.replyRefuse();
+	}
+	
+	/**
+	 * Sends a refuse reply to the seller agent which requested the registration of an auction.
+	 * 
+	 * @return the code of the transition after a refusal of the registration of an auction.
+	 */
+	private int replyRefuse()
+	{
+		// Reply
+		ACLMessage reply =
+				this.myFSM.getRequest().createReply();
+		
+		reply.setPerformative(
+				FishMarket.Performatives.REFUSE_AUCTION_REGISTRATION);
+		
+		super.myAgent.send(reply);
+		
+		return SellerManagementBehaviour.TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST;
 	}
 }

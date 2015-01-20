@@ -28,10 +28,10 @@ public class FishMarket
 		public static final int REPLY_AUCTION_LIST = ACLMessage.INFORM;
 		
 		/** Requests of the subscription to an auction, from a bidder agent to the market agent. */
-		public static final int REQUEST_AUCTION_SUBSCRIPTION = ACLMessage.SUBSCRIBE;
+		public static final int REQUEST_BIDDER_SUBSCRIPTION = ACLMessage.SUBSCRIBE;
 		
 		/** Rejects the subscription to an auction, from the market agent to a bidder agent. */
-		public static final int REFUSE_AUCTION_SUBSCRIPTION = ACLMessage.REFUSE;
+		public static final int REFUSE_BIDDER_SUBSCRIPTION = ACLMessage.REFUSE;
 		
 		/** Confirms the subscription to an auction, from the market agent to a bidder agent. */
 		public static final int CONFIRM_BIDDER_SUBSCRIPTION = ACLMessage.INFORM;
