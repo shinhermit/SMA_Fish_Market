@@ -91,9 +91,14 @@ public class WaitBidderRequestBehaviour extends Behaviour
 				{
 					this.transition =
 							BidderManagementBehaviour
-							.TRANSITION_AUCTION_SUBSCRIPTION_REQUEST_RECEIVED;
+							.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
 				}
 			}
+		}
+		else
+		{
+			WaitBidderRequestBehaviour.LOGGER.log(
+					Level.SEVERE, "Message filter creation failed");
 		}
 	}
 

@@ -61,6 +61,42 @@ public class Auction implements Serializable
 	{
 		this(null);
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		boolean equals = false;
+		
+		if(o != null)
+		{
+			if(o instanceof Auction)
+			{
+				Auction other = (Auction) o;
+				
+				equals = this.sellerID.equals(
+						other.getSellerID());
+			}
+		}
+		
+		return equals;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return
+				"Auction {seller: " +
+				this.sellerID.toString() +
+				"; status: " +
+				Auction.printStatus(this.status) +
+				"}";
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.toString().hashCode();
+	}
 
 	/**
 	 * 
@@ -97,5 +133,39 @@ public class Auction implements Serializable
 	public void setStatus(int status)
 	{
 		this.status = status;
+	}
+	
+	/**
+	 * Converts an auction status code into a human readable string.
+	 * 
+	 * @param status the auction status code.
+	 * 
+	 * @return the corresponding string.
+	 */
+	public static String printStatus(int status)
+	{
+		String statusString = "UNKOWN";
+		
+		if(status == Auction.STATUS_CREATED)
+		{
+			statusString = "CREATED";
+		}
+		else if(status == Auction.STATUS_RUNNING)
+		{
+			statusString = "RUNNING";
+			
+		}
+		else if(status == Auction.STATUS_OVER)
+		{
+			statusString = "OVER";
+			
+		}
+		else if(status == Auction.STATUS_CANCELLED)
+		{
+			statusString = "CANCELLED";
+			
+		}
+		
+		return statusString;
 	}
 }

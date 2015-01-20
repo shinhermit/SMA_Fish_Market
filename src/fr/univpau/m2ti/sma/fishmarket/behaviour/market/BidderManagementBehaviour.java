@@ -45,7 +45,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 	public static final int TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
 	
 	/** Return code which activates the transition to evaluate a request for a subscription to an auction. */
-	public static final int TRANSITION_AUCTION_SUBSCRIPTION_REQUEST_RECEIVED;
+	public static final int TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
 	
 	/** Return code which activates the transition to terminate this FSM. */
 	public static final int TRANSITION_USER_TERMINATE;
@@ -78,7 +78,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 	{
 		int start = -1;
 		TRANSITION_AUCTION_LIST_REQUEST_RECEIVED = ++start;
-		TRANSITION_AUCTION_SUBSCRIPTION_REQUEST_RECEIVED = ++start;
+		TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED = ++start;
 		TRANSITION_USER_TERMINATE = ++start;
 		TRANSITION_REFUSE_SUBSCRIPTION = ++start;
 		TRANSITION_CONFIRM_SUBSCRIPTION = ++start;
@@ -125,7 +125,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_EVALUATE_SUBSCRIPTION_REQUEST,
-				TRANSITION_AUCTION_SUBSCRIPTION_REQUEST_RECEIVED);
+				TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED);
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_TERMINATE_BIDDER_MANAGEMENT,

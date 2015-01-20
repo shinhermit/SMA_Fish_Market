@@ -69,7 +69,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 		}
 		catch (UnreadableException e)
 		{
-			e.printStackTrace();
+			EvaluateSubscriptionRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
 		
 		if(content != null)
