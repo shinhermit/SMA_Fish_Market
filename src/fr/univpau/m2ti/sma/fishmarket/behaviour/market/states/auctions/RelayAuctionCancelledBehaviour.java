@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -56,6 +57,11 @@ public class RelayAuctionCancelledBehaviour extends OneShotBehaviour
 		
 		super.myAgent.send(toRelay);
 		
+		// Delete request
 		this.myFSM.setRequest(null);
+		
+		// Close auction
+		myMarketAgent.setAuctionStatus(
+				this.myFSM.getSeller(), Auction.STATUS_CANCELLED);
 	}
 }

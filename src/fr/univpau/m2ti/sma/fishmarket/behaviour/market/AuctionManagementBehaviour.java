@@ -212,10 +212,10 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		this.registerState(new RelayAuctionOverBehaviour(myMarketAgent, this),
 				STATE_RELAY_AUCTION_OVER);
 		
-		this.registerLastState(new TerminateSuccessBehaviour(myMarketAgent),
+		this.registerLastState(new TerminateSuccessBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_SUCCESS);
 		
-		this.registerLastState(new TerminateCancelledBehaviour(myMarketAgent),
+		this.registerLastState(new TerminateCancelledBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_CANCELLED);
 		
 		// Register transitions

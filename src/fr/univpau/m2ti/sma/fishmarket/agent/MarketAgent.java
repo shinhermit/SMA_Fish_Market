@@ -220,6 +220,31 @@ public class MarketAgent extends Agent
 	{
 		return this.auctions.get(new Auction(sellerAID));
 	}
+	
+	/**
+	 * Defines the status of an auction.
+	 * 
+	 * @param sellerAID  the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param status the new status of the auction (public static fields of class Auction).
+	 */
+	public void setAuctionStatus(AID sellerAID, int status)
+	{
+		Auction auction = this.findAuction(sellerAID);
+		
+		if(auction != null)
+		{
+			auction.setStatus(status);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param sellerAID an auction that we want to delete.
+	 */
+	public void deleteAuction(AID sellerAID)
+	{
+		this.auctions.remove(new Auction(sellerAID));
+	}
     
     /**
      * Add a description of this agent's services to the DF.
