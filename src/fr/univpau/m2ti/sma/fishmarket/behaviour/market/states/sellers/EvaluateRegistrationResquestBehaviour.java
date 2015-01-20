@@ -18,7 +18,7 @@ import jade.lang.acl.UnreadableException;
  * @author Josuah Aron
  *
  */
-public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
+public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -28,7 +28,7 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(EvaluateCreationResquestBehaviour.class.getName());
+			Logger.getLogger(EvaluateRegistrationResquestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a state of the 
@@ -38,7 +38,7 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public EvaluateCreationResquestBehaviour(
+	public EvaluateRegistrationResquestBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -61,7 +61,7 @@ public class EvaluateCreationResquestBehaviour extends OneShotBehaviour
 		}
 		catch (UnreadableException e)
 		{
-			EvaluateCreationResquestBehaviour.LOGGER.log(Level.SEVERE, null, e);
+			EvaluateRegistrationResquestBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
 		
 		if(! myMarketAgent.isRegisteredAuction(auction))

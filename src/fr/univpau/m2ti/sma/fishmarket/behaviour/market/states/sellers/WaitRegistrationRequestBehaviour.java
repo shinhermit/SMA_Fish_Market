@@ -22,7 +22,7 @@ import jade.lang.acl.UnreadableException;
  * @author Josuah Aron
  *
  */
-public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
+public class WaitRegistrationRequestBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -35,7 +35,7 @@ public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(WaitAuctionRegistrationRequestBehaviour.class.getName());
+			Logger.getLogger(WaitRegistrationRequestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -45,7 +45,7 @@ public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public WaitAuctionRegistrationRequestBehaviour(
+	public WaitRegistrationRequestBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -95,7 +95,7 @@ public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
 				}
 			} catch (UnreadableException e)
 			{
-				WaitAuctionRegistrationRequestBehaviour.LOGGER.log(Level.WARNING, null, e);
+				WaitRegistrationRequestBehaviour.LOGGER.log(Level.WARNING, null, e);
 			}
 		}
 	}
@@ -143,7 +143,7 @@ public class WaitAuctionRegistrationRequestBehaviour extends Behaviour
 		}
 		catch (ServiceException e)
 		{
-			WaitAuctionRegistrationRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
+			WaitRegistrationRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
 		
 		return filter;

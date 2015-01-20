@@ -1,10 +1,10 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmAuctionCreationBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateCreationResquestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmRegistrationBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateRegistrationResquestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitAuctionRegistrationRequestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitRegistrationRequestBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -61,13 +61,13 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		super(myMarketAgent);
 		
 		// Register states
-		this.registerFirstState(new WaitAuctionRegistrationRequestBehaviour(myMarketAgent, this),
+		this.registerFirstState(new WaitRegistrationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
 		
-		this.registerState(new EvaluateCreationResquestBehaviour(myMarketAgent, this),
+		this.registerState(new EvaluateRegistrationResquestBehaviour(myMarketAgent, this),
 				STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST);
 		
-		this.registerState(new ConfirmAuctionCreationBehaviour(myMarketAgent, this),
+		this.registerState(new ConfirmRegistrationBehaviour(myMarketAgent, this),
 				STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST);
 		
 		this.registerLastState(new TerminateSellerManagementBehaviour(myMarketAgent),

@@ -18,14 +18,14 @@ import jade.lang.acl.UnreadableException;
  * @author Josuah Aron
  *
  */
-public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
+public class ConfirmRegistrationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
-			Logger.getLogger(ConfirmAuctionCreationBehaviour.class.getName());
+			Logger.getLogger(ConfirmRegistrationBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a state of the 
@@ -35,7 +35,7 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public ConfirmAuctionCreationBehaviour(
+	public ConfirmRegistrationBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -60,7 +60,7 @@ public class ConfirmAuctionCreationBehaviour extends OneShotBehaviour
 		}
 		catch (UnreadableException e)
 		{
-			ConfirmAuctionCreationBehaviour.LOGGER.log(Level.SEVERE, null, e);
+			ConfirmRegistrationBehaviour.LOGGER.log(Level.SEVERE, null, e);
 		}
 		
 		auction.setStatus(
