@@ -1,31 +1,22 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 /**
- * A behaviour which is to be associated with a state of the market agent's FSM behaviour.
+ * A behaviour which is to be associated with a state of the marker agent's FSM behaviour.
  * 
  * @author Josuah Aron
  *
  */
-public class ReplyAuctionListBehaviour extends OneShotBehaviour
+public class NotifySellerBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private BidderManagementBehaviour myFSM;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(ReplyAuctionListBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -35,7 +26,7 @@ public class ReplyAuctionListBehaviour extends OneShotBehaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public ReplyAuctionListBehaviour(
+	public NotifySellerBehaviour(
 			MarketAgent myMarketAgent,
 			BidderManagementBehaviour myFSM)
 	{
@@ -47,20 +38,22 @@ public class ReplyAuctionListBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// Notify the seller (so he can start to announce).
+		MarketAgent myMarketAgent =
+				(MarketAgent) super.myAgent;
 		
-		ACLMessage reply = this.myFSM.getRequest().createReply();
+		ACLMessage request = this.myFSM.getRequest();
 		
-		try
-		{
-			reply.setContentObject(
-					(HashSet<Auction>)
-					((MarketAgent)myAgent).getRegisteredAuctions());
-			
-			myAgent.send(reply);
-		}
-		catch (IOException e)
-		{
-			ReplyAuctionListBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
+		String auctionID = (String) request.getContent();
+		
+		ACLMessage notify = new ACLMessage(
+				FishMarket.Performatives.TO_SUBSCRIBE);
+		
+		notify.setConversationId(auctionID);
+		
+		notify.addReceiver(
+				myMarketAgent.getSeller(auctionID));
+		
+		myMarketAgent.send(notify);
 	}
 }

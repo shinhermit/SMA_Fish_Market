@@ -50,7 +50,7 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
 		
 		for(AID subscriber : myMarketAgent.getSubscribers(
-				this.myFSM.getSeller()))
+				this.myFSM.getAuctionId()))
 		{
 			toRelay.addReceiver(subscriber);
 		}

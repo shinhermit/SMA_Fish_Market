@@ -43,6 +43,14 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
+		// Update auction price
+		float price = Float.parseFloat(
+				(String)toRelay.getContent());
+		
+		myMarketAgent.setAuctionPrice(
+				this.myFSM.getAuctionId(), price);
+		
+		// Relay
 		toRelay.clearAllReceiver();
 		
 		// Put back message topic
@@ -51,7 +59,7 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 		
 		// Add all subscribers as receivers
 		for(AID subscriber : myMarketAgent.getSubscribers(
-				this.myFSM.getSeller()))
+				this.myFSM.getAuctionId()))
 		{
 			toRelay.addReceiver(subscriber);
 		}

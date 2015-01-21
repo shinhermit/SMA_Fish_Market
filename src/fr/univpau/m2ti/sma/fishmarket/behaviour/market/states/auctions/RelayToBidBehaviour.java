@@ -49,19 +49,21 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	{
 		// Wait messages in order to choose a transition
 		boolean received = this.receive(
-				AuctionManagementBehaviour.CANCELLETION_WAIT_DELAY);
+				AuctionManagementBehaviour.TO_CANCEL_WAIT_DELAY);
 		
 		if(received)
 		{
 			this.transition =
-						AuctionManagementBehaviour.TRANSITION_AUCTION_CANCELLED_RECEIVED;
+						AuctionManagementBehaviour.TRANSITION_TO_CANCEL;
 		}
 		
-		// relay
 		else
 		{
 			ACLMessage toRelay = this.myFSM.getRequest();
 			
+			this.myFSM.addBidder(toRelay.getSender());
+			
+			// relay
 			toRelay.clearAllReceiver();
 			
 			// Put back message topic
@@ -76,7 +78,7 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 			
 			// Select transition
 			this.transition =
-					AuctionManagementBehaviour.TRANSITION_TO_BID_RELAYED;
+					AuctionManagementBehaviour.TRANSITION_TO_WAIT_REP_BID;
 			
 			// Delete request
 			this.myFSM.setRequest(null);
@@ -102,7 +104,7 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 		this.block(millis);
 		
 		// Receive messages
-		ACLMessage mess = myAgent.receive(
+		ACLMessage mess = super.myAgent.receive(
 				this.messageFilter);
 		
 		if(mess != null)
@@ -123,12 +125,8 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	private MessageTemplate createFilter()
 	{
 		return MessageTemplate.and(
-				MessageTemplate.MatchTopic(
-						AuctionManagementBehaviour.MESSAGE_TOPIC),
-				MessageTemplate.and(
-					MessageTemplate.MatchConversationId(
-							this.myFSM.getConversationId()),
-					MessageTemplate.MatchPerformative(
-							FishMarket.Performatives.TO_CANCEL)));
+				this.myFSM.getMessageFilter(),
+				MessageTemplate.MatchPerformative(
+						FishMarket.Performatives.TO_CANCEL));
 	}
 }

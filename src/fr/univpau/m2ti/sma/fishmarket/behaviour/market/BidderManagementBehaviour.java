@@ -1,9 +1,9 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.ConfirmSubscriptionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.NotifySellerBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.EvaluateSubscriptionRequestBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.ReplyAuctionListBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.ProvideAuctionListBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.TerminateBidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.WaitBidderRequestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
@@ -11,6 +11,7 @@ import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 /**
@@ -25,9 +26,14 @@ public class BidderManagementBehaviour extends FSMBehaviour
 	private ACLMessage request;
 	
 	/** The topic of the messages of conversations accepted by the behaviour. */
-	public static final AID MESSAGE_TOPIC = 
+	public static final AID MESSAGE_TOPIC =
 			TopicUtility.createTopic(
 					FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
+
+	/** Allows filtering incoming messages. */
+	public static final MessageTemplate MESSAGE_FILTER =
+				MessageTemplate.MatchTopic(
+						BidderManagementBehaviour.MESSAGE_TOPIC);
 	
 	/** The state in which the agent waits for bidders messages requests. */
 	private static final String STATE_WAIT_BIDDER_REQUEST =
@@ -42,30 +48,30 @@ public class BidderManagementBehaviour extends FSMBehaviour
 			"STATE_EVALUATE_SUBSCRIPTION_REQUEST";
 	
 	/** The state in which the agent confirms the subscription of a bidder to an auction. */
-	private static final String STATE_CONFIRM_SUBSCRIPTION =
-			"STATE_CONFIRM_SUBSCRIPTION";
+	private static final String STATE_NOTIFY_SELLER =
+			"STATE_NOTIFY_SELLER";
 	
 	/** The terminating state of the bidder management behaviour. */
 	private static final String STATE_TERMINATE_BIDDER_MANAGEMENT =
 			"STATE_TERMINATE_BIDDER_MANAGEMENT";
 	
 	/** Return code which activates the transition to reply to an available auction list request. */
-	public static final int TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
+	public static final int TRANSITION_TO_PROVIDE_AUCTION_LIST;
 	
 	/** Return code which activates the transition to evaluate a request for a subscription to an auction. */
-	public static final int TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+	public static final int TRANSITION_TO_VALUATE_REQUEST;
 	
 	/** Return code which activates the transition to terminate this FSM. */
-	public static final int TRANSITION_USER_TERMINATE;
+	public static final int TRANSITION_TO_TERMINATE;
 	
 	/** Return code which activates the transition to reject a request for a subscription to an auction. */
-	public static final int TRANSITION_REFUSE_SUBSCRIPTION;
+	public static final int TRANSITION_TO_WAIT_REQUEST;
 	
 	/** Return code which activates the transition to register the subscription of a bidder to an auction. */
-	public static final int TRANSITION_CONFIRM_SUBSCRIPTION;
+	public static final int TRANSITION_TO_NOTIFY_SELLER;
 	
-	/** Status code for a subscription request has not been refused. */
-	public static final int STATUS_REFUSE_NOT_REFUSED;
+	/** Status code for a subscription request which could not be processed. */
+	public static final int STATUS_REFUSE_NOT_UNDERSTOOD;
 	
 	/** Status code for a subscription request which is refused because the auction is over. */
 	public static final int STATUS_REFUSE_AUCTION_OVER;
@@ -85,14 +91,14 @@ public class BidderManagementBehaviour extends FSMBehaviour
 	static
 	{
 		int start = -1;
-		TRANSITION_AUCTION_LIST_REQUEST_RECEIVED = ++start;
-		TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED = ++start;
-		TRANSITION_USER_TERMINATE = ++start;
-		TRANSITION_REFUSE_SUBSCRIPTION = ++start;
-		TRANSITION_CONFIRM_SUBSCRIPTION = ++start;
+		TRANSITION_TO_PROVIDE_AUCTION_LIST = ++start;
+		TRANSITION_TO_VALUATE_REQUEST = ++start;
+		TRANSITION_TO_TERMINATE = ++start;
+		TRANSITION_TO_WAIT_REQUEST = ++start;
+		TRANSITION_TO_NOTIFY_SELLER = ++start;
 		
 		start = -1;
-		STATUS_REFUSE_NOT_REFUSED = ++start;
+		STATUS_REFUSE_NOT_UNDERSTOOD = ++start;
 		STATUS_REFUSE_AUCTION_OVER = ++start;
 		STATUS_REFUSE_AUCTION_CANCELLED = ++start;
 		STATUS_REFUSE_AUCTION_NOT_FOUND = ++start;
@@ -115,14 +121,14 @@ public class BidderManagementBehaviour extends FSMBehaviour
 		this.registerFirstState(new WaitBidderRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_BIDDER_REQUEST);
 		
-		this.registerState(new ReplyAuctionListBehaviour(myMarketAgent, this),
+		this.registerState(new ProvideAuctionListBehaviour(myMarketAgent, this),
 				STATE_REPLY_AUCTION_LIST);
 		
 		this.registerState(new EvaluateSubscriptionRequestBehaviour(myMarketAgent, this),
 				STATE_EVALUATE_SUBSCRIPTION_REQUEST);
 		
-		this.registerState(new ConfirmSubscriptionBehaviour(myMarketAgent, this),
-				STATE_CONFIRM_SUBSCRIPTION);
+		this.registerState(new NotifySellerBehaviour(myMarketAgent, this),
+				STATE_NOTIFY_SELLER);
 		
 		this.registerLastState(new TerminateBidderManagementBehaviour(myMarketAgent),
 				STATE_TERMINATE_BIDDER_MANAGEMENT);
@@ -130,28 +136,28 @@ public class BidderManagementBehaviour extends FSMBehaviour
 		// Register transitions
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_REPLY_AUCTION_LIST,
-				TRANSITION_AUCTION_LIST_REQUEST_RECEIVED);
+				TRANSITION_TO_PROVIDE_AUCTION_LIST);
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_EVALUATE_SUBSCRIPTION_REQUEST,
-				TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED);
+				TRANSITION_TO_VALUATE_REQUEST);
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_TERMINATE_BIDDER_MANAGEMENT,
-				TRANSITION_USER_TERMINATE);
+				TRANSITION_TO_TERMINATE);
 		
 		this.registerDefaultTransition(STATE_REPLY_AUCTION_LIST,
 				STATE_WAIT_BIDDER_REQUEST);
 		
 		this.registerTransition(STATE_EVALUATE_SUBSCRIPTION_REQUEST,
 				STATE_WAIT_BIDDER_REQUEST,
-				TRANSITION_REFUSE_SUBSCRIPTION);
+				TRANSITION_TO_WAIT_REQUEST);
 		
 		this.registerTransition(STATE_EVALUATE_SUBSCRIPTION_REQUEST,
-				STATE_CONFIRM_SUBSCRIPTION,
-				TRANSITION_CONFIRM_SUBSCRIPTION);
+				STATE_NOTIFY_SELLER,
+				TRANSITION_TO_NOTIFY_SELLER);
 		
-		this.registerDefaultTransition(STATE_CONFIRM_SUBSCRIPTION,
+		this.registerDefaultTransition(STATE_NOTIFY_SELLER,
 				STATE_WAIT_BIDDER_REQUEST);
 	}
 

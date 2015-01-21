@@ -14,7 +14,7 @@ import jade.lang.acl.ACLMessage;
  * @author Josuah Aron
  *
  */
-public class RelayAuctionCancelledBehaviour extends OneShotBehaviour
+public class RelayToCancelBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private AuctionManagementBehaviour myFSM;
@@ -27,7 +27,7 @@ public class RelayAuctionCancelledBehaviour extends OneShotBehaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public RelayAuctionCancelledBehaviour(
+	public RelayToCancelBehaviour(
 			MarketAgent myMarketAgent,
 			AuctionManagementBehaviour myFSM)
 	{
@@ -51,7 +51,7 @@ public class RelayAuctionCancelledBehaviour extends OneShotBehaviour
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
 		
 		for(AID subscriber : myMarketAgent.getSubscribers(
-				this.myFSM.getSeller()))
+				this.myFSM.getAuctionId()))
 		{
 			toRelay.addReceiver(subscriber);
 		}
@@ -63,6 +63,6 @@ public class RelayAuctionCancelledBehaviour extends OneShotBehaviour
 		
 		// Close auction
 		myMarketAgent.setAuctionStatus(
-				this.myFSM.getSeller(), Auction.STATUS_CANCELLED);
+				this.myFSM.getAuctionId(), Auction.STATUS_CANCELLED);
 	}
 }

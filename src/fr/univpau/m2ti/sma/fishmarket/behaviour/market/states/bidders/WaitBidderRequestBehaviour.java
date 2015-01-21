@@ -28,11 +28,10 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					MessageTemplate.MatchTopic(
-							BidderManagementBehaviour.MESSAGE_TOPIC),
+					BidderManagementBehaviour.MESSAGE_FILTER,
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.TO_PROVIDE),
+									FishMarket.Performatives.TO_REQUEST),
 							MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.TO_SUBSCRIBE)));
 	
@@ -75,17 +74,17 @@ public class WaitBidderRequestBehaviour extends Behaviour
 			this.isDone = true;
 			
 			if(mess.getPerformative() ==
-					FishMarket.Performatives.TO_PROVIDE)
+					FishMarket.Performatives.TO_REQUEST)
 			{
 				this.transition =
 						BidderManagementBehaviour
-						.TRANSITION_AUCTION_LIST_REQUEST_RECEIVED;
+						.TRANSITION_TO_PROVIDE_AUCTION_LIST;
 			}
 			else
 			{
 				this.transition =
 						BidderManagementBehaviour
-						.TRANSITION_BIDDER_SUBSCRIPTION_REQUEST_RECEIVED;
+						.TRANSITION_TO_VALUATE_REQUEST;
 			}
 		}
 	}
@@ -100,7 +99,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	public int onEnd()
 	{
 		return ((MarketAgent)myAgent).isDone() ?
-				BidderManagementBehaviour.TRANSITION_USER_TERMINATE :
+				BidderManagementBehaviour.TRANSITION_TO_TERMINATE :
 					this.transition;
 	}
 }

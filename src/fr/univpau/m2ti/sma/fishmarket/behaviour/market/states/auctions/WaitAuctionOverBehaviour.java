@@ -81,12 +81,8 @@ public class WaitAuctionOverBehaviour extends Behaviour
 	private MessageTemplate createMessageFilter()
 	{
 		return MessageTemplate.and(
-						MessageTemplate.MatchTopic(
-								AuctionManagementBehaviour.MESSAGE_TOPIC),
-						MessageTemplate.and(
-								MessageTemplate.MatchConversationId(
-										this.myFSM.getConversationId()),
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.AUCTION_OVER)));
+				this.myFSM.getMessageFilter(),
+				MessageTemplate.MatchPerformative(
+						FishMarket.Performatives.AUCTION_OVER));
 	}
 }

@@ -62,7 +62,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	
 	/** Return code which activates the transition to confirm the registration of a new auction
 	 * after the last evaluation resulted in an approval. */
-	public static final int TRANSITION_TO_ACCEPT_REGISTRATION;
+	public static final int TRANSITION_TO_CONFIRM_REGISTRATION;
 	
 	static
 	{
@@ -71,7 +71,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		TRANSITION_TO_EVALUATE_REQUEST = ++start;
 		TRANSITION_TO_TERMINATE = ++start;
 		TRANSITION_TO_WAIT_REQUEST = ++start;
-		TRANSITION_TO_ACCEPT_REGISTRATION = ++start;
+		TRANSITION_TO_CONFIRM_REGISTRATION = ++start;
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_EVALUATE_REQUEST,
 				STATE_ACCEPT_REGISTRATION,
-				TRANSITION_TO_ACCEPT_REGISTRATION);
+				TRANSITION_TO_CONFIRM_REGISTRATION);
 		
 		this.registerDefaultTransition(STATE_ACCEPT_REGISTRATION,
 				STATE_WAIT_REQUEST);

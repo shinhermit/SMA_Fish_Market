@@ -73,20 +73,20 @@ public class WaitToBidBehaviour extends Behaviour
 			{
 				this.transition =
 						AuctionManagementBehaviour
-						.TRANSITION_TO_BID_RECEIVED;
+						.TRANSITION_TO_RELAY_BID;
 			}
 			else if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ANNOUNCE)
 			{
 				this.transition =
 						AuctionManagementBehaviour
-						.TRANSITION_TO_ANNOUNCE_RECEIVED;
+						.TRANSITION_TO_RELAY_ANNOUNCE;
 			}
 			else
 			{
 				this.transition =
 						AuctionManagementBehaviour
-						.TRANSITION_AUCTION_CANCELLED_RECEIVED;
+						.TRANSITION_TO_CANCEL;
 			}
 		}
 	}
@@ -111,18 +111,14 @@ public class WaitToBidBehaviour extends Behaviour
 	private MessageTemplate createMessageFilter()
 	{
 		return MessageTemplate.and(
-						MessageTemplate.MatchTopic(
-								AuctionManagementBehaviour.MESSAGE_TOPIC),
-						MessageTemplate.and(
-								MessageTemplate.MatchConversationId(
-										this.myFSM.getConversationId()),
-										MessageTemplate.or(
-												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.TO_BID),
-												MessageTemplate.or(
-												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.TO_ANNOUNCE),
-												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.TO_CANCEL)))));
+				this.myFSM.getMessageFilter(),
+				MessageTemplate.or(
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_BID),
+						MessageTemplate.or(
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_ANNOUNCE),
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_CANCEL))));
 	}
 }

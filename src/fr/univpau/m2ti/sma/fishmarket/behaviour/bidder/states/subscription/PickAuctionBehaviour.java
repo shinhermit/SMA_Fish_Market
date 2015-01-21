@@ -65,7 +65,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
         if (content != null)
         {
             // pick a random auction
-            AID selectedAuction = this.pickRandomAuctionSeller(
+            String selectedAuction = this.pickRandomAuctionSeller(
                     (HashSet<Auction>) content
             );
 
@@ -117,12 +117,12 @@ public class PickAuctionBehaviour extends OneShotBehaviour
     }
 
 
-    private AID pickRandomAuctionSeller(HashSet<Auction> auctions)
+    private String pickRandomAuctionSeller(HashSet<Auction> auctions)
     {
         List<Auction> auctionList = new ArrayList<Auction>(auctions);
         int randomAuction;
         boolean lookingForAuction = true;
-        AID seller;
+        String auctionId;
 
 
         int numAuctions = auctionList.size();;
@@ -130,12 +130,12 @@ public class PickAuctionBehaviour extends OneShotBehaviour
         do
         {
             randomAuction = this.randomGenerator.nextInt(numAuctions);
-            seller = auctionList.get(randomAuction).getSellerID();
+            auctionId = auctionList.get(randomAuction).getID();
 
-            if (this.myFSM.hasSubscribedToAuction(seller))
+            if (this.myFSM.hasSubscribedToAuction(auctionId))
             {
                 // known seller.
-                auctionList.remove(seller);
+                auctionList.remove(auctionId);
             }
             else
             {
@@ -149,10 +149,10 @@ public class PickAuctionBehaviour extends OneShotBehaviour
 
         if (lookingForAuction)
         {
-            seller = null;
+        	auctionId = null;
         }
 
-        return seller;
+        return auctionId;
 
     }
 

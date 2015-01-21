@@ -39,24 +39,25 @@ public class ConfirmRegistrationBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		ACLMessage msg = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
+		
 		MarketAgent myMarketAgent = (MarketAgent)
 				super.myAgent;
 		
 		// Create FSM Behaviour to manage the auction
 		myMarketAgent.addBehaviour(
-				new AuctionManagementBehaviour(myMarketAgent, msg.getSender()));
+				new AuctionManagementBehaviour(myMarketAgent,
+						request.getSender(), request.getConversationId()));
 		
 		// Send reply
-		ACLMessage reply = msg.createReply();
+		ACLMessage reply = request.createReply();
 		
 		reply.setPerformative(
 				FishMarket.Performatives.TO_ACCEPT);
 		
-		reply.setConversationId( // Inform seller about the conversation ID of the auction
-				AuctionManagementBehaviour.createConversationId(
-						msg.getSender()));
-		
 		myMarketAgent.send(reply);
+		
+		// Delete request
+		this.myFSM.setRequest(null);
 	}
 }

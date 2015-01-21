@@ -10,6 +10,7 @@ import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 /**
@@ -26,7 +27,10 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	private final AID mySeller;
 	
 	/** The ID of the conversation associated with the auction that this behaviour manages. */
-	private final String conversationId;
+	private final String myAuctionId;
+	
+	/** Allows filtering incoming messages. */
+	private final MessageTemplate messageFilter;
 	
 	/** The first bidder for the current price. */
 	private AID firstBidder = null;
@@ -45,7 +49,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	public static final long BID_WAIT_DELAY = 10000; // 10 sec
 	
 	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
-	public static final long CANCELLETION_WAIT_DELAY = 500; // 0.5 sec
+	public static final long TO_CANCEL_WAIT_DELAY = 500; // 0.5 sec
 	
 	/** The state in which the agent waits for a first announcement from the seller. */
 	private static final String STATE_WAIT_TO_ANNOUNCE =
@@ -120,33 +124,33 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 			"STATE_TERMINATE_CANCELLED";
 	
 	/** Return code to activates the appropriate transitions when <i>to_announce</i> is received. */
-	public static final int TRANSITION_TO_ANNOUNCE_RECEIVED;
+	public static final int TRANSITION_TO_RELAY_ANNOUNCE;
 	
 	/** Return code to activates the appropriate transitions when <i>to_bid</i> is received. */
-	public static final int TRANSITION_TO_BID_RECEIVED;
+	public static final int TRANSITION_TO_RELAY_BID;
 	
 	/** Return code to activates the appropriate transitions when <i>auction_cancelled</i> is received. */
-	public static final int TRANSITION_AUCTION_CANCELLED_RECEIVED;
+	public static final int TRANSITION_TO_CANCEL;
 	
 	/** Return code to activates the appropriate transitions when <i>auction_cancelled</i> is received. */
-	public static final int TRANSITION_TO_BID_RELAYED;
+	public static final int TRANSITION_TO_WAIT_REP_BID;
 	
 	/** Return code to activates the appropriate transitions when <i>rep_bid_ok</i> is received. */
-	public static final int TRANSITION_REP_BID_OK_RECEIVED;
+	public static final int TRANSITION_TO_RELAY_REP_BID_OK;
 	
 	/** Return code to activates the appropriate transitions when <i>rep_bid_nok</i> is received. */
-	public static final int TRANSITION_REP_BID_NOK_RECEIVED;
+	public static final int TRANSITION_TO_RELAY_REP_BID_NOK;
 	
 	static
 	{
 		int start = -1;
 		
-		TRANSITION_TO_ANNOUNCE_RECEIVED = ++start;
-		TRANSITION_TO_BID_RECEIVED = ++start;
-		TRANSITION_AUCTION_CANCELLED_RECEIVED = ++start;
-		TRANSITION_TO_BID_RELAYED = ++start;
-		TRANSITION_REP_BID_OK_RECEIVED = ++start;
-		TRANSITION_REP_BID_NOK_RECEIVED = ++start;
+		TRANSITION_TO_RELAY_ANNOUNCE = ++start;
+		TRANSITION_TO_RELAY_BID = ++start;
+		TRANSITION_TO_CANCEL = ++start;
+		TRANSITION_TO_WAIT_REP_BID = ++start;
+		TRANSITION_TO_RELAY_REP_BID_OK = ++start;
+		TRANSITION_TO_RELAY_REP_BID_NOK = ++start;
 	}
 	
 	/**
@@ -157,15 +161,16 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 */
 	public AuctionManagementBehaviour(
 			MarketAgent myMarketAgent,
-			AID mySeller)
+			AID mySeller,
+			String myAuctionId)
 	{
 		super(myMarketAgent);
 		
 		this.mySeller = mySeller;
 		
-		this.conversationId =
-				AuctionManagementBehaviour.createConversationId(
-						this.mySeller);
+		this.myAuctionId = myAuctionId;
+		
+		this.messageFilter = this.createMessageFilter();
 		
 		// Register states
 		this.registerFirstState(new WaitToAnnounceBehaviour(myMarketAgent, this),
@@ -195,7 +200,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		this.registerState(new RelayToBidBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_BID);
 		
-		this.registerState(new RelayAuctionCancelledBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToCancelBehaviour(myMarketAgent, this),
 				STATE_RELAY_AUCTION_CANCELLED);
 		
 		this.registerState(new RelayRepBidOkBehaviour(myMarketAgent, this),
@@ -219,7 +224,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		this.registerLastState(new TerminateSuccessBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_SUCCESS);
 		
-		this.registerLastState(new TerminateCancelledBehaviour(myMarketAgent, this),
+		this.registerLastState(new TerminateCancelBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_CANCELLED);
 		
 		// Register transitions
@@ -264,39 +269,39 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_TO_BID,
-				TRANSITION_TO_BID_RECEIVED);
+				TRANSITION_TO_RELAY_BID);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_TO_ANNOUNCE,
-				TRANSITION_TO_ANNOUNCE_RECEIVED);
+				TRANSITION_TO_RELAY_ANNOUNCE);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
-				TRANSITION_AUCTION_CANCELLED_RECEIVED);
+				TRANSITION_TO_CANCEL);
 		
 		this.registerTransition(STATE_RELAY_TO_BID,
 				STATE_WAIT_REP_BID,
-				TRANSITION_TO_BID_RELAYED);
+				TRANSITION_TO_WAIT_REP_BID);
 		
 		this.registerTransition(STATE_RELAY_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
-				TRANSITION_AUCTION_CANCELLED_RECEIVED);
+				TRANSITION_TO_CANCEL);
 		
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_REP_BID_OK,
-				TRANSITION_REP_BID_OK_RECEIVED);
+				TRANSITION_TO_RELAY_REP_BID_OK);
 		
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_REP_BID_NOK,
-				TRANSITION_REP_BID_NOK_RECEIVED);
+				TRANSITION_TO_RELAY_REP_BID_NOK);
 		
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_TO_BID,
-				TRANSITION_TO_BID_RECEIVED);
+				TRANSITION_TO_RELAY_BID);
 		
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
-				TRANSITION_AUCTION_CANCELLED_RECEIVED);
+				TRANSITION_TO_CANCEL);
 	}
 	
 	/**
@@ -383,9 +388,9 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 * 
 	 * @return the ID of the conversation associated with the auction that this behaviour manages.
 	 */
-	public String getConversationId()
+	public String getAuctionId()
 	{
-		return conversationId;
+		return myAuctionId;
 	}
 	
 	/**
@@ -395,8 +400,31 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 * 
 	 * @return a conversation if for the auction.
 	 */
-	public static String createConversationId(AID sellerAID)
+	public static String createAuctionId(AID sellerAID)
 	{
 		return sellerAID.toString();
+	}
+	
+	/**
+	 * 
+	 * @return base message filter for conversations for the auction managed by this behaviour.
+	 */
+	public MessageTemplate getMessageFilter() 
+	{
+		return messageFilter;
+	}
+
+	/**
+	 * Creates a filter for incoming message.
+	 * 
+	 * @return the filter for incoming messages.
+	 */
+	private MessageTemplate createMessageFilter()
+	{
+		return MessageTemplate.and(
+						MessageTemplate.MatchTopic(
+								AuctionManagementBehaviour.MESSAGE_TOPIC),
+						MessageTemplate.MatchConversationId(
+										this.myAuctionId));
 	}
 }

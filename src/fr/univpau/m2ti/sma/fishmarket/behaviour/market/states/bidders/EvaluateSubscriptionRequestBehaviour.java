@@ -1,16 +1,12 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 /**
@@ -25,14 +21,10 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	private BidderManagementBehaviour myFSM;
 	
 	/** The status of the evaluation (in case of refuse). */
-	private int status = BidderManagementBehaviour.STATUS_REFUSE_NOT_REFUSED;
+	private int status = BidderManagementBehaviour.STATUS_REFUSE_NOT_UNDERSTOOD;
 	
 	/** Tells whether the subscription has been accepted or not. */
 	private boolean subscriptionAccepted;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(EvaluateSubscriptionRequestBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -56,68 +48,64 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	{
 		this.subscriptionAccepted = false;
 		
-		ACLMessage mess = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
 		
 		MarketAgent myMarketAgent = (MarketAgent)
 				super.myAgent;
 		
-		Object content = null;
+		String auctionId = (String) request.getContent();
 		
-		try
+		if(auctionId != null)
 		{
-			content = mess.getContentObject();
-		}
-		catch (UnreadableException e)
-		{
-			EvaluateSubscriptionRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
-		
-		if(content != null)
-		{
-			if(content instanceof AID)
+			Auction requestedAuction =
+					myMarketAgent.findAuction(auctionId);
+			
+			if(requestedAuction != null)
 			{
-				AID seller = (AID) content;
-				
-				Auction requestedAuction =
-						myMarketAgent.findAuction(seller);
-				
-				if(requestedAuction != null)
+				if(requestedAuction.getStatus() != Auction.STATUS_OVER
+						&& requestedAuction.getStatus() != Auction.STATUS_CANCELLED
+						&& !myMarketAgent.isSuscriber(
+								auctionId, request.getSender()))
 				{
-					if(requestedAuction.getStatus() != Auction.STATUS_OVER
-							&& requestedAuction.getStatus() != Auction.STATUS_CANCELLED
-							&& !myMarketAgent.isSuscriber(
-									seller, mess.getSender()))
-					{
-						this.subscriptionAccepted = true;  //// Accepted !!!!!!!!!!
-					}
+					this.subscriptionAccepted = true;  //// Accepted !!!!!!!!!!
 					
+					ACLMessage reply = request.createReply();
+					AID bidderAID = request.getSender();
 					
-					else if(requestedAuction.getStatus() == Auction.STATUS_OVER)
-					{
-						this.status = 
-								BidderManagementBehaviour.STATUS_REFUSE_AUCTION_OVER;
-					}
-					else if(requestedAuction.getStatus() == Auction.STATUS_CANCELLED)
-					{
-						this.status = 
-								BidderManagementBehaviour.STATUS_REFUSE_AUCTION_CANCELLED;
-					}
-					else
-					{
-						this.status = 
-								BidderManagementBehaviour.STATUS_REFUSE_ALREADY_REGISTERED;
-					}
+					// Register subscription
+					
+					myMarketAgent.addSuscriber(auctionId, bidderAID);
+					
+					// Reply accept
+					reply.setPerformative(
+							FishMarket.Performatives.TO_ACCEPT);
+					
+					reply.setConversationId(auctionId);		
+					
+					myMarketAgent.send(reply);
+				}
+				
+				
+				else if(requestedAuction.getStatus() == Auction.STATUS_OVER)
+				{
+					this.status = 
+							BidderManagementBehaviour.STATUS_REFUSE_AUCTION_OVER;
+				}
+				else if(requestedAuction.getStatus() == Auction.STATUS_CANCELLED)
+				{
+					this.status = 
+							BidderManagementBehaviour.STATUS_REFUSE_AUCTION_CANCELLED;
 				}
 				else
 				{
 					this.status = 
-							BidderManagementBehaviour.STATUS_REFUSE_AUCTION_NOT_FOUND;
+							BidderManagementBehaviour.STATUS_REFUSE_ALREADY_REGISTERED;
 				}
 			}
 			else
 			{
 				this.status = 
-						BidderManagementBehaviour.STATUS_REFUSE_SELLER_AID_NOT_UNDERSTOOD;
+						BidderManagementBehaviour.STATUS_REFUSE_AUCTION_NOT_FOUND;
 			}
 		}
 		else
@@ -131,7 +119,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	public int onEnd()
 	{
 		return (this.subscriptionAccepted) ?
-				BidderManagementBehaviour.TRANSITION_CONFIRM_SUBSCRIPTION :
+				BidderManagementBehaviour.TRANSITION_TO_NOTIFY_SELLER :
 					this.replyRefuse();
 	}
 	
@@ -146,17 +134,14 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 		ACLMessage reply =
 				this.myFSM.getRequest().createReply();
 		
-		try
-		{
-			reply.setContentObject(new Integer(this.status));
-		}
-		catch (IOException e)
-		{
-			EvaluateSubscriptionRequestBehaviour.LOGGER.log(Level.SEVERE, null, e);
-		}
+		reply.setPerformative(
+				FishMarket.Performatives.TO_REFUSE);
+		
+		reply.setContent(
+				String.valueOf(this.status));
 		
 		super.myAgent.send(reply);
 		
-		return BidderManagementBehaviour.TRANSITION_REFUSE_SUBSCRIPTION;
+		return BidderManagementBehaviour.TRANSITION_TO_WAIT_REQUEST;
 	}
 }

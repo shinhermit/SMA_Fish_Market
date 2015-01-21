@@ -1,6 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
@@ -44,8 +45,13 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 	{
 		MarketAgent myMarketAgent = (MarketAgent)myAgent;
 		
-		Auction auction = new Auction(
-				this.myFSM.getRequest().getSender());
+		ACLMessage request = this.myFSM.getRequest();
+		
+		String auctionId =
+				AuctionManagementBehaviour.createAuctionId(
+						request.getSender());
+		
+		Auction auction = new Auction(auctionId);
 		
 		if(! myMarketAgent.isRegisteredAuction(auction) )
 		{
@@ -53,11 +59,14 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 			auction.setStatus(
 					Auction.STATUS_RUNNING);
 			
-			myMarketAgent.registerAuction(auction);
+			myMarketAgent.registerAuction(
+					auction, request.getSender());
+			
+			request.setConversationId(auctionId);
 			
 			// Next transition
 			this.transition =
-					SellerManagementBehaviour.TRANSITION_TO_ACCEPT_REGISTRATION;
+					SellerManagementBehaviour.TRANSITION_TO_CONFIRM_REGISTRATION;
 		}
 		else
 		{
@@ -73,6 +82,8 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 			// Next transition
 			this.transition =
 					SellerManagementBehaviour.TRANSITION_TO_WAIT_REQUEST;
+			
+			this.myFSM.setRequest(null);
 		}
 	}
 	

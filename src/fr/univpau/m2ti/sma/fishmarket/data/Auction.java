@@ -1,6 +1,5 @@
 package fr.univpau.m2ti.sma.fishmarket.data;
 
-import jade.core.AID;
 import jade.util.leap.Serializable;
 
 @SuppressWarnings("serial")
@@ -14,8 +13,11 @@ import jade.util.leap.Serializable;
  */
 public class Auction implements Serializable
 {
-	/** The agent ID of the seller who created this auction. */
-	private AID sellerID;
+	/** The ID of this auction. */
+	private String auctionID;
+	
+	/** The current price of the auction. */
+	private float currentPrice = 0;
 	
 	/** The status of the auction. One of the static fields prefixed with <i>STATUS_</i>.*/
 	private int status;
@@ -45,11 +47,11 @@ public class Auction implements Serializable
 	/**
 	 * Creates a new auction, associated with it seller initiator.
 	 * 
-	 * @param sellerID the seller agent who requested the creation of this auction.
+	 * @param auctionID the ID of this auction.
 	 */
-	public Auction(AID sellerID)
+	public Auction(String auctionID)
 	{
-		this.sellerID = sellerID;
+		this.auctionID = auctionID;
 		
 		this.status = Auction.STATUS_CREATED;
 	}
@@ -73,8 +75,8 @@ public class Auction implements Serializable
 			{
 				Auction other = (Auction) o;
 				
-				equals = this.sellerID.equals(
-						other.getSellerID());
+				equals = this.auctionID.equals(
+						other.getID());
 			}
 		}
 		
@@ -85,8 +87,8 @@ public class Auction implements Serializable
 	public String toString()
 	{
 		return
-				"Auction {seller: " +
-				this.sellerID.toString() +
+				"Auction {ID: " +
+				this.auctionID +
 				"; status: " +
 				Auction.printStatus(this.status) +
 				"}";
@@ -102,18 +104,18 @@ public class Auction implements Serializable
 	 * 
 	 * @return the seller agent who requested the creation of this auction.
 	 */
-	public AID getSellerID()
+	public String getID()
 	{
-		return sellerID;
+		return this.auctionID;
 	}
 
 	/**
 	 * 
-	 * @param sellerID the seller agent who requested the creation of this auction.
+	 * @param auctionID the seller agent who requested the creation of this auction.
 	 */
-	public void setSellerID(AID sellerID)
+	public void setID(String auctionID)
 	{
-		this.sellerID = sellerID;
+		this.auctionID = auctionID;
 	}
 
 	/**
@@ -167,5 +169,23 @@ public class Auction implements Serializable
 		}
 		
 		return statusString;
+	}
+
+	/**
+	 * 
+	 * @return the current price of the auction.
+	 */
+	public float getCurrentPrice()
+	{
+		return currentPrice;
+	}
+
+	/**
+	 * 
+	 * @param currentPrice  the current price of the auction.
+	 */
+	public void setCurrentPrice(float currentPrice)
+	{
+		this.currentPrice = currentPrice;
 	}
 }

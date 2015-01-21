@@ -74,7 +74,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					FishMarket.Performatives.REP_BID)
 			{
 				this.transition =
-						AuctionManagementBehaviour.TRANSITION_REP_BID_NOK_RECEIVED;
+						AuctionManagementBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
 				
 				String content = (String) mess.getContent();
 				
@@ -85,7 +85,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					if(repBidOk)
 					{
 						this.transition =
-									AuctionManagementBehaviour.TRANSITION_REP_BID_OK_RECEIVED;
+									AuctionManagementBehaviour.TRANSITION_TO_RELAY_REP_BID_OK;
 					}
 				}
 			}
@@ -95,7 +95,7 @@ public class WaitRepBidBehaviour extends Behaviour
 			{
 				this.transition =
 						AuctionManagementBehaviour
-						.TRANSITION_TO_BID_RECEIVED;
+						.TRANSITION_TO_RELAY_BID;
 			}
 			
 			else if(performative ==
@@ -103,7 +103,7 @@ public class WaitRepBidBehaviour extends Behaviour
 			{
 				this.transition =
 						AuctionManagementBehaviour
-						.TRANSITION_AUCTION_CANCELLED_RECEIVED;
+						.TRANSITION_TO_CANCEL;
 			}
 		}
 	}
@@ -128,18 +128,14 @@ public class WaitRepBidBehaviour extends Behaviour
 	private MessageTemplate createMessageFilter()
 	{
 		return MessageTemplate.and(
-						MessageTemplate.MatchTopic(
-								AuctionManagementBehaviour.MESSAGE_TOPIC),
-						MessageTemplate.and(
-								MessageTemplate.MatchConversationId(
-										this.myFSM.getConversationId()),
-								MessageTemplate.or(
-										MessageTemplate.MatchPerformative(
-												FishMarket.Performatives.REP_BID),
-										MessageTemplate.or(
-												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.TO_BID),
-												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.TO_CANCEL)))));
+				this.myFSM.getMessageFilter(),
+				MessageTemplate.or(
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.REP_BID),
+						MessageTemplate.or(
+								MessageTemplate.MatchPerformative(
+										FishMarket.Performatives.TO_BID),
+								MessageTemplate.MatchPerformative(
+										FishMarket.Performatives.TO_CANCEL))));
 	}
 }

@@ -51,7 +51,7 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
 		
 		for(AID subscriber : myMarketAgent.getSubscribers(
-				this.myFSM.getSeller()))
+				this.myFSM.getAuctionId()))
 		{
 			toRelay.addReceiver(subscriber);
 		}
@@ -63,6 +63,6 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 		
 		// Close auction
 		myMarketAgent.setAuctionStatus(
-				this.myFSM.getSeller(), Auction.STATUS_OVER);
+				this.myFSM.getAuctionId(), Auction.STATUS_OVER);
 	}
 }

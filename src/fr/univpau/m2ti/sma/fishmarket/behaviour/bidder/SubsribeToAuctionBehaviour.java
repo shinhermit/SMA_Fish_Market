@@ -226,9 +226,9 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 	 * @param seller
 	 * @return
 	 */
-	public boolean hasSubscribedToAuction(AID seller)
+	public boolean hasSubscribedToAuction(String auctionId)
 	{
-		return this.subscribedAuctions.contains(seller);
+		return this.subscribedAuctions.contains(auctionId);
 	}
 
 	public void setLastSubscribedAuction(AID auction)

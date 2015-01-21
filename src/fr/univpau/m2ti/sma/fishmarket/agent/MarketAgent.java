@@ -32,6 +32,10 @@ public class MarketAgent extends Agent
 	private Map<Auction, Set<AID>> auctions =
 			new HashMap<Auction, Set<AID>>();
 	
+	/** Associate an auction with it's seller agent. */
+	private Map<Auction, AID> sellers =
+			new HashMap<Auction, AID>();
+	
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
 	
@@ -134,10 +138,12 @@ public class MarketAgent extends Agent
 	 * Registers a new auction.
 	 * 
 	 * @param auction the auction which is to be registered.
+	 * @param seller the AID of the seller in this auction.
 	 */
-	public void registerAuction(Auction auction)
+	public void registerAuction(Auction auction, AID seller)
 	{
 		this.auctions.put(auction, new HashSet<AID>());
+		this.sellers.put(auction, seller);
 	}
 	
 	/**
@@ -152,11 +158,11 @@ public class MarketAgent extends Agent
 	/**
 	 * Retrieves a registered auction by the AID the the seller who created it.
 	 * 
-	 * @param sellerAID the AID the the seller who created the looked-up auction (uniquely identifies the auction).
+	 * @param auctionID the ID of the auction.
 	 * 
 	 * @return the looked-up auction if found, null otherwise.
 	 */
-	public Auction findAuction(AID sellerAID)
+	public Auction findAuction(String auctionID)
 	{
 		Auction auction = null;
 		boolean found = false;
@@ -168,7 +174,7 @@ public class MarketAgent extends Agent
 		{
 			auction = it.next();
 			
-			found = auction.getSellerID().equals(sellerAID);
+			found = auction.getID().equals(auctionID);
 		}
 		
 		if(!found)
@@ -180,15 +186,26 @@ public class MarketAgent extends Agent
 	}
 	
 	/**
+	 * 
+	 * @param auctionID the ID of an auction.
+	 * 
+	 * @return the seller in this auction.
+	 */
+	public AID getSeller(String auctionID)
+	{
+		return this.sellers.get(new Auction(auctionID));
+	}
+	
+	/**
 	 * Adds an agent to the set of registered bidder for an auction.
 	 * 
-	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param auctionID the AID of the auction.
 	 * @param bidderAID the AID of the bidder agent who wants to subscribe to the auction.
 	 */
-	public void addSuscriber(AID sellerAID, AID bidderAID)
+	public void addSuscriber(String auctionID, AID bidderAID)
 	{
 		Set<AID> suscribers =
-				this.auctions.get(new Auction(sellerAID));
+				this.auctions.get(new Auction(auctionID));
 		
 		suscribers.add(bidderAID);
 	}
@@ -196,15 +213,15 @@ public class MarketAgent extends Agent
 	/**
 	 * Tells whether a bidder agent is a subscriber on an auction.
 	 * 
-	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param auctionID the ID of the auction.
 	 * @param bidderAID the AID of the bidder agent which is checked.
 	 * 
 	 * @return true if the bidder agent is found in the subscriber list of the auction represented by it's seller AID.
 	 */
-	public boolean isSuscriber(AID sellerAID, AID bidderAID)
+	public boolean isSuscriber(String auctionID, AID bidderAID)
 	{
 		Set<AID> suscribers =
-				this.auctions.get(new Auction(sellerAID));
+				this.auctions.get(new Auction(auctionID));
 		
 		return suscribers.contains(bidderAID);
 	}
@@ -212,24 +229,24 @@ public class MarketAgent extends Agent
 	/**
 	 * Provides the subscribers of an auction.
 	 * 
-	 * @param sellerAID the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param auctionID the AID of the seller who created the auction (uniquely identifies the auction).
 	 * 
 	 * @return the list of subscribers for the given auction.
 	 */
-	public Set<AID> getSubscribers(AID sellerAID)
+	public Set<AID> getSubscribers(String auctionID)
 	{
-		return this.auctions.get(new Auction(sellerAID));
+		return this.auctions.get(new Auction(auctionID));
 	}
 	
 	/**
 	 * Defines the status of an auction.
 	 * 
-	 * @param sellerAID  the AID of the seller who created the auction (uniquely identifies the auction).
+	 * @param auctionID  the ID of the auction.
 	 * @param status the new status of the auction (public static fields of class Auction).
 	 */
-	public void setAuctionStatus(AID sellerAID, int status)
+	public void setAuctionStatus(String auctionID, int status)
 	{
-		Auction auction = this.findAuction(sellerAID);
+		Auction auction = this.findAuction(auctionID);
 		
 		if(auction != null)
 		{
@@ -238,12 +255,29 @@ public class MarketAgent extends Agent
 	}
 	
 	/**
+	 * Defines the status of an auction.
 	 * 
-	 * @param sellerAID an auction that we want to delete.
+	 * @param auctionID  the ID of the auction.
+	 * @param status the new status of the auction (public static fields of class Auction).
 	 */
-	public void deleteAuction(AID sellerAID)
+	public void setAuctionPrice(String auctionID, float price)
 	{
-		this.auctions.remove(new Auction(sellerAID));
+		Auction auction = this.findAuction(auctionID);
+		
+		if(auction != null)
+		{
+			auction.setCurrentPrice(price);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param auctionID an auction that we want to delete.
+	 */
+	public void deleteAuction(String auctionID)
+	{
+		this.auctions.remove(new Auction(auctionID));
+		this.sellers.remove(new Auction(auctionID));
 	}
     
     /**

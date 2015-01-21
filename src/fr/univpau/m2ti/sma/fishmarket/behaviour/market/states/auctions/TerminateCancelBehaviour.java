@@ -11,7 +11,7 @@ import jade.core.behaviours.OneShotBehaviour;
  * @author Josuah Aron
  *
  */
-public class TerminateCancelledBehaviour extends OneShotBehaviour
+public class TerminateCancelBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private AuctionManagementBehaviour myFSM;
@@ -24,7 +24,7 @@ public class TerminateCancelledBehaviour extends OneShotBehaviour
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public TerminateCancelledBehaviour(
+	public TerminateCancelBehaviour(
 			MarketAgent myMarketAgent,
 			AuctionManagementBehaviour myFSM)
 	{
@@ -39,7 +39,7 @@ public class TerminateCancelledBehaviour extends OneShotBehaviour
 		MarketAgent myMarketAgent =
 				(MarketAgent) super.myAgent;
 		
-		myMarketAgent.deleteAuction(this.myFSM.getSeller());
+		myMarketAgent.deleteAuction(this.myFSM.getAuctionId());
 		
 		// Say bye !
 	}

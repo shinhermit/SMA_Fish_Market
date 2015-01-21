@@ -41,7 +41,8 @@ public class WaitToAnnounceBehaviour extends Behaviour
 		
 		this.myFSM = myFSM;
 		
-		this.messageFilter = this.createMessageFilter();
+		this.messageFilter =
+				this.createMessageFilter();
 	}
 	
 	@Override
@@ -55,8 +56,11 @@ public class WaitToAnnounceBehaviour extends Behaviour
 		// Wait that myAgent receives message
 		this.block();
 		
+		MarketAgent myMarketAgent =
+				(MarketAgent) super.myAgent;
+		
 		// Receive messages
-		ACLMessage mess = myAgent.receive(
+		ACLMessage mess = myMarketAgent.receive(
 				this.messageFilter);
 		
 		if(mess != null)
@@ -81,12 +85,8 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	private MessageTemplate createMessageFilter()
 	{
 		return MessageTemplate.and(
-						MessageTemplate.MatchTopic(
-								AuctionManagementBehaviour.MESSAGE_TOPIC),
-						MessageTemplate.and(
-								MessageTemplate.MatchConversationId(
-										this.myFSM.getConversationId()),
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.TO_ANNOUNCE)));
+				this.myFSM.getMessageFilter(),
+				MessageTemplate.MatchPerformative(
+						FishMarket.Performatives.TO_ANNOUNCE));
 	}
 }
