@@ -70,7 +70,7 @@ public class ConfirmSubscriptionBehaviour extends OneShotBehaviour
 		
 		// Reply confirm
 		reply.setPerformative(
-				FishMarket.Performatives.CONFIRM_BIDDER_SUBSCRIPTION);
+				FishMarket.Performatives.TO_ACCEPT);
 		reply.setConversationId(
 				AuctionManagementBehaviour.createConversationId(
 						sellerAID));

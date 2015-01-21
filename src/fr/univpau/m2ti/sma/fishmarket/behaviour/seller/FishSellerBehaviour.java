@@ -16,7 +16,7 @@ import jade.lang.acl.MessageTemplate;
 public class FishSellerBehaviour extends FSMBehaviour
 {
 	/** The id of the conversation of this auction. */
-	private String conversationId;
+	private final String conversationId;
 	
 	/** The state in which the seller makes an announcement of the current price. */
 	private static final String STATE_ANNONCE_PRICE =
@@ -45,10 +45,6 @@ public class FishSellerBehaviour extends FSMBehaviour
 	/** The state in which the seller waits for the payment from the selected bidder. */
 	private static final String STATE_WAIT_TO_PAY =
 			"STATE_WAIT_TO_PAY";
-	
-	/** The state in which the seller send the notification that the auction ended successfully. */
-	private static final String STATE_NOTIFY_AUCTION_OVER =
-			"STATE_NOTIFY_AUCTION_OVER";
 	
 	/** The final state when the auction succeeded. */
 	private static final String STATE_TERMINATE_SUCCESS =
@@ -130,10 +126,6 @@ public class FishSellerBehaviour extends FSMBehaviour
 				STATE_WAIT_TO_PAY);
 		
 		this.registerLastState(
-				new NotifyAuctionOverBehaviour(mySellerAgent, this),
-				STATE_NOTIFY_AUCTION_OVER);
-		
-		this.registerLastState(
 				new TerminateCancelBehaviour(mySellerAgent, this),
 				STATE_TERMINATE_CANCEL);
 		
@@ -173,10 +165,7 @@ public class FishSellerBehaviour extends FSMBehaviour
 				STATE_SEND_TO_GIVE, STATE_WAIT_TO_PAY);
 		
 		this.registerDefaultTransition(
-				STATE_WAIT_TO_PAY, STATE_NOTIFY_AUCTION_OVER);
-		
-		this.registerDefaultTransition(
-				STATE_NOTIFY_AUCTION_OVER, STATE_TERMINATE_SUCCESS);
+				STATE_WAIT_TO_PAY, STATE_TERMINATE_SUCCESS);
 	}
 
 	/**

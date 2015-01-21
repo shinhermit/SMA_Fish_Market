@@ -1,17 +1,12 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 public class WaitSecondBidBehaviour extends OneShotBehaviour
@@ -28,10 +23,6 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 	
 	/** The time to wait for the second bid. */
 	private static final long SECOND_BID_WAIT_DURATION = 20000l; // 20 sec
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(WaitSecondBidBehaviour.class.getName());
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -63,27 +54,12 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
 		
-		AID bidder = null;
-		
 		if(mess != null)
 		{
-			try
-			{
-				bidder = (AID) mess.getContentObject();
-			}
-			catch (UnreadableException e)
-			{
-				WaitSecondBidBehaviour.LOGGER.log(Level.SEVERE, null, e);
-			}
-			
-			if(bidder != null)
-			{
-				this.transition =
-						FishSellerBehaviour.TRANSITION_TO_WAIT_MORE_BID;
-			}
+			this.transition =
+					FishSellerBehaviour.TRANSITION_TO_WAIT_MORE_BID;
 		}
-		
-		if(mess == null || bidder == null)
+		else
 		{
 			this.transition =
 					FishSellerBehaviour.TRANSITION_TO_ATTRIBUTE;
@@ -91,8 +67,6 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 			// send rep_bid(OK)
 			ACLMessage reply = new ACLMessage(
 					FishMarket.Performatives.REP_BID);
-			
-			reply.clearAllReceiver();
 			
 			// Set topic
 			reply.addReceiver(

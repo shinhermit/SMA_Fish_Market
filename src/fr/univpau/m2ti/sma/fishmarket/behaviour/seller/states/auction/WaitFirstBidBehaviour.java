@@ -1,17 +1,11 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 public class WaitFirstBidBehaviour extends OneShotBehaviour
@@ -21,10 +15,6 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(WaitFirstBidBehaviour.class.getName());
 	
 	/** The selected transition to the next state. */
 	private int transition =
@@ -63,27 +53,12 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
 		
-		AID bidder = null;
-		
 		if(mess != null)
 		{
-			try
-			{
-				bidder = (AID) mess.getContentObject();
-			}
-			catch (UnreadableException e)
-			{
-				WaitFirstBidBehaviour.LOGGER.log(Level.SEVERE, null, e);
-			}
-			
-			if(bidder != null)
-			{
-				this.transition =
-						FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
-			}
+			this.transition =
+					FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
 		}
-		
-		if(mess == null || bidder == null)
+		else
 		{
 			float newStep = mySellerAgent.getPriceStep() / 2f;
 			float newPrice = mySellerAgent.getCurrentPrice() - newStep;
@@ -101,25 +76,6 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 			{
 				this.transition =
 						FishSellerBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
-				
-				// Notify auction cancelled
-				ACLMessage cancelMess = new ACLMessage(
-						FishMarket.Performatives.TO_CANCEL);
-				
-				// Set topic
-				cancelMess.addReceiver(
-						AuctionManagementBehaviour.MESSAGE_TOPIC);
-				
-				// Set conversation id
-				cancelMess.setConversationId(
-						this.myFSM.getConversationId());
-				
-				// Receiver
-				cancelMess.addReceiver(
-						mySellerAgent.getMarketAgent());
-				
-				// send
-				mySellerAgent.send(cancelMess);
 			}
 		}
 	}

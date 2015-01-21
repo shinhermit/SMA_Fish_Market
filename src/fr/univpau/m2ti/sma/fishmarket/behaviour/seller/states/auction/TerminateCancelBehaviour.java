@@ -1,9 +1,11 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 public class TerminateCancelBehaviour extends OneShotBehaviour
@@ -29,6 +31,26 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		SellerAgent mySellerAgent =
+				(SellerAgent)super.myAgent;
 		
+		// Notify auction cancelled
+		ACLMessage cancelMess = new ACLMessage(
+				FishMarket.Performatives.TO_CANCEL);
+		
+		// Set topic
+		cancelMess.addReceiver(
+				AuctionManagementBehaviour.MESSAGE_TOPIC);
+		
+		// Set conversation id
+		cancelMess.setConversationId(
+				this.myFSM.getConversationId());
+		
+		// Receiver
+		cancelMess.addReceiver(
+				mySellerAgent.getMarketAgent());
+		
+		// send
+		mySellerAgent.send(cancelMess);
 	}
 }

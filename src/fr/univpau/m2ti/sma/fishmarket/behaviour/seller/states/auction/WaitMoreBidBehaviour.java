@@ -76,7 +76,8 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		else if(nextPriceStep >= minPriceStep)
 		{
 			mySellerAgent.decreasePriceStep();
-			mySellerAgent.decreasePrice();
+			
+			mySellerAgent.increasePrice();
 		}
 		else
 		{
@@ -89,8 +90,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		// send rep_bid
 		ACLMessage reply = new ACLMessage(
 				FishMarket.Performatives.REP_BID);
-		
-		reply.clearAllReceiver();
 		
 		// Set topic
 		reply.addReceiver(
