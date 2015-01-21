@@ -47,8 +47,8 @@ public class CreateBidderFSMBehaviour extends OneShotBehaviour
         {
             min = Long.MAX_VALUE - 1;
         }
-        
-        if (max >= min)
+
+        if (max <= min)
         {
             max = min + 1;
         }
