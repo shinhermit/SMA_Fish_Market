@@ -1,7 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.WakerBehaviour;
@@ -50,25 +49,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 		else
 		{
 			this.transition =
-					RegisterAuctionBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
-			
-			// Send to_cancel
-			SellerAgent mySellerAgent =
-					(SellerAgent) super.myAgent;
-			
-			ACLMessage cancelMess = new ACLMessage(
-					FishMarket.Performatives.TO_CANCEL);
-			
-			// Set topic
-			cancelMess.addReceiver(
-					SellerManagementBehaviour.MESSAGE_TOPIC);
-			
-			// Receiver
-			cancelMess.addReceiver(
-					mySellerAgent.getMarketAgent());
-			
-			// Add auction and send
-			mySellerAgent.send(cancelMess);
+					RegisterAuctionBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
 		}
 	}
 

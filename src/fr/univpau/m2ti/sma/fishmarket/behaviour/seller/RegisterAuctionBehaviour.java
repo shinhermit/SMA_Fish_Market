@@ -43,15 +43,22 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 	private static final String STATE_TERMINATE_SUCCESS =
 			"STATE_TERMINATE_SUCCESS";
 	
-	/** The state in which the seller end this behaviour and creates the behaviour to participate to his auction. */
+	/** The state in which the seller terminate because his auction requests have been rejected too many times. */
 	private static final String STATE_TERMINATE_FAILURE =
 			"STATE_TERMINATE_FAILURE";
+	
+	/** The state in which the seller cancels the auction because no bidder subscribed. */
+	private static final String STATE_TERMINATE_CANCEL =
+			"STATE_TERMINATE_CANCEL";
 	
 	/** The code which activates the transition to wait for an answer from the market after a registration request. */
 	public static final int TRANSITION_TO_WAIT_RESPONSE;
 	
-	/** The code which activates the transition to terminate without any completing the whole registration process. */
+	/** The code which activates the transition to terminate because auction requests have been rejected too many times. */
 	public static final int TRANSITION_TO_TERMINATE_FAILURE;
+	
+	/** The code which activates the transition to terminate and cancel the auction because no bidder subscribed. */
+	public static final int TRANSITION_TO_TERMINATE_CANCEL;
 	
 	/** The code which activates the transition to wait for bidders subscriptions. */
 	public static final int TRANSITION_TO_WAIT_BIDDERS;
@@ -68,6 +75,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		
 		TRANSITION_TO_WAIT_RESPONSE = ++start;
 		TRANSITION_TO_TERMINATE_FAILURE = ++start;
+		TRANSITION_TO_TERMINATE_CANCEL = ++start;
 		TRANSITION_TO_WAIT_BIDDERS = ++start;
 		TRANSITION_TO_REQUEST_REGISTRATION = ++start;
 		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
@@ -105,6 +113,10 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 				new TerminateFailureBehaviour(mySellerAgent, this),
 				STATE_TERMINATE_FAILURE);
 		
+		this.registerLastState(
+				new TerminateCancelBehaviour(mySellerAgent, this),
+				STATE_TERMINATE_CANCEL);
+		
 		// Add transitions
 		this.registerTransition(
 				STATE_REQUEST_REGISTRATION, STATE_WAIT_RESPONSE,
@@ -123,8 +135,8 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 				TRANSITION_TO_WAIT_BIDDERS);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDER, STATE_TERMINATE_FAILURE,
-				TRANSITION_TO_TERMINATE_FAILURE);
+				STATE_WAIT_BIDDER, STATE_TERMINATE_CANCEL,
+				TRANSITION_TO_TERMINATE_CANCEL);
 		
 		this.registerTransition(
 				STATE_WAIT_BIDDER, STATE_TERMINATE_SUCCESS,
