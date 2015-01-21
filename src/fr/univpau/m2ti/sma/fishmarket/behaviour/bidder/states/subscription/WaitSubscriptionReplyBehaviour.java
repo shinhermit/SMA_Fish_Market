@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -24,11 +24,11 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
     private static final Logger LOGGER =
             Logger.getLogger(WaitSubscriptionReplyBehaviour.class.getName());
 
-    private SubsribeToAuctionBehaviour myFSM;
+    private SubscribeToAuctionBehaviour myFSM;
 
     private int transition;
 
-    public WaitSubscriptionReplyBehaviour(Agent a, SubsribeToAuctionBehaviour fsm)
+    public WaitSubscriptionReplyBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
         this.myFSM = fsm;
@@ -59,7 +59,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
             {
                 // subscription succeeded
                 this.transition =
-                        SubsribeToAuctionBehaviour
+                        SubscribeToAuctionBehaviour
                                 .TRANSITION_SUBSCRIPTION_ACCEPTED;
 
                 try
@@ -77,7 +77,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
             else
             {
                 this.transition =
-                        SubsribeToAuctionBehaviour
+                        SubscribeToAuctionBehaviour
                                 .TRANSITION_SUBSCRIPTION_REFUSED;
             }
         }

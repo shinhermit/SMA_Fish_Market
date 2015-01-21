@@ -26,5 +26,7 @@ public class AuctionOverUnsuccessfullyBehaviour extends OneShotBehaviour
     @Override
     public void action() {
         System.out.println("action => " + getBehaviourName());
+
+        System.out.println("Auction cancelled.");
     }
 }

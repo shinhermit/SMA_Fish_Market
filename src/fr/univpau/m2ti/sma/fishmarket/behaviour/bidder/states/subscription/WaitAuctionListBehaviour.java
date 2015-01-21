@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -23,9 +23,9 @@ public class WaitAuctionListBehaviour extends OneShotBehaviour
     private static final Logger LOGGER =
             Logger.getLogger(WaitAuctionListBehaviour.class.getName());
 
-    private SubsribeToAuctionBehaviour myFSM;
+    private SubscribeToAuctionBehaviour myFSM;
 
-    public WaitAuctionListBehaviour(Agent a, SubsribeToAuctionBehaviour myFSM)
+    public WaitAuctionListBehaviour(Agent a, SubscribeToAuctionBehaviour myFSM)
     {
         super(a);
         this.myFSM = myFSM;
@@ -92,6 +92,6 @@ public class WaitAuctionListBehaviour extends OneShotBehaviour
     public int onEnd()
     {
         // Implemented because of possible early return to end state.
-        return SubsribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED;
+        return SubscribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED;
     }
 }

@@ -1,16 +1,12 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
-import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,8 +65,10 @@ public class AboutToBidBehaviour extends OneShotBehaviour
             //bidding is possible
             ACLMessage bid = mess.createReply();
             bid.setPerformative(FishMarket.Performatives.TO_BID);
-
             super.myAgent.send(bid);
+
+            // Store bidding price
+            this.myFSM.setBiddingPrice(price);
 
             this.transition = BidderBehaviour.TRANSITION_BID;
         }
@@ -89,7 +87,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
 
                 if (newMessage.getPerformative() == FishMarket.Performatives.TO_ANNOUNCE)
                 {
-                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_FIRST_ANNOUNCE;
+                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
                 }
                 else if (newMessage.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
                 {

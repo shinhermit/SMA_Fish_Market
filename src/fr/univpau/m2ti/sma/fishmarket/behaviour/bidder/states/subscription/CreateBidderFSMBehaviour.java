@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
@@ -17,9 +17,9 @@ public class CreateBidderFSMBehaviour extends OneShotBehaviour
     private static final Logger LOGGER =
             Logger.getLogger(CreateBidderFSMBehaviour.class.getName());
 
-    private SubsribeToAuctionBehaviour myFSM;
+    private SubscribeToAuctionBehaviour myFSM;
 
-    public CreateBidderFSMBehaviour(Agent a, SubsribeToAuctionBehaviour fsm)
+    public CreateBidderFSMBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
         this.myFSM = fsm;

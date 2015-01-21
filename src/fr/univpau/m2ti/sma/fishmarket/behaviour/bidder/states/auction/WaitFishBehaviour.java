@@ -12,11 +12,11 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitAttributionBehaviour extends OneShotBehaviour
+public class WaitFishBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
-            Logger.getLogger(WaitAttributionBehaviour.class.getName());
+            Logger.getLogger(WaitFishBehaviour.class.getName());
 
     private BidderBehaviour myFSM;
 
@@ -26,18 +26,19 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
     static
     {
         MESSAGE_FILTER = MessageTemplate.MatchPerformative(
-                FishMarket.Performatives.TO_ATTRIBUTE
+                FishMarket.Performatives.TO_GIVE
         );
     }
 
-    public WaitAttributionBehaviour(Agent a, BidderBehaviour fsm)
+    public WaitFishBehaviour(Agent a, BidderBehaviour fsm)
     {
         super(a);
         this.myFSM = fsm;
     }
 
     @Override
-    public void action() {
+    public void action()
+    {
         System.out.println("action => " + getBehaviourName());
 
         this.block();
@@ -46,7 +47,9 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
 
         if (message != null)
         {
-            System.out.println("Received attribution");
+            System.out.println("Received Fish");
         }
+
     }
 }
+

@@ -68,6 +68,9 @@ public class BidderBehaviour extends FSMBehaviour
 
 	private long maxPrice;
 
+	/** Price at last bid */
+	private long biddingPrice;
+
 	public BidderBehaviour (Agent a, AID auctionSeller, long maxPrice)
 	{
 		super(a);
@@ -96,7 +99,7 @@ public class BidderBehaviour extends FSMBehaviour
 		);
 
 		this.registerState(
-				new WaitFishdBehaviour(a, this),
+				new WaitFishBehaviour(a, this),
 				STATE_WAIT_FISH
 		);
 
@@ -226,5 +229,21 @@ public class BidderBehaviour extends FSMBehaviour
 	public long getPriceLimit()
 	{
 		return this.maxPrice;
+	}
+
+	public void setBiddingPrice(long biddingPrice)
+	{
+		this.biddingPrice = biddingPrice;
+	}
+
+	public long getBiddingPrice()
+	{
+		return this.biddingPrice;
+	}
+
+	@Override
+	public int onEnd()
+	{
+		return super.onEnd();
 	}
 }

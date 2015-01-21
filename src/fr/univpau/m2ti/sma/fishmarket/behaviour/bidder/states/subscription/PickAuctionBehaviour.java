@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -27,7 +27,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
     private static final Logger LOGGER =
             Logger.getLogger(PickAuctionBehaviour.class.getName());
 
-    private SubsribeToAuctionBehaviour myFSM;
+    private SubscribeToAuctionBehaviour myFSM;
 
     private HashSet<Auction> auctionList;
 
@@ -35,7 +35,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
 
     private int transition;
 
-    public PickAuctionBehaviour(Agent a, SubsribeToAuctionBehaviour fsm)
+    public PickAuctionBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
         this.myFSM = fsm;
@@ -75,7 +75,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
                 ACLMessage reply = mess.createReply();
                 reply.setPerformative(FishMarket.Performatives.REQUEST_AUCTION_REGISTRATION);
 
-                this.transition = SubsribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+                this.transition = SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 
                 try
                 {
@@ -102,7 +102,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
         {
             // could not select item
             this.transition =
-                    SubsribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
+                    SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
         }
 
 
