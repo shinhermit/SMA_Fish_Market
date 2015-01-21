@@ -69,6 +69,8 @@ public class AboutToBidBehaviour extends Behaviour
             //bidding is possible
             ACLMessage bid = mess.createReply();
             bid.setPerformative(FishMarket.Performatives.TO_BID);
+            bid.setContent(String.valueOf(price));
+
             super.myAgent.send(bid);
 
             // Store bidding price
