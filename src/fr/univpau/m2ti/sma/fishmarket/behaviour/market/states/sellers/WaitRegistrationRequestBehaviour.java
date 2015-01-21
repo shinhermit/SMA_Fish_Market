@@ -1,16 +1,11 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 @SuppressWarnings("serial")
 /**
@@ -26,21 +21,13 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(WaitRegistrationRequestBehaviour.class.getName());
 
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.and(
-					MessageTemplate.MatchTopic(
-							SellerManagementBehaviour.MESSAGE_TOPIC),
-					MessageTemplate.or(
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.TO_PROVIDE),
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.TO_SUBSCRIBE)));
+					SellerManagementBehaviour.MESSAGE_FILTER,
+					MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.TO_REGISTER));
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -76,30 +63,9 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 		
 		if(mess != null)
 		{
-			try
-			{
-				Object content = mess.getContentObject();
-				
-				if(content != null)
-				{
-					if(content instanceof Auction)
-					{
-						this.myFSM.setRequest(mess);
-						
-						this.isDone = true;
-					}
-					else
-					{
-						ACLMessage reply = mess.createReply();
-						reply.setPerformative(ACLMessage.NOT_UNDERSTOOD);
-						
-						super.myAgent.send(reply);
-					}
-				}
-			} catch (UnreadableException e)
-			{
-				WaitRegistrationRequestBehaviour.LOGGER.log(Level.WARNING, null, e);
-			}
+			this.myFSM.setRequest(mess);
+			
+			this.isDone = true;
 		}
 	}
 
@@ -113,7 +79,7 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 	public int onEnd()
 	{
 		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_USER_TERMINATE :
-					SellerManagementBehaviour.TRANSITION_AUCTION_REQUEST_RECEIVED;
+				SellerManagementBehaviour.TRANSITION_TO_TERMINATE :
+					SellerManagementBehaviour.TRANSITION_TO_EVALUATE_REQUEST;
 	}
 }

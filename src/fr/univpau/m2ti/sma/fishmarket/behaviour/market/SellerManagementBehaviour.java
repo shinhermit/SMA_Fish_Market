@@ -10,6 +10,7 @@ import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 /**
@@ -27,17 +28,22 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	public static final AID MESSAGE_TOPIC = 
 			TopicUtility.createTopic(
 					FishMarket.Topics.TOPIC_AUCTION_REGISTRATION);
+
+	/** Allows filtering incoming messages. */
+	public static final MessageTemplate MESSAGE_FILTER =
+				MessageTemplate.MatchTopic(
+							SellerManagementBehaviour.MESSAGE_TOPIC);
 	
 	/** The state in which the agent waits for auction creation requests. */
-	private static final String STATE_WAIT_AUCTION_REGISTRATION_REQUEST =
+	private static final String STATE_WAIT_REQUEST =
 			"STATE_WAIT_AUCTION_CREATION_REQUEST";
 	
 	/** The state in which the agent evaluates auction creation requests. */
-	private static final String STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST =
+	private static final String STATE_EVALUATE_REQUEST =
 			"STATE_EVALUATE_AUCTION_CREATION_REQUEST";
 	
 	/** The state in which the agent evaluates auction creation requests. */
-	private static final String STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST =
+	private static final String STATE_ACCEPT_REGISTRATION =
 			"STATE_CONFIRM_AUCTION_CREATION_REQUEST";
 	
 	/** The ending state for the behaviour (user properly stopped the market). */
@@ -45,18 +51,28 @@ public class SellerManagementBehaviour extends FSMBehaviour
 			"STATE_TERMINATE";
 	
 	/** Return code which activates the transition to evaluate an auction registration request. */
-	public static final int TRANSITION_AUCTION_REQUEST_RECEIVED = 0;
+	public static final int TRANSITION_TO_EVALUATE_REQUEST;
 	
 	/** Return code which activates the transition to terminate this finite state machine. */
-	public static final int TRANSITION_USER_TERMINATE = 1;
+	public static final int TRANSITION_TO_TERMINATE;
 	
 	/** Return code which activates the transition to the wait new requests after
 	 * the last evaluation resulted in a reject. */
-	public static final int TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST = 2;
+	public static final int TRANSITION_TO_WAIT_REQUEST;
 	
 	/** Return code which activates the transition to confirm the registration of a new auction
 	 * after the last evaluation resulted in an approval. */
-	public static final int TRANSITION_CONFIRM_AUCTION_REGISTRATION = 3;
+	public static final int TRANSITION_TO_ACCEPT_REGISTRATION;
+	
+	static
+	{
+		int start = -1;
+		
+		TRANSITION_TO_EVALUATE_REQUEST = ++start;
+		TRANSITION_TO_TERMINATE = ++start;
+		TRANSITION_TO_WAIT_REQUEST = ++start;
+		TRANSITION_TO_ACCEPT_REGISTRATION = ++start;
+	}
 	
 	/**
 	 * Create the behaviour of a market agent which is responsible for creating new auction and registering them.
@@ -71,36 +87,36 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		// Register states
 		// The last state must call myMarketAgent.setIsDone(true);	
 		this.registerFirstState(new WaitRegistrationRequestBehaviour(myMarketAgent, this),
-				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
+				STATE_WAIT_REQUEST);
 		
 		this.registerState(new EvaluateRegistrationResquestBehaviour(myMarketAgent, this),
-				STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST);
+				STATE_EVALUATE_REQUEST);
 		
 		this.registerState(new ConfirmRegistrationBehaviour(myMarketAgent, this),
-				STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST);
+				STATE_ACCEPT_REGISTRATION);
 		
 		this.registerLastState(new TerminateSellerManagementBehaviour(myMarketAgent),
 				STATE_TERMINATE);
 		
 		// Register transitions
-		this.registerTransition(STATE_WAIT_AUCTION_REGISTRATION_REQUEST,
-				STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST,
-				TRANSITION_AUCTION_REQUEST_RECEIVED);
+		this.registerTransition(STATE_WAIT_REQUEST,
+				STATE_EVALUATE_REQUEST,
+				TRANSITION_TO_EVALUATE_REQUEST);
 		
-		this.registerTransition(STATE_WAIT_AUCTION_REGISTRATION_REQUEST,
+		this.registerTransition(STATE_WAIT_REQUEST,
 				STATE_TERMINATE,
-				TRANSITION_USER_TERMINATE);
+				TRANSITION_TO_TERMINATE);
 		
-		this.registerTransition(STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST,
-				STATE_WAIT_AUCTION_REGISTRATION_REQUEST,
-				TRANSITION_REFUSE_AUCTION_REGISTRATION_REQUEST);
+		this.registerTransition(STATE_EVALUATE_REQUEST,
+				STATE_WAIT_REQUEST,
+				TRANSITION_TO_WAIT_REQUEST);
 		
-		this.registerTransition(STATE_EVALUATE_AUCTION_REGISTRATION_REQUEST,
-				STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST,
-				TRANSITION_CONFIRM_AUCTION_REGISTRATION);
+		this.registerTransition(STATE_EVALUATE_REQUEST,
+				STATE_ACCEPT_REGISTRATION,
+				TRANSITION_TO_ACCEPT_REGISTRATION);
 		
-		this.registerDefaultTransition(STATE_CONFIRM_AUCTION_REGISTRATION_REQUEST,
-				STATE_WAIT_AUCTION_REGISTRATION_REQUEST);
+		this.registerDefaultTransition(STATE_ACCEPT_REGISTRATION,
+				STATE_WAIT_REQUEST);
 	}
 	
 	/**
