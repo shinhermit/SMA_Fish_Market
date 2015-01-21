@@ -13,9 +13,6 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private FishSellerBehaviour myFSM;
 	
-	/** Allows filtering incoming messages. */
-	private final MessageTemplate messageFilter;
-	
 	/** The selected transition to the next state. */
 	private int transition =
 			FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
@@ -36,9 +33,6 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 		super(mySellerAgent);
 		
 		this.myFSM = myFSM;
-		
-		this.messageFilter =
-				this.createMessageFilter();
 	}
 	
 	@Override
@@ -48,7 +42,7 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
-				this.messageFilter);
+				this.getMessageFilter());
 		
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
@@ -90,11 +84,17 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 	 * 
 	 * @return the message filter to use in this behaviour.
 	 */
-	private MessageTemplate createMessageFilter()
+	private MessageTemplate getMessageFilter()
 	{
+		SellerAgent mySellerAgent =
+				(SellerAgent) super.myAgent;
+		
 		return MessageTemplate.and(
 				this.myFSM.getMessageFilter(),
-				MessageTemplate.MatchPerformative(
-						FishMarket.Performatives.TO_BID));
+				MessageTemplate.and(
+						MessageTemplate.MatchContent(
+								String.valueOf(mySellerAgent.getCurrentPrice())),
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_BID)));
 	}
 }

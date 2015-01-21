@@ -18,9 +18,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	private int transition =
 			FishSellerBehaviour.TRANSITION_TO_ANNOUNCE;
 	
-	/** Allows filtering incoming messages. */
-	private final MessageTemplate messageFilter;
-	
 	/** The time to wait for more bid. */
 	public static final long MORE_BID_WAIT_DURATION = 20000l; // 20 sec
 	
@@ -37,9 +34,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		super(mySellerAgent, MORE_BID_WAIT_DURATION);
 		
 		this.myFSM = myFSM;
-		
-		this.messageFilter =
-				this.createMessageFilter();
 	}
 	
 	@Override
@@ -54,7 +48,7 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		do
 		{
 			mess = myAgent.receive(
-					this.messageFilter);
+					this.getMessageFilter());
 		}
 		while(mess != null);
 		
@@ -120,11 +114,17 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	 * 
 	 * @return the message filter to use in this behaviour.
 	 */
-	private MessageTemplate createMessageFilter()
+	private MessageTemplate getMessageFilter()
 	{
+		SellerAgent mySellerAgent =
+				(SellerAgent) super.myAgent;
+		
 		return MessageTemplate.and(
 				this.myFSM.getMessageFilter(),
-				MessageTemplate.MatchPerformative(
-						FishMarket.Performatives.TO_BID));
+				MessageTemplate.and(
+						MessageTemplate.MatchContent(
+								String.valueOf(mySellerAgent.getCurrentPrice())),
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_BID)));
 	}
 }
