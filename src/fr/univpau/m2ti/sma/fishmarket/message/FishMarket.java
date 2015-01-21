@@ -12,8 +12,8 @@ public class FishMarket
 {
 	public static class Performatives
 	{
-		/** Requests of the registration of an auction, from a seller agent to the market agent. */
-		public static final int TO_REGISTER = ACLMessage.REQUEST;
+		/** Requests of the creation of a new auction, from a seller agent to the market agent. */
+		public static final int TO_CREATE = ACLMessage.REQUEST;
 		
 		/** Requests of the subscription to an auction, from a bidder agent to the market agent. */
 		public static final int TO_SUBSCRIBE = ACLMessage.SUBSCRIBE;
@@ -58,15 +58,15 @@ public class FishMarket
 	public static class Topics
 	{
 		/** The topic of the conversations of the sellers with the fish market outside auction. */
-		public static final String TOPIC_AUCTION_REGISTRATION = 
-				FishMarket.Topics.class.getName()+":TOPIC_AUCTION_REGISTRATION";
+		public static final String TOPIC_AUCTION_CREATION = 
+				FishMarket.Topics.class.getName()+":TOPIC_AUCTION_CREATION";
 		
 		/** The topic of the conversations of the bidders with the fish market outside auction. */
 		public static final String TOPIC_BIDDERS_SUBSCRIPTION = 
 				FishMarket.Topics.class.getName()+":TOPIC_BIDDERS_SUBSCRIPTION";
 
 		/** The topic of the conversations of the bidders with the fish market outside auction. */
-		public static final String TOPIC_AUCTION_MANAGEMENT = 
+		public static final String TOPIC_RUNNING_AUCTION = 
 				FishMarket.Topics.class.getName()+":TOPIC_RUNNING_AUCTION";
 	}
 }

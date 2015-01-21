@@ -1,14 +1,12 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class TerminateCancelBehaviour extends OneShotBehaviour
+public class TerminateSuccessBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private RegisterAuctionBehaviour myFSM;
@@ -19,7 +17,7 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public TerminateCancelBehaviour(
+	public TerminateSuccessBehaviour(
 			SellerAgent mySellerAgent,
 			RegisterAuctionBehaviour myFSM)
 	{
@@ -31,23 +29,11 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		// Send to_cancel
-		SellerAgent mySellerAgent =
-				(SellerAgent) super.myAgent;
-		
-		ACLMessage cancelMess = new ACLMessage(
-				FishMarket.Performatives.TO_CANCEL);
-		
-		// Set topic
-		cancelMess.addReceiver(
-				SellerManagementBehaviour.MESSAGE_TOPIC);
-		
-		// Receiver
-		cancelMess.addReceiver(
-				mySellerAgent.getMarketAgent());
-		
-		// Add auction and send
-		mySellerAgent.send(cancelMess);
+		// Create auction FSM
+		super.myAgent.addBehaviour(
+				new FishSellerBehaviour(
+						(SellerAgent)super.myAgent,
+						this.myFSM.getResponse().getConversationId()));
 		
 		this.myFSM.setRequestCount(0);
 	}

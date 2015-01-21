@@ -1,10 +1,10 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmRegistrationBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateRegistrationResquestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmCreationBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateResquestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitRegistrationRequestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitCreationRequestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
@@ -27,7 +27,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	/** The topic of the messages of conversations accepted by the behaviour. */
 	public static final AID MESSAGE_TOPIC = 
 			TopicUtility.createTopic(
-					FishMarket.Topics.TOPIC_AUCTION_REGISTRATION);
+					FishMarket.Topics.TOPIC_AUCTION_CREATION);
 
 	/** Allows filtering incoming messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
@@ -36,15 +36,15 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	
 	/** The state in which the agent waits for auction creation requests. */
 	private static final String STATE_WAIT_REQUEST =
-			"STATE_WAIT_AUCTION_CREATION_REQUEST";
+			"STATE_WAIT_REQUEST";
 	
 	/** The state in which the agent evaluates auction creation requests. */
 	private static final String STATE_EVALUATE_REQUEST =
-			"STATE_EVALUATE_AUCTION_CREATION_REQUEST";
+			"STATE_EVALUATE_REQUEST";
 	
 	/** The state in which the agent evaluates auction creation requests. */
-	private static final String STATE_ACCEPT_REGISTRATION =
-			"STATE_CONFIRM_AUCTION_CREATION_REQUEST";
+	private static final String STATE_ACCEPT_CREATION =
+			"STATE_ACCEPT_CREATION";
 	
 	/** The ending state for the behaviour (user properly stopped the market). */
 	private static final String STATE_TERMINATE =
@@ -62,7 +62,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	
 	/** Return code which activates the transition to confirm the registration of a new auction
 	 * after the last evaluation resulted in an approval. */
-	public static final int TRANSITION_TO_CONFIRM_REGISTRATION;
+	public static final int TRANSITION_TO_CONFIRM_CREATION;
 	
 	static
 	{
@@ -71,7 +71,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		TRANSITION_TO_EVALUATE_REQUEST = ++start;
 		TRANSITION_TO_TERMINATE = ++start;
 		TRANSITION_TO_WAIT_REQUEST = ++start;
-		TRANSITION_TO_CONFIRM_REGISTRATION = ++start;
+		TRANSITION_TO_CONFIRM_CREATION = ++start;
 	}
 	
 	/**
@@ -86,14 +86,14 @@ public class SellerManagementBehaviour extends FSMBehaviour
 		
 		// Register states
 		// The last state must call myMarketAgent.setIsDone(true);	
-		this.registerFirstState(new WaitRegistrationRequestBehaviour(myMarketAgent, this),
+		this.registerFirstState(new WaitCreationRequestBehaviour(myMarketAgent, this),
 				STATE_WAIT_REQUEST);
 		
-		this.registerState(new EvaluateRegistrationResquestBehaviour(myMarketAgent, this),
+		this.registerState(new EvaluateResquestBehaviour(myMarketAgent, this),
 				STATE_EVALUATE_REQUEST);
 		
-		this.registerState(new ConfirmRegistrationBehaviour(myMarketAgent, this),
-				STATE_ACCEPT_REGISTRATION);
+		this.registerState(new ConfirmCreationBehaviour(myMarketAgent, this),
+				STATE_ACCEPT_CREATION);
 		
 		this.registerLastState(new TerminateSellerManagementBehaviour(myMarketAgent),
 				STATE_TERMINATE);
@@ -112,10 +112,10 @@ public class SellerManagementBehaviour extends FSMBehaviour
 				TRANSITION_TO_WAIT_REQUEST);
 		
 		this.registerTransition(STATE_EVALUATE_REQUEST,
-				STATE_ACCEPT_REGISTRATION,
-				TRANSITION_TO_CONFIRM_REGISTRATION);
+				STATE_ACCEPT_CREATION,
+				TRANSITION_TO_CONFIRM_CREATION);
 		
-		this.registerDefaultTransition(STATE_ACCEPT_REGISTRATION,
+		this.registerDefaultTransition(STATE_ACCEPT_CREATION,
 				STATE_WAIT_REQUEST);
 	}
 	

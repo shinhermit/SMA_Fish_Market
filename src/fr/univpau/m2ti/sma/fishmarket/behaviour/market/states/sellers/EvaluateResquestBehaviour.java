@@ -15,7 +15,7 @@ import jade.lang.acl.ACLMessage;
  * @author Josuah Aron
  *
  */
-public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
+public class EvaluateResquestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -31,7 +31,7 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public EvaluateRegistrationResquestBehaviour(
+	public EvaluateResquestBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -59,6 +59,9 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 			auction.setStatus(
 					Auction.STATUS_RUNNING);
 			
+			auction.setCurrentPrice(Float.parseFloat(
+					(String)request.getContent()));
+			
 			myMarketAgent.registerAuction(
 					auction, request.getSender());
 			
@@ -66,7 +69,7 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 			
 			// Next transition
 			this.transition =
-					SellerManagementBehaviour.TRANSITION_TO_CONFIRM_REGISTRATION;
+					SellerManagementBehaviour.TRANSITION_TO_CONFIRM_CREATION;
 		}
 		else
 		{

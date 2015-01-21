@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
@@ -8,7 +8,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class RequestRegistrationBehaviour extends OneShotBehaviour
+public class RequestCreationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private RegisterAuctionBehaviour myFSM;
@@ -25,7 +25,7 @@ public class RequestRegistrationBehaviour extends OneShotBehaviour
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public RequestRegistrationBehaviour(
+	public RequestCreationBehaviour(
 			SellerAgent mySellerAgent,
 			RegisterAuctionBehaviour myFSM)
 	{
@@ -43,7 +43,7 @@ public class RequestRegistrationBehaviour extends OneShotBehaviour
 					(SellerAgent) super.myAgent;
 			
 			ACLMessage mess = new ACLMessage(
-					FishMarket.Performatives.TO_REGISTER);
+					FishMarket.Performatives.TO_CREATE);
 			
 			// Set topic
 			mess.addReceiver(
@@ -52,7 +52,11 @@ public class RequestRegistrationBehaviour extends OneShotBehaviour
 			// Receiver
 			mess.addReceiver(mySellerAgent.getMarketAgent());
 			
-			// Add auction and send
+			// Add starting price
+			mess.setContent(String.valueOf(
+					mySellerAgent.getCurrentPrice()));
+			
+			// Send
 			mySellerAgent.send(mess);
 			
 			this.myFSM.notifyNewRequest();

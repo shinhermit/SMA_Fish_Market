@@ -74,7 +74,7 @@ public class PickAuctionBehaviour extends Behaviour
             {
                 //an auction has been found
                 ACLMessage reply = mess.createReply();
-                reply.setPerformative(FishMarket.Performatives.TO_REGISTER);
+                reply.setPerformative(FishMarket.Performatives.TO_CREATE);
 
                 this.transition = SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 

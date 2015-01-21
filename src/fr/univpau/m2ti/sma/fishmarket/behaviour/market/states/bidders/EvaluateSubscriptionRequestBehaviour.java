@@ -21,7 +21,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	private BidderManagementBehaviour myFSM;
 	
 	/** The status of the evaluation (in case of refuse). */
-	private int status = BidderManagementBehaviour.STATUS_REFUSE_NOT_UNDERSTOOD;
+	private int status;
 	
 	/** Tells whether the subscription has been accepted or not. */
 	private boolean subscriptionAccepted;

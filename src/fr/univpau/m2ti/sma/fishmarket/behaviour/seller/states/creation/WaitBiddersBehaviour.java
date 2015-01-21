@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;

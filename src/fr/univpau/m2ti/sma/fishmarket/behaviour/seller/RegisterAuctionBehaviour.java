@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration.*;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -28,15 +28,15 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 			MessageTemplate.MatchTopic(SellerManagementBehaviour.MESSAGE_TOPIC);
 	
 	/** The initial state, in which the seller creates an auction and request it's registration to the market agent. */
-	private static final String STATE_REQUEST_REGISTRATION =
-			"STATE_REQUEST_REGISTRATION";
+	private static final String STATE_REQUEST_CREATION =
+			"STATE_REQUEST_CREATION";
 	
 	/** The state in which the seller waits that the market agent confirms the registration of his auction. */
 	private static final String STATE_WAIT_RESPONSE =
 			"STATE_WAIT_RESPONSE";
 	
 	/** The state in which the seller waits that at least one bidder subscribes to his auction. */
-	private static final String STATE_WAIT_BIDDER =
+	private static final String STATE_WAIT_BIDDERS =
 			"STATE_WAIT_BIDDERS";
 	
 	/** The state in which the seller end this behaviour and creates the behaviour to participate to his auction. */
@@ -64,7 +64,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 	public static final int TRANSITION_TO_WAIT_BIDDERS;
 	
 	/** The code which activates the transition to try another registration request. */
-	public static final int TRANSITION_TO_REQUEST_REGISTRATION;
+	public static final int TRANSITION_TO_REQUEST_CREATION;
 	
 	/** The code which activates the transition to terminate and actually begin the auction. */
 	public static final int TRANSITION_TO_TERMINATE_SUCCESS;
@@ -77,7 +77,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		TRANSITION_TO_TERMINATE_FAILURE = ++start;
 		TRANSITION_TO_TERMINATE_CANCEL = ++start;
 		TRANSITION_TO_WAIT_BIDDERS = ++start;
-		TRANSITION_TO_REQUEST_REGISTRATION = ++start;
+		TRANSITION_TO_REQUEST_CREATION = ++start;
 		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
 	}
 	
@@ -94,8 +94,8 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		// Add states
 		// Final state must create AuctionSellerBehaviour
 		this.registerFirstState(
-				new RequestRegistrationBehaviour(mySellerAgent, this),
-				STATE_REQUEST_REGISTRATION);
+				new RequestCreationBehaviour(mySellerAgent, this),
+				STATE_REQUEST_CREATION);
 		
 		this.registerState(
 				new WaitResponseBehaviour(mySellerAgent, this),
@@ -103,7 +103,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		
 		this.registerState(
 				new WaitBiddersBehaviour(mySellerAgent),
-				STATE_WAIT_BIDDER);
+				STATE_WAIT_BIDDERS);
 		
 		this.registerLastState(
 				new TerminateSuccessBehaviour(mySellerAgent, this),
@@ -119,27 +119,27 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		
 		// Add transitions
 		this.registerTransition(
-				STATE_REQUEST_REGISTRATION, STATE_WAIT_RESPONSE,
+				STATE_REQUEST_CREATION, STATE_WAIT_RESPONSE,
 				TRANSITION_TO_WAIT_RESPONSE);
 		
 		this.registerTransition(
-				STATE_REQUEST_REGISTRATION, STATE_TERMINATE_FAILURE,
+				STATE_REQUEST_CREATION, STATE_TERMINATE_FAILURE,
 				TRANSITION_TO_TERMINATE_FAILURE);
 		
 		this.registerTransition(
-				STATE_WAIT_RESPONSE, STATE_REQUEST_REGISTRATION,
-				TRANSITION_TO_REQUEST_REGISTRATION);
+				STATE_WAIT_RESPONSE, STATE_REQUEST_CREATION,
+				TRANSITION_TO_REQUEST_CREATION);
 		
 		this.registerTransition(
-				STATE_WAIT_RESPONSE, STATE_WAIT_BIDDER,
+				STATE_WAIT_RESPONSE, STATE_WAIT_BIDDERS,
 				TRANSITION_TO_WAIT_BIDDERS);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDER, STATE_TERMINATE_CANCEL,
+				STATE_WAIT_BIDDERS, STATE_TERMINATE_CANCEL,
 				TRANSITION_TO_TERMINATE_CANCEL);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDER, STATE_TERMINATE_SUCCESS,
+				STATE_WAIT_BIDDERS, STATE_TERMINATE_SUCCESS,
 				TRANSITION_TO_TERMINATE_SUCCESS);
 	}
 

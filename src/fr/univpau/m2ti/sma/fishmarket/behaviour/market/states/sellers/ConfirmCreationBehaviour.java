@@ -14,7 +14,7 @@ import jade.lang.acl.ACLMessage;
  * @author Josuah Aron
  *
  */
-public class ConfirmRegistrationBehaviour extends OneShotBehaviour
+public class ConfirmCreationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -27,7 +27,7 @@ public class ConfirmRegistrationBehaviour extends OneShotBehaviour
 	 * 			the market agent of which FSM behavior's state this behaviour is to be associated.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public ConfirmRegistrationBehaviour(
+	public ConfirmCreationBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{

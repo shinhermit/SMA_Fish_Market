@@ -43,7 +43,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 
 	/** The topic of the conversations managed by this behaviour. */
 	public static final AID MESSAGE_TOPIC = TopicUtility.createTopic(
-			FishMarket.Topics.TOPIC_AUCTION_MANAGEMENT);
+			FishMarket.Topics.TOPIC_RUNNING_AUCTION);
 	
 	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
 	public static final long BID_WAIT_DELAY = 10000; // 10 sec
@@ -53,7 +53,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	
 	/** The state in which the agent waits for a first announcement from the seller. */
 	private static final String STATE_WAIT_TO_ANNOUNCE =
-			"STATE_WAIT_FIRST_TO_ANNOUNCE";
+			"STATE_WAIT_TO_ANNOUNCE";
 	
 	/** The state in which the agent relays the first announcement from the seller to the bidders. */
 	private static final String STATE_RELAY_TO_ANNOUNCE =
@@ -77,11 +77,11 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	
 	/** The state in which the agent relays the positive response to the bid from the seller to one bidder. */
 	private static final String STATE_RELAY_REP_BID_OK =
-			"STATE_STATE_RELAY_REP_BID_OK";
+			"STATE_RELAY_REP_BID_OK";
 	
 	/** The state in which the agent relays the negative response to the bid from the seller to non-chosen bidders. */
 	private static final String STATE_RELAY_REP_BID_NOK =
-			"STATE_STATE_RELAY_REP_BID_NOK";
+			"STATE_RELAY_REP_BID_NOK";
 	
 	/** The state in which the agent waits for the attribution message from the seller. */
 	private static final String STATE_WAIT_TO_ATTRIBUTE =

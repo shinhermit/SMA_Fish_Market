@@ -14,7 +14,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitRegistrationRequestBehaviour extends Behaviour
+public class WaitCreationRequestBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
@@ -27,7 +27,7 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 				MessageTemplate.and(
 					SellerManagementBehaviour.MESSAGE_FILTER,
 					MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.TO_REGISTER));
+									FishMarket.Performatives.TO_CREATE));
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -37,7 +37,7 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 	 * 			(which contains the state to which this behaviour is associated) is added.
 	 * @param myFSM the FSM behaviour of which this behaviour represents a state.
 	 */
-	public WaitRegistrationRequestBehaviour(
+	public WaitCreationRequestBehaviour(
 			MarketAgent myMarketAgent,
 			SellerManagementBehaviour myFSM)
 	{
@@ -59,7 +59,7 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
-				WaitRegistrationRequestBehaviour.MESSAGE_FILTER);
+				WaitCreationRequestBehaviour.MESSAGE_FILTER);
 		
 		if(mess != null)
 		{
