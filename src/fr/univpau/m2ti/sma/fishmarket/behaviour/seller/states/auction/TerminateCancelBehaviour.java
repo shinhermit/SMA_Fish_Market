@@ -1,15 +1,15 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 
 @SuppressWarnings("serial")
-public class TerminateSuccessBehaviour extends OneShotBehaviour
+public class TerminateCancelBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private FishSellerBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -17,9 +17,9 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public TerminateSuccessBehaviour(
+	public TerminateCancelBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			FishSellerBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -29,9 +29,6 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		super.myAgent.addBehaviour(
-				new FishSellerBehaviour(
-						(SellerAgent)super.myAgent,
-						this.myFSM.getResponse().getConversationId()));
+		
 	}
 }

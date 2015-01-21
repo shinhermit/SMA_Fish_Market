@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
@@ -16,7 +16,7 @@ import jade.lang.acl.ACLMessage;
 public class RequestRegistrationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private RegisterAuctionBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -36,7 +36,7 @@ public class RequestRegistrationBehaviour extends OneShotBehaviour
 	 */
 	public RequestRegistrationBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			RegisterAuctionBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -76,8 +76,8 @@ public class RequestRegistrationBehaviour extends OneShotBehaviour
 		// Next transition
 		this.transition =
 				(requestCount >= RequestRegistrationBehaviour.MAX_REQUEST_COUNT) ?
-				CreateAuctionBehaviour.TRANSITION_TERMINATE_FAILURE :
-					CreateAuctionBehaviour.TRANSITION_REQUEST_SENT;
+				RegisterAuctionBehaviour.TRANSITION_TERMINATE_FAILURE :
+					RegisterAuctionBehaviour.TRANSITION_REQUEST_SENT;
 	}
 	
 	@Override

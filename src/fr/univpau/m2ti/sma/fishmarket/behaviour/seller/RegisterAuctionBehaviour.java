@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.*;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -14,7 +14,7 @@ import jade.lang.acl.ACLMessage;
  * @author Josuah Aron
  *
  */
-public class CreateAuctionBehaviour extends FSMBehaviour
+public class RegisterAuctionBehaviour extends FSMBehaviour
 {
 	/** Holds the response from the market. */
 	private ACLMessage response;
@@ -77,7 +77,7 @@ public class CreateAuctionBehaviour extends FSMBehaviour
 	 * 
 	 * @param mySellerAgent the seller agent to which the behaviour is to be added.
 	 */
-	public CreateAuctionBehaviour(
+	public RegisterAuctionBehaviour(
 			SellerAgent mySellerAgent)
 	{
 		super(mySellerAgent);
