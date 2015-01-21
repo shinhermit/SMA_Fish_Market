@@ -1,6 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.registration.*;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
@@ -110,7 +110,7 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 		);
 
 		CreateBidderFSMBehaviour createBidderFSMBehaviour =
-				new CreateBidderFSMBehaviour(a);
+				new CreateBidderFSMBehaviour(a, this);
 
 		this.registerState(
 				createBidderFSMBehaviour,

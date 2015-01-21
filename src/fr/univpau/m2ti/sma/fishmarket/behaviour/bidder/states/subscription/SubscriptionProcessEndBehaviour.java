@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;

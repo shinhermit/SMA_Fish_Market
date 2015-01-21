@@ -1,14 +1,13 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.registration.SubscriptionProcessStartBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription.SubscriptionProcessStartBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.lang.acl.ACLMessage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,9 +26,8 @@ public class BidderAgent extends Agent
 
 		// Register behaviours
 		this.addBehaviour(new SubscriptionProcessStartBehaviour(this));
-		this.addBehaviour(new BidderBehaviour(this));
 	}
-	
+
 	@Override
 	protected void takeDown()
 	{
@@ -38,29 +36,17 @@ public class BidderAgent extends Agent
 	}
 
 	/**
-	 * Sends message from this agent to market.
-	 *
-	 * @param message
-	 */
-	public void sendMessage(ACLMessage message)
-	{
-		AID marketAID = this.getMarketAgentAID();
-		message.addReceiver(marketAID);
-		message.setSender(this.getAID());
-		this.send(message);
-	}
-
-	/**
 	 * Called at the end of the auction subscription process.
 	 *
 	 * @param seller
 	 */
-	public void createBidderFSM(AID seller)
+	public void createBidderFSM(AID seller, long maxPrice)
 	{
 		// TODO: implement
+		this.addBehaviour(new BidderBehaviour(this, seller, maxPrice));
 	}
 
-	private AID getMarketAgentAID()
+	public AID getMarketAgentAID()
 	{
 		AID marketAgent = null;
 

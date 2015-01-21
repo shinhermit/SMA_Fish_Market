@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
@@ -136,7 +136,6 @@ public class PickAuctionBehaviour extends OneShotBehaviour
             {
                 // known seller.
                 auctionList.remove(seller);
-
             }
             else
             {
