@@ -78,8 +78,6 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 			
 			if(bidder != null)
 			{
-				mySellerAgent.addBidder(bidder);
-				
 				this.transition =
 						FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
 			}
@@ -106,7 +104,7 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 				
 				// Notify auction cancelled
 				ACLMessage cancelMess = new ACLMessage(
-						FishMarket.Performatives.AUCTION_CANCELLED);
+						FishMarket.Performatives.TO_CANCEL);
 				
 				// Set topic
 				cancelMess.addReceiver(

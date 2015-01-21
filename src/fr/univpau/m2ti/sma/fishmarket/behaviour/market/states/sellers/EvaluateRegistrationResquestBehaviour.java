@@ -94,7 +94,7 @@ public class EvaluateRegistrationResquestBehaviour extends OneShotBehaviour
 				this.myFSM.getRequest().createReply();
 		
 		reply.setPerformative(
-				FishMarket.Performatives.REFUSE_AUCTION_REGISTRATION);
+				FishMarket.Performatives.TO_REFUSE);
 		
 		super.myAgent.send(reply);
 		

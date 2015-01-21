@@ -13,28 +13,22 @@ public class FishMarket
 	public static class Performatives
 	{
 		/** Requests of the registration of an auction, from a seller agent to the market agent. */
-		public static final int REQUEST_AUCTION_REGISTRATION = ACLMessage.REQUEST;
-		
-		/** Rejects the registration of an auction, from the market agent to a seller agent. */
-		public static final int REFUSE_AUCTION_REGISTRATION = ACLMessage.DISCONFIRM;
-		
-		/** Confirms the registration of an auction, from the market agent to a seller agent. */
-		public static final int CONFIRM_AUCTION_REGISTRATION = ACLMessage.CONFIRM;
-		
-		/** Requestq of the list of available auction, from a bidder agent to the market agent. */
-		public static final int REQUEST_AUCTION_LIST = ACLMessage.REQUEST;
-		
-		/** Provides the list of available auction, from the market agent to a bidder. */
-		public static final int REPLY_AUCTION_LIST = ACLMessage.INFORM;
+		public static final int TO_REGISTER = ACLMessage.REQUEST;
 		
 		/** Requests of the subscription to an auction, from a bidder agent to the market agent. */
-		public static final int REQUEST_BIDDER_SUBSCRIPTION = ACLMessage.SUBSCRIBE;
+		public static final int TO_SUBSCRIBE = ACLMessage.SUBSCRIBE;
 		
-		/** Rejects the subscription to an auction, from the market agent to a bidder agent. */
-		public static final int REFUSE_BIDDER_SUBSCRIPTION = ACLMessage.REFUSE;
+		/** Rejects the registration of an auction or the subscription of a bidder to an auction, from the market agent to other agents. */
+		public static final int TO_REFUSE = ACLMessage.REFUSE;
 		
-		/** Confirms the subscription to an auction, from the market agent to a bidder agent. */
-		public static final int CONFIRM_BIDDER_SUBSCRIPTION = ACLMessage.INFORM;
+		/** Confirms the registration of an auction or the subscription of a bidder to an auction, from the market agent to other agents. */
+		public static final int TO_ACCEPT = ACLMessage.CONFIRM;
+		
+		/** Requests the list of available auction, from a bidder agent to the market agent. */
+		public static final int TO_REQUEST = ACLMessage.REQUEST;
+		
+		/** Provides the list of available auction, from the market agent to a bidder. */
+		public static final int TO_PROVIDE = ACLMessage.INFORM;
 		
 		/** Announces a price for a fish supply, from a seller agent to the market agent, or the market agent to a bidder agent. */
 		public static final int TO_ANNOUNCE = ACLMessage.CFP;
@@ -58,7 +52,7 @@ public class FishMarket
 		public static final int AUCTION_OVER = ACLMessage.CANCEL;
 		
 		/** Informs that the auction has been cancelled (ended without attribution). */
-		public static final int AUCTION_CANCELLED = ACLMessage.FAILURE;
+		public static final int TO_CANCEL = ACLMessage.FAILURE;
 	}
 	
 	public static class Topics

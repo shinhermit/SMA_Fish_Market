@@ -1,5 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions.*;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
@@ -25,8 +28,11 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	/** The ID of the conversation associated with the auction that this behaviour manages. */
 	private final String conversationId;
 	
-	/** The AID of the bidder to which the fish supply has been attributed. */
-	private AID selectedBidder = null;
+	/** The first bidder for the current price. */
+	private AID firstBidder = null;
+	
+	/** The list of bidders for the current price. */
+	private Set<AID> bidders = new HashSet<AID>();
 	
 	/** Holds the last auction creation request. */
 	private ACLMessage request;
@@ -328,16 +334,49 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 */
 	public AID getSelectedBidder()
 	{
-		return selectedBidder;
+		return this.firstBidder;
 	}
 
 	/**
 	 * 
 	 * @param selectedBidder the AID of the bidder to which the fish supply has been attributed, null meaning no attribution.
 	 */
-	public void setSelectedBidder(AID selectedBidder)
+	public void setFirstBidder(AID bidder)
 	{
-		this.selectedBidder = selectedBidder;
+		this.firstBidder = bidder;
+	}
+
+	/**
+	 * 
+	 * @return the <code>AID</code> of the first bidder for the current price if there has been, <code>null</code> otherwise.
+	 */
+	public AID getFirstBidder()
+	{
+		return firstBidder;
+	}
+	
+	/**
+	 * 
+	 * @param bidder the <code>AID</code> of a bidder agent.
+	 */
+	public void addBidder(AID bidder)
+	{
+		if(this.bidders.isEmpty())
+		{
+			this.firstBidder = bidder;
+		}
+		
+		this.bidders.add(bidder);
+	}
+	
+	/**
+	 * Remove all bidders.
+	 */
+	public void clearBidderList()
+	{
+		this.bidders.clear();
+		
+		this.firstBidder = null;
 	}
 
 	/**

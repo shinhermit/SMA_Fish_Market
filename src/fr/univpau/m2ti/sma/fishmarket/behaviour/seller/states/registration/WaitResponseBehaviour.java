@@ -1,7 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
@@ -23,13 +22,12 @@ public class WaitResponseBehaviour extends Behaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					MessageTemplate.MatchTopic(
-							SellerManagementBehaviour.MESSAGE_TOPIC),
+					RegisterAuctionBehaviour.MESSAGE_FILTER,
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION),
+									FishMarket.Performatives.TO_ACCEPT),
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REFUSE_AUCTION_REGISTRATION)));
+									FishMarket.Performatives.TO_REFUSE)));
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -61,21 +59,21 @@ public class WaitResponseBehaviour extends Behaviour
 		{
 			this.myFSM.setResponse(mess);
 			
-			this.isDone = true;
-			
 			if(mess.getPerformative() ==
-					FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION)
+					FishMarket.Performatives.TO_ACCEPT)
 			{
 				this.transition =
 						RegisterAuctionBehaviour
-						.TRANSITION_REGISTRATION_CONFIRMED;
+						.TRANSITION_TO_WAIT_BIDDERS;
 			}
 			else
 			{
 				this.transition =
 						RegisterAuctionBehaviour
-						.TRANSITION_REGISTRATION_REFUSED;
+						.TRANSITION_TO_REQUEST_REGISTRATION;
 			}
+			
+			this.isDone = true;
 		}
 	}
 

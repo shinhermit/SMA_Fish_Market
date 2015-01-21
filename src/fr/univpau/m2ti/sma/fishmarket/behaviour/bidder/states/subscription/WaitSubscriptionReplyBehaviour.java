@@ -55,7 +55,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
         if(mess != null)
         {
             if(mess.getPerformative() ==
-                    FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION)
+                    FishMarket.Performatives.TO_ACCEPT)
             {
                 // subscription succeeded
                 this.transition =
@@ -118,9 +118,9 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
                 MessageTemplate.MatchTopic(topic),
                 MessageTemplate.or(
                     MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION),
+                            FishMarket.Performatives.TO_ACCEPT),
                     MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.REFUSE_AUCTION_REGISTRATION
+                            FishMarket.Performatives.TO_REFUSE
                     )
                 )
             );

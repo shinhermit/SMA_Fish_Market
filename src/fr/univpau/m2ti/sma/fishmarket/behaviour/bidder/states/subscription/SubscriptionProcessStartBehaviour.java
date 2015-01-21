@@ -31,7 +31,7 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
         AID marketAID = bidderAgent.getMarketAgentAID();
 
         ACLMessage requestAuctionListMessage =
-                new ACLMessage(FishMarket.Performatives.REQUEST_AUCTION_LIST);
+                new ACLMessage(FishMarket.Performatives.TO_PROVIDE);
         requestAuctionListMessage.addReceiver(marketAID);
 
         final AID topic =

@@ -78,7 +78,7 @@ public class WaitAuctionListBehaviour extends OneShotBehaviour
             filter = MessageTemplate.and(
                     MessageTemplate.MatchTopic(topic),
                     MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.REPLY_AUCTION_LIST));
+                            FishMarket.Performatives.TO_PROVIDE));
         }
         catch (ServiceException e)
         {

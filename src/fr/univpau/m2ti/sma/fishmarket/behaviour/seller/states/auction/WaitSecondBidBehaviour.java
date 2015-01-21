@@ -1,6 +1,5 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,8 +78,6 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 			
 			if(bidder != null)
 			{
-				mySellerAgent.addBidder(bidder);
-				
 				this.transition =
 						FishSellerBehaviour.TRANSITION_TO_WAIT_MORE_BID;
 			}
@@ -110,20 +107,10 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 					mySellerAgent.getMarketAgent());
 			
 			// Add price and send
-			try
-			{
-				reply.setContentObject(
-						mySellerAgent.getFirstBidder());
-				
-				mySellerAgent.send(reply);
-			}
-			catch (IOException e)
-			{
-				WaitSecondBidBehaviour.LOGGER.log(Level.SEVERE, null, e);
-			}
+			reply.setContent(String.valueOf(true));
 			
-			// Can clear bidders (the market knows the selected bidder)
-			mySellerAgent.clearBidderList();
+			// Send
+			mySellerAgent.send(reply);
 		}
 	}
 	

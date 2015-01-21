@@ -32,9 +32,9 @@ public class WaitBidderRequestBehaviour extends Behaviour
 							BidderManagementBehaviour.MESSAGE_TOPIC),
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_AUCTION_LIST),
+									FishMarket.Performatives.TO_PROVIDE),
 							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
+									FishMarket.Performatives.TO_SUBSCRIBE)));
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -75,7 +75,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 			this.isDone = true;
 			
 			if(mess.getPerformative() ==
-					FishMarket.Performatives.REQUEST_AUCTION_LIST)
+					FishMarket.Performatives.TO_PROVIDE)
 			{
 				this.transition =
 						BidderManagementBehaviour

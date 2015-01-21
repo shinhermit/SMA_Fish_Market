@@ -38,7 +38,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
                         ),
                         MessageTemplate.or(
                                 MessageTemplate.MatchPerformative(
-                                        FishMarket.Performatives.AUCTION_CANCELLED
+                                        FishMarket.Performatives.TO_CANCEL
                                 ),
                                 MessageTemplate.MatchPerformative(
                                         FishMarket.Performatives.AUCTION_OVER
@@ -91,7 +91,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_FIRST_ANNOUNCE;
                 }
-                else if (newMessage.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
+                else if (newMessage.getPerformative() == FishMarket.Performatives.TO_CANCEL)
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
                 }

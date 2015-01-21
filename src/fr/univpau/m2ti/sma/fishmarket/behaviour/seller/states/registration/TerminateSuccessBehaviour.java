@@ -33,5 +33,7 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 				new FishSellerBehaviour(
 						(SellerAgent)super.myAgent,
 						this.myFSM.getResponse().getConversationId()));
+		
+		this.myFSM.setRequestCount(0);
 	}
 }

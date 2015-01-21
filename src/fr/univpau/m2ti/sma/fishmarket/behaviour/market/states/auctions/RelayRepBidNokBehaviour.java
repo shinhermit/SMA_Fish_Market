@@ -58,5 +58,7 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 		super.myAgent.send(toRelay);
 		
 		this.myFSM.setRequest(null);
+		
+		this.myFSM.clearBidderList();
 	}
 }

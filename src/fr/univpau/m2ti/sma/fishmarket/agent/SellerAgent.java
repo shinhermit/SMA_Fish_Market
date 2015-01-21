@@ -7,8 +7,6 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,12 +38,6 @@ public class SellerAgent extends Agent
 	
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
-	
-	/** The first bidder for the current price. */
-	private AID firstBidder = null;
-	
-	/** The list of bidders for the current price. */
-	private Set<AID> bidders = new HashSet<AID>();
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -258,38 +250,5 @@ public class SellerAgent extends Agent
 	public void decreasePrice()
 	{
 		this.currentPrice -= this.priceStep;
-	}
-
-	/**
-	 * 
-	 * @return the <code>AID</code> of the first bidder for the current price if there has been, <code>null</code> otherwise.
-	 */
-	public AID getFirstBidder()
-	{
-		return firstBidder;
-	}
-	
-	/**
-	 * 
-	 * @param bidder the <code>AID</code> of a bidder agent.
-	 */
-	public void addBidder(AID bidder)
-	{
-		if(this.bidders.isEmpty())
-		{
-			this.firstBidder = bidder;
-		}
-		
-		this.bidders.add(bidder);
-	}
-	
-	/**
-	 * Remove all bidders.
-	 */
-	public void clearBidderList()
-	{
-		this.bidders.clear();
-		
-		this.firstBidder = null;
 	}
 }

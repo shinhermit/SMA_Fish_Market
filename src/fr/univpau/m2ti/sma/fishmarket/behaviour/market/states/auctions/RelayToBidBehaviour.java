@@ -129,6 +129,6 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 					MessageTemplate.MatchConversationId(
 							this.myFSM.getConversationId()),
 					MessageTemplate.MatchPerformative(
-							FishMarket.Performatives.AUCTION_CANCELLED)));
+							FishMarket.Performatives.TO_CANCEL)));
 	}
 }

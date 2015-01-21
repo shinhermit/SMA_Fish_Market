@@ -73,7 +73,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
             {
                 //an auction has been found
                 ACLMessage reply = mess.createReply();
-                reply.setPerformative(FishMarket.Performatives.REQUEST_AUCTION_REGISTRATION);
+                reply.setPerformative(FishMarket.Performatives.TO_REGISTER);
 
                 this.transition = SubsribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 
@@ -181,7 +181,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
             filter = MessageTemplate.and(
                     MessageTemplate.MatchTopic(topic),
                     MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.REPLY_AUCTION_LIST));
+                            FishMarket.Performatives.TO_PROVIDE));
         }
         catch (ServiceException e)
         {

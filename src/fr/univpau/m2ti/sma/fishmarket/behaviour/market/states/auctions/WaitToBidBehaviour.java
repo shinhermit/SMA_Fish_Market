@@ -123,6 +123,6 @@ public class WaitToBidBehaviour extends Behaviour
 												MessageTemplate.MatchPerformative(
 														FishMarket.Performatives.TO_ANNOUNCE),
 												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.AUCTION_CANCELLED)))));
+														FishMarket.Performatives.TO_CANCEL)))));
 	}
 }

@@ -1,9 +1,5 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
@@ -24,10 +20,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
-	
-	/** Allows logging. */
-	private static final Logger LOGGER =
-			Logger.getLogger(WaitMoreBidBehaviour.class.getName());
 	
 	/** The time to wait for more bid. */
 	public static final long MORE_BID_WAIT_DURATION = 20000l; // 20 sec
@@ -63,12 +55,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		{
 			mess = myAgent.receive(
 					this.messageFilter);
-			
-			if(mess != null)
-			{
-				mySellerAgent.addBidder(
-						mess.getSender());
-			}
 		}
 		while(mess != null);
 		
@@ -119,23 +105,10 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 				mySellerAgent.getMarketAgent());
 		
 		// Add selected bidder AID
-		if(repBidOk)
-		{
-			try
-			{
-				reply.setContentObject(
-						mySellerAgent.getFirstBidder());
-			}
-			catch (IOException e)
-			{
-				WaitMoreBidBehaviour.LOGGER.log(Level.SEVERE, null, e);
-			}
-		}
+		reply.setContent(String.valueOf(repBidOk));
 		
+		// Send
 		mySellerAgent.send(reply);
-		
-		// Can clear bidders (either the market knows the selected bidder, or the list is obsolete)
-		mySellerAgent.clearBidderList();
 	}
 
 	@Override

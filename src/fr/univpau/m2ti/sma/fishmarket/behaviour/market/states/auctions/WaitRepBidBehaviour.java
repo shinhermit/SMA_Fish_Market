@@ -3,7 +3,6 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -77,18 +76,16 @@ public class WaitRepBidBehaviour extends Behaviour
 				this.transition =
 						AuctionManagementBehaviour.TRANSITION_REP_BID_NOK_RECEIVED;
 				
-				Object content = mess.getContent();
+				String content = (String) mess.getContent();
 				
 				if(content != null)
 				{
-					if(content instanceof AID) // REP_BID(OK) == REP_BID(selectedBidderAID)
+					boolean repBidOk = Boolean.parseBoolean(content);
+					
+					if(repBidOk)
 					{
-						AID selectedBidder = (AID) content;
-						
-						this.myFSM.setSelectedBidder(selectedBidder);
-						
 						this.transition =
-								AuctionManagementBehaviour.TRANSITION_REP_BID_OK_RECEIVED;
+									AuctionManagementBehaviour.TRANSITION_REP_BID_OK_RECEIVED;
 					}
 				}
 			}
@@ -102,7 +99,7 @@ public class WaitRepBidBehaviour extends Behaviour
 			}
 			
 			else if(performative ==
-					FishMarket.Performatives.AUCTION_CANCELLED)
+					FishMarket.Performatives.TO_CANCEL)
 			{
 				this.transition =
 						AuctionManagementBehaviour
@@ -143,6 +140,6 @@ public class WaitRepBidBehaviour extends Behaviour
 												MessageTemplate.MatchPerformative(
 														FishMarket.Performatives.TO_BID),
 												MessageTemplate.MatchPerformative(
-														FishMarket.Performatives.AUCTION_CANCELLED)))));
+														FishMarket.Performatives.TO_CANCEL)))));
 	}
 }
