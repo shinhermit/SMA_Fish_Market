@@ -6,6 +6,7 @@ import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
+public class WaitSubscriptionReplyBehaviour extends Behaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -84,6 +85,13 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
 
         // transition to next step
 
+    }
+
+    @Override
+    public boolean done()
+    {
+        // Dies with fsm
+        return false;
     }
 
     @Override

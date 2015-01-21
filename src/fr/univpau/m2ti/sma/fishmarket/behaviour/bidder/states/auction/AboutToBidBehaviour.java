@@ -24,8 +24,6 @@ public class AboutToBidBehaviour extends Behaviour
 
     private int transition;
 
-    private boolean isDone = false;
-
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER;
 
@@ -98,20 +96,17 @@ public class AboutToBidBehaviour extends Behaviour
                 else if (newMessage.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
-                    this.isDone = true;
                 }
                 else
                 {
                     //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
-                    this.isDone = true;
                 }
             }
             else
             {
                 //Should not happen
                 AboutToBidBehaviour.LOGGER.log(Level.SEVERE, null, "Received null message");
-                this.isDone = true;
             }
         }
     }
@@ -119,7 +114,8 @@ public class AboutToBidBehaviour extends Behaviour
     @Override
     public boolean done()
     {
-        return this.isDone;
+        // Dies with fsm
+        return false;
     }
 
     @Override

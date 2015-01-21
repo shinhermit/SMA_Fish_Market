@@ -23,8 +23,6 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
 
     private BidderBehaviour myFSM;
 
-    private boolean isDone = false;
-
     /** Allows filtering incoming messages. */
     private static final MessageTemplate MESSAGE_FILTER;
 
@@ -79,13 +77,11 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
             else if (mess.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
             {
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
-                this.isDone = true;
             }
             else
             {
                 //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
-                this.isDone = true;
             }
         }
         else
@@ -93,7 +89,6 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
             //Should not happen
             InitialOrAfterFailedBidBehaviour.LOGGER
                     .log(Level.SEVERE, null, "Received null message");
-            this.isDone = true;
         }
 
         // transition to next step
@@ -103,8 +98,10 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
     @Override
     public boolean done()
     {
-        return this.isDone;
+        // Dies with fsm
+        return false;
     }
+
 
     @Override
     public int onEnd()

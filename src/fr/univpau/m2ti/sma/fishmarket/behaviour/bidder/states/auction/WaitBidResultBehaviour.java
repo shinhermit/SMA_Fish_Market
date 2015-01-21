@@ -30,8 +30,6 @@ public class WaitBidResultBehaviour extends Behaviour
 
     private int transition;
 
-    private boolean isDone;
-
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER;
 
@@ -81,7 +79,6 @@ public class WaitBidResultBehaviour extends Behaviour
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_REP_BID_OK;
                     System.out.println("I won !!!");
-                    this.isDone = true;
                 }
                 else
                 {
@@ -93,13 +90,11 @@ public class WaitBidResultBehaviour extends Behaviour
             else if (mess.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
             {
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
-                this.isDone = true;
             }
             else
             {
                 //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
-                this.isDone = true;
             }
         }
         else
@@ -113,8 +108,10 @@ public class WaitBidResultBehaviour extends Behaviour
     @Override
     public boolean done()
     {
-        return this.isDone;
+        // Dies with fsm
+        return false;
     }
+
 
     @Override
     public int onEnd()
