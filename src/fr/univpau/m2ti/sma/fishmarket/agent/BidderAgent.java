@@ -1,6 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription.SubscriptionProcessStartBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
@@ -24,8 +25,8 @@ public class BidderAgent extends Agent
 		// Look up market
 		super.setup();
 
-		// Register behaviours
-		this.addBehaviour(new SubscriptionProcessStartBehaviour(this));
+		//find new auction
+		this.createAuctionFinderFSM();
 	}
 
 	@Override
@@ -44,6 +45,13 @@ public class BidderAgent extends Agent
 	{
 		// TODO: implement
 		this.addBehaviour(new BidderBehaviour(this, seller, maxPrice));
+	}
+
+	public void createAuctionFinderFSM()
+	{
+		// Register behaviour
+		this.addBehaviour(new SubscribeToAuctionBehaviour(this));
+
 	}
 
 	public AID getMarketAgentAID()

@@ -1,23 +1,20 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
-import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
  */
-public class AboutToBidBehaviour extends OneShotBehaviour
+public class AboutToBidBehaviour extends Behaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -27,6 +24,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
 
     private int transition;
 
+    /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER;
 
     static
@@ -69,8 +67,12 @@ public class AboutToBidBehaviour extends OneShotBehaviour
             //bidding is possible
             ACLMessage bid = mess.createReply();
             bid.setPerformative(FishMarket.Performatives.TO_BID);
+            bid.setContent(String.valueOf(price));
 
             super.myAgent.send(bid);
+
+            // Store bidding price
+            this.myFSM.setBiddingPrice(price);
 
             this.transition = BidderBehaviour.TRANSITION_BID;
         }
@@ -89,7 +91,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
 
                 if (newMessage.getPerformative() == FishMarket.Performatives.TO_ANNOUNCE)
                 {
-                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_FIRST_ANNOUNCE;
+                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
                 }
                 else if (newMessage.getPerformative() == FishMarket.Performatives.TO_CANCEL)
                 {
@@ -107,6 +109,13 @@ public class AboutToBidBehaviour extends OneShotBehaviour
                 AboutToBidBehaviour.LOGGER.log(Level.SEVERE, null, "Received null message");
             }
         }
+    }
+
+    @Override
+    public boolean done()
+    {
+        // Dies with fsm
+        return false;
     }
 
     @Override

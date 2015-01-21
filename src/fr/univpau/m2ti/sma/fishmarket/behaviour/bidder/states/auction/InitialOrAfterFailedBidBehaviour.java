@@ -2,30 +2,20 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.ServiceException;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.messaging.TopicManagementHelper;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
  */
-public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
+public class InitialOrAfterFailedBidBehaviour extends Behaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -104,6 +94,14 @@ public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
         // transition to next step
 
     }
+
+    @Override
+    public boolean done()
+    {
+        // Dies with fsm
+        return false;
+    }
+
 
     @Override
     public int onEnd()

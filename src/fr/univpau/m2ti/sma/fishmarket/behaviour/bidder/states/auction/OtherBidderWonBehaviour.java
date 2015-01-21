@@ -26,5 +26,7 @@ public class OtherBidderWonBehaviour extends OneShotBehaviour
     @Override
     public void action() {
         System.out.println("action => " + getBehaviourName());
+
+        System.out.println("Other bidder won.");
     }
 }

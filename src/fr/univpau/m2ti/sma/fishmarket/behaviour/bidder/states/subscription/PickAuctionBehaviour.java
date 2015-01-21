@@ -1,12 +1,13 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
@@ -21,13 +22,13 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class PickAuctionBehaviour extends OneShotBehaviour
+public class PickAuctionBehaviour extends Behaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
             Logger.getLogger(PickAuctionBehaviour.class.getName());
 
-    private SubsribeToAuctionBehaviour myFSM;
+    private SubscribeToAuctionBehaviour myFSM;
 
     private HashSet<Auction> auctionList;
 
@@ -35,7 +36,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
 
     private int transition;
 
-    public PickAuctionBehaviour(Agent a, SubsribeToAuctionBehaviour fsm)
+    public PickAuctionBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
         this.myFSM = fsm;
@@ -75,7 +76,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
                 ACLMessage reply = mess.createReply();
                 reply.setPerformative(FishMarket.Performatives.TO_REGISTER);
 
-                this.transition = SubsribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+                this.transition = SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 
                 try
                 {
@@ -102,12 +103,19 @@ public class PickAuctionBehaviour extends OneShotBehaviour
         {
             // could not select item
             this.transition =
-                    SubsribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
+                    SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
         }
 
 
         // transition to next step
 
+    }
+
+    @Override
+    public boolean done()
+    {
+        // Stays alive in case we need to pick a new auction list
+        return false;
     }
 
     @Override

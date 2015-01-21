@@ -26,5 +26,7 @@ public class AuctionOverSuccessfullyBehaviour extends OneShotBehaviour
     @Override
     public void action() {
         System.out.println("action => " + getBehaviourName());
+
+        System.out.println("Thanks for the fish");
     }
 }

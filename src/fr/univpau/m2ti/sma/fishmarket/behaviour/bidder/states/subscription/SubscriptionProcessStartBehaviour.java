@@ -1,22 +1,27 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 /**
  *
  */
-public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
+public class SubscriptionProcessStartBehaviour extends Behaviour
 {
-    public SubscriptionProcessStartBehaviour(Agent a)
+    private SubscribeToAuctionBehaviour myFsm;
+
+    public SubscriptionProcessStartBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
+        this.myFsm = fsm;
     }
 
     @Override
@@ -25,7 +30,6 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
-
 
         // Prepare and send message
         AID marketAID = bidderAgent.getMarketAgentAID();
@@ -36,7 +40,8 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 
         final AID topic =
                 TopicUtility.createTopic(
-                        FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
+                        FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION
+                );
 
         requestAuctionListMessage.addReceiver(topic);
 
@@ -48,8 +53,15 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
     }
 
     @Override
+    public boolean done()
+    {
+        // Stays alive in case we need to ask for new auction list
+        return false;
+    }
+
+    @Override
     public int onEnd() {
         // Implemented because of possible early return to end state.
-        return SubsribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST;
+        return SubscribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST;
     }
 }

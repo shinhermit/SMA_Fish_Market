@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings("serial")
-public class SubsribeToAuctionBehaviour extends FSMBehaviour
+public class SubscribeToAuctionBehaviour extends FSMBehaviour
 {
 	private static final String STATE_SUBSCRIPTION_PROCESS_START =
 			"STATE_SUBSCRIPTION_PROCESS_START";
@@ -25,31 +25,49 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 	private static final String STATE_SUBSCRIPTION_PROCESS_END =
 			"STATE_SUBSCRIPTION_PROCESS_END";
 
-	/** Return code which activates the transition to wait for an auction list. */
+	/**
+	 * Return code which activates the transition to wait for an auction list.
+	 */
 	public static final int TRANSITION_REQUEST_AUCTION_LIST;
 
-	/** Return code which activates the transition to the state where auctions are picked. */
+	/**
+	 * Return code which activates the transition to the state where auctions are picked.
+	 */
 	public static final int TRANSITION_AUCTION_LIST_RECEIVED;
 
-	/** Return code which activates the transition to wait for a subscription response. */
+	/**
+	 * Return code which activates the transition to wait for a subscription response.
+	 */
 	public static final int TRANSITION_REQUEST_SUBSCRIPTION;
 
-	/** Return code which activates the transition confirming that our subscription was accepted. */
+	/**
+	 * Return code which activates the transition confirming that our subscription was accepted.
+	 */
 	public static final int TRANSITION_SUBSCRIPTION_ACCEPTED;
 
-	/** Return code which activates the transition confirming that our subscription was refused. */
+	/**
+	 * Return code which activates the transition confirming that our subscription was refused.
+	 */
 	public static final int TRANSITION_SUBSCRIPTION_REFUSED;
 
-	/** Return code which activates the transition to the exit state of this FSM. */
+	/**
+	 * Return code which activates the transition to the exit state of this FSM.
+	 */
 	public static final int TRANSITION_EXIT_SUBSCRIPTION_PROCESS;
 
-	/** Return code which activates the transition to the start state of this FSM. */
+	/**
+	 * Return code which activates the transition to the start state of this FSM.
+	 */
 	public static final int TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
 
-	/** An empty auction list has been received. */
+	/**
+	 * An empty auction list has been received.
+	 */
 	public static final int STATUS_EMPTY_AUCTION_LIST;
 
-	/** Used to pass the auction list to pick auctions from.  */
+	/**
+	 * Used to pass the auction list to pick auctions from.
+	 */
 	private ACLMessage request;
 
 	private AID lastSubscribedAuction;
@@ -71,14 +89,14 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 		STATUS_EMPTY_AUCTION_LIST = ++start;
 	}
 
-	public SubsribeToAuctionBehaviour(Agent a)
+	public SubscribeToAuctionBehaviour(Agent a)
 	{
 		super(a);
 
 		// Declare and register states
 
 		SubscriptionProcessStartBehaviour initialState =
-				new SubscriptionProcessStartBehaviour(a);
+				new SubscriptionProcessStartBehaviour(a, this);
 
 		this.registerFirstState(
 				initialState,
@@ -129,44 +147,44 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 		this.registerTransition(
 				STATE_SUBSCRIPTION_PROCESS_START,
 				STATE_WAIT_AUCTION_LIST,
-				SubsribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST
+				SubscribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST
 		);
 
 		this.registerTransition(
 				STATE_WAIT_AUCTION_LIST,
 				STATE_PICK_AUCTION,
-				SubsribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED
+				SubscribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED
 		);
 
 		this.registerTransition(
 				STATE_PICK_AUCTION,
 				STATE_WAIT_SUBSCRIPTION_REPLY,
-				SubsribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION
+				SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION
 		);
 
 		// Return to process start when auction list empty
 		this.registerTransition(
 				STATE_PICK_AUCTION,
 				STATE_SUBSCRIPTION_PROCESS_START,
-				SubsribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
+				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
 		);
 
 		this.registerTransition(
 				STATE_WAIT_SUBSCRIPTION_REPLY,
 				STATE_CREATE_BIDDER_FSM,
-				SubsribeToAuctionBehaviour.TRANSITION_SUBSCRIPTION_ACCEPTED
+				SubscribeToAuctionBehaviour.TRANSITION_SUBSCRIPTION_ACCEPTED
 		);
 
 		this.registerTransition(
 				STATE_WAIT_SUBSCRIPTION_REPLY,
 				STATE_PICK_AUCTION,
-				SubsribeToAuctionBehaviour.TRANSITION_SUBSCRIPTION_REFUSED
+				SubscribeToAuctionBehaviour.TRANSITION_SUBSCRIPTION_REFUSED
 		);
 
 		this.registerTransition(
 				STATE_CREATE_BIDDER_FSM,
 				STATE_SUBSCRIPTION_PROCESS_START,
-				SubsribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
+				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
 		);
 
 		this.registerDefaultTransition(
@@ -178,19 +196,19 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 		this.registerTransition(
 				STATE_SUBSCRIPTION_PROCESS_START,
 				STATE_SUBSCRIPTION_PROCESS_END,
-				SubsribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				SubscribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
 		);
 
 		this.registerTransition(
 				STATE_WAIT_AUCTION_LIST,
 				STATE_SUBSCRIPTION_PROCESS_END,
-				SubsribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				SubscribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
 		);
 
 		this.registerTransition(
 				STATE_PICK_AUCTION,
 				STATE_SUBSCRIPTION_PROCESS_END,
-				SubsribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				SubscribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
 		);
 
 	}
@@ -223,6 +241,7 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 
 	/**
 	 * Returns true if auction has already been subscribed to.
+	 *
 	 * @param seller
 	 * @return
 	 */
@@ -240,4 +259,5 @@ public class SubsribeToAuctionBehaviour extends FSMBehaviour
 	{
 		return this.lastSubscribedAuction;
 	}
+
 }
