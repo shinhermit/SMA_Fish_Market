@@ -29,6 +29,7 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// Create auction FSM
 		super.myAgent.addBehaviour(
 				new FishSellerBehaviour(
 						(SellerAgent)super.myAgent,

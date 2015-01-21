@@ -38,8 +38,6 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	@Override
 	public void onWake()
 	{
-		this.block();
-		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				WaitBiddersBehaviour.MESSAGE_FILTER);
