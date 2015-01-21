@@ -3,18 +3,15 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitResponseBehaviour extends Behaviour
+public class WaitResponseBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private RegisterAuctionBehaviour myFSM;
-	
-	/** Tells whether this behaviour has ended it's task or not. */
-	private boolean isDone;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -47,8 +44,10 @@ public class WaitResponseBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
+		// DEBUG
+		System.out.println("Seller: waiting response !");
 		
+		// Wait that myAgent receives message
 		this.block();
 		
 		// Receive messages
@@ -58,6 +57,9 @@ public class WaitResponseBehaviour extends Behaviour
 		if(mess != null)
 		{
 			this.myFSM.setResponse(mess);
+			
+			// Reset blocking state
+			this.restart();
 			
 			if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ACCEPT)
@@ -72,15 +74,13 @@ public class WaitResponseBehaviour extends Behaviour
 						RegisterAuctionBehaviour
 						.TRANSITION_TO_REQUEST_CREATION;
 			}
-			
-			this.isDone = true;
 		}
-	}
-
-	@Override
-	public boolean done()
-	{
-		return this.isDone;
+		else
+		{
+			this.transition =
+					RegisterAuctionBehaviour
+					.TRANSITION_TO_WAIT_RESPONSE;
+		}
 	}
 
 	@Override

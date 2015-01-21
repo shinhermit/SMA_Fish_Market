@@ -50,5 +50,8 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		mySellerAgent.send(cancelMess);
 		
 		this.myFSM.setRequestCount(0);
+		
+		// DEBUG
+		System.out.println("Seller: terminate cancel !");
 	}
 }

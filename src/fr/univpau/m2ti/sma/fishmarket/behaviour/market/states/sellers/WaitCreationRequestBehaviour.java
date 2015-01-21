@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,13 +14,13 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitCreationRequestBehaviour extends Behaviour
+public class WaitCreationRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private SellerManagementBehaviour myFSM;
 	
-	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone;
+	/** The selected next transition. */
+	private int transition;
 
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
@@ -49,8 +49,6 @@ public class WaitCreationRequestBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
@@ -61,25 +59,34 @@ public class WaitCreationRequestBehaviour extends Behaviour
 		ACLMessage mess = myAgent.receive(
 				WaitCreationRequestBehaviour.MESSAGE_FILTER);
 		
-		if(mess != null)
+		if( ((MarketAgent)myAgent).isDone() )
+		{
+			this.transition = SellerManagementBehaviour.
+					TRANSITION_TO_TERMINATE;
+			
+			// Reset blocking state
+			this.restart();
+		}
+		else if(mess != null)
 		{
 			this.myFSM.setRequest(mess);
 			
-			this.isDone = true;
+			this.transition = SellerManagementBehaviour.
+					TRANSITION_TO_EVALUATE_REQUEST;
+			
+			// Reset blocking state
+			this.restart();
 		}
-	}
-
-	@Override
-	public boolean done()
-	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		else
+		{
+			this.transition = SellerManagementBehaviour.
+					TRANSITION_TO_WAIT_REQUEST;
+		}
 	}
 	
 	@Override
 	public int onEnd()
 	{
-		return ((MarketAgent)myAgent).isDone() ?
-				SellerManagementBehaviour.TRANSITION_TO_TERMINATE :
-					SellerManagementBehaviour.TRANSITION_TO_EVALUATE_REQUEST;
+		return  this.transition;
 	}
 }

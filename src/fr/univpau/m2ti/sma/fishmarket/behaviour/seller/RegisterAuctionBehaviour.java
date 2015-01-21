@@ -127,6 +127,10 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 				TRANSITION_TO_TERMINATE_FAILURE);
 		
 		this.registerTransition(
+				STATE_WAIT_RESPONSE, STATE_WAIT_RESPONSE,
+				TRANSITION_TO_WAIT_RESPONSE);
+		
+		this.registerTransition(
 				STATE_WAIT_RESPONSE, STATE_REQUEST_CREATION,
 				TRANSITION_TO_REQUEST_CREATION);
 		

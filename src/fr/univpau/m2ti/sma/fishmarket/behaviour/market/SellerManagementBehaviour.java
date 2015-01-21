@@ -104,6 +104,10 @@ public class SellerManagementBehaviour extends FSMBehaviour
 				TRANSITION_TO_EVALUATE_REQUEST);
 		
 		this.registerTransition(STATE_WAIT_REQUEST,
+				STATE_WAIT_REQUEST,
+				TRANSITION_TO_WAIT_REQUEST);
+		
+		this.registerTransition(STATE_WAIT_REQUEST,
 				STATE_TERMINATE,
 				TRANSITION_TO_TERMINATE);
 		

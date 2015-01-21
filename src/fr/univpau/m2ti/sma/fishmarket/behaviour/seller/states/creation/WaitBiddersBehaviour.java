@@ -13,7 +13,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	/** The transition which will be selected. */
 	private int transition;
 	
-	private static final long WAIT_BIDDER_DELAY = 120000l; // 2 min
+	private static final long WAIT_BIDDER_DELAY = 5000l; // 1 min
 	
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
@@ -37,6 +37,11 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	@Override
 	public void onWake()
 	{
+		this.restart();
+		
+		// DEBUG
+		System.out.println("Seller: awaken !");
+		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				WaitBiddersBehaviour.MESSAGE_FILTER);

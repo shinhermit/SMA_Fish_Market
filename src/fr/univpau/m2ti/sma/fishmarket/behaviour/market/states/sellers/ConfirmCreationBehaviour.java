@@ -55,9 +55,16 @@ public class ConfirmCreationBehaviour extends OneShotBehaviour
 		reply.setPerformative(
 				FishMarket.Performatives.TO_ACCEPT);
 		
+		// Set topic
+		reply.addReceiver(
+				SellerManagementBehaviour.MESSAGE_TOPIC);
+		
+		// Set conversation ID
+		reply.setConversationId(request.getConversationId());
+		
 		myMarketAgent.send(reply);
 		
 		// Delete request
-		this.myFSM.setRequest(null);
+		this.myFSM.setRequest(null);		
 	}
 }

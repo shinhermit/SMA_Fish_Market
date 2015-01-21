@@ -36,5 +36,8 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 						this.myFSM.getResponse().getConversationId()));
 		
 		this.myFSM.setRequestCount(0);
+		
+		// DEBUG
+		System.out.println("Seller: \n\tTerminate success !");
 	}
 }

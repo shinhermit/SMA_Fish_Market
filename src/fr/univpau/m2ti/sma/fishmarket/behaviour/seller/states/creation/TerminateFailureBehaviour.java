@@ -29,5 +29,8 @@ public class TerminateFailureBehaviour extends OneShotBehaviour
 	public void action()
 	{
 		this.myFSM.setRequestCount(0);
+		
+		// DEBUG
+		System.out.println("Seller: Terminate failure !");
 	}
 }
