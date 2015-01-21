@@ -45,12 +45,12 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			ACLMessage mess = new ACLMessage(
 					FishMarket.Performatives.TO_CREATE);
 			
+			// Receiver
+			mess.addReceiver(mySellerAgent.getMarketAgent());
+			
 			// Set topic
 			mess.addReceiver(
 					SellerManagementBehaviour.MESSAGE_TOPIC);
-			
-			// Receiver
-			mess.addReceiver(mySellerAgent.getMarketAgent());
 			
 			// Add starting price
 			mess.setContent(String.valueOf(

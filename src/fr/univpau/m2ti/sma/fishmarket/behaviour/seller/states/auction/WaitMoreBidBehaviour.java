@@ -85,6 +85,10 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		ACLMessage reply = new ACLMessage(
 				FishMarket.Performatives.REP_BID);
 		
+		// Receiver
+		reply.addReceiver(
+				mySellerAgent.getMarketAgent());
+		
 		// Set topic
 		reply.addReceiver(
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
@@ -92,10 +96,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		// Set conversation id
 		reply.setConversationId(
 				this.myFSM.getConversationId());
-		
-		// Receiver
-		reply.addReceiver(
-				mySellerAgent.getMarketAgent());
 		
 		// Add selected bidder AID
 		reply.setContent(String.valueOf(repBidOk));

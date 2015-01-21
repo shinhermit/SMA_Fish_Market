@@ -37,6 +37,10 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		ACLMessage mess = new ACLMessage(
 				FishMarket.Performatives.AUCTION_OVER);
 		
+		// Receiver
+		mess.addReceiver(
+				mySellerAgent.getMarketAgent());
+		
 		// Set topic
 		mess.addReceiver(
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
@@ -44,10 +48,6 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		// Set conversation id
 		mess.setConversationId(
 				this.myFSM.getConversationId());
-		
-		// Receiver
-		mess.addReceiver(
-				mySellerAgent.getMarketAgent());
 		
 		// Send
 		mySellerAgent.send(mess);

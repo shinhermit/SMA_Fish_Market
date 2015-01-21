@@ -66,12 +66,12 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 			// relay
 			toRelay.clearAllReceiver();
 			
+			// set seller agent as receiver
+			toRelay.addReceiver(this.myFSM.getSeller());
+			
 			// Put back message topic
 			toRelay.addReceiver(
 					AuctionManagementBehaviour.MESSAGE_TOPIC);
-			
-			// set seller agent as subscriber
-			toRelay.addReceiver(this.myFSM.getSeller());
 			
 			// Send
 			super.myAgent.send(toRelay);

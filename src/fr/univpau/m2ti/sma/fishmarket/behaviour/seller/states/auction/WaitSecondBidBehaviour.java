@@ -62,6 +62,10 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 			ACLMessage reply = new ACLMessage(
 					FishMarket.Performatives.REP_BID);
 			
+			// Receiver
+			reply.addReceiver(
+					mySellerAgent.getMarketAgent());
+			
 			// Set topic
 			reply.addReceiver(
 					AuctionManagementBehaviour.MESSAGE_TOPIC);
@@ -69,10 +73,6 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 			// Set conversation id
 			reply.setConversationId(
 					this.myFSM.getConversationId());
-			
-			// Receiver
-			reply.addReceiver(
-					mySellerAgent.getMarketAgent());
 			
 			// Add price and send
 			reply.setContent(String.valueOf(true));

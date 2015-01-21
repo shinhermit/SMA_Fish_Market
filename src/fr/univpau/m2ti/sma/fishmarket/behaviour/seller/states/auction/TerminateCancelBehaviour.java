@@ -38,6 +38,10 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		ACLMessage cancelMess = new ACLMessage(
 				FishMarket.Performatives.TO_CANCEL);
 		
+		// Receiver
+		cancelMess.addReceiver(
+				mySellerAgent.getMarketAgent());
+		
 		// Set topic
 		cancelMess.addReceiver(
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
@@ -45,10 +49,6 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		// Set conversation id
 		cancelMess.setConversationId(
 				this.myFSM.getConversationId());
-		
-		// Receiver
-		cancelMess.addReceiver(
-				mySellerAgent.getMarketAgent());
 		
 		// send
 		mySellerAgent.send(cancelMess);

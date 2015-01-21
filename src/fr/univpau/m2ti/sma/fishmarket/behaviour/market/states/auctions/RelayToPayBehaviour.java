@@ -41,12 +41,12 @@ public class RelayToPayBehaviour extends OneShotBehaviour
 		
 		toRelay.clearAllReceiver();
 		
+		toRelay.addReceiver(
+				this.myFSM.getSeller());
+		
 		// Put back message topic
 		toRelay.addReceiver(
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
-		
-		toRelay.addReceiver(
-				this.myFSM.getSeller());
 		
 		super.myAgent.send(toRelay);
 		

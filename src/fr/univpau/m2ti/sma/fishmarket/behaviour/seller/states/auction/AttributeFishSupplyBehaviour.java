@@ -37,6 +37,10 @@ public class AttributeFishSupplyBehaviour extends OneShotBehaviour
 		ACLMessage mess = new ACLMessage(
 				FishMarket.Performatives.TO_ATTRIBUTE);
 		
+		// Receiver
+		mess.addReceiver(
+				mySellerAgent.getMarketAgent());
+		
 		// Set topic
 		mess.addReceiver(
 				AuctionManagementBehaviour.MESSAGE_TOPIC);
@@ -44,10 +48,6 @@ public class AttributeFishSupplyBehaviour extends OneShotBehaviour
 		// Set conversation id
 		mess.setConversationId(
 				this.myFSM.getConversationId());
-		
-		// Receiver
-		mess.addReceiver(
-				mySellerAgent.getMarketAgent());
 		
 		// send
 		mySellerAgent.send(mess);
