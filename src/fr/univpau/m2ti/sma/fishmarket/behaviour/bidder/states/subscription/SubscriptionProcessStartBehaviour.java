@@ -2,7 +2,6 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.Bidder;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -17,16 +16,6 @@ import jade.lang.acl.MessageTemplate;
 public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 {
     private SubscribeToAuctionBehaviour myFsm;
-
-    /** Allows filtering incoming messages. */
-    private static final MessageTemplate MESSAGE_FILTER;
-
-    static
-    {
-        MESSAGE_FILTER = MessageTemplate.MatchPerformative(
-                Bidder.Performatives.LOOK_FOR_AUCTION
-        );
-    }
 
     public SubscriptionProcessStartBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
