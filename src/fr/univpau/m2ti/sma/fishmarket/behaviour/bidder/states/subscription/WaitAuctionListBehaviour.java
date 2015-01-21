@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.registration;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubsribeToAuctionBehaviour;
@@ -10,7 +10,6 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,20 +17,18 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
+public class WaitAuctionListBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
-            Logger.getLogger(WaitSubscriptionReplyBehaviour.class.getName());
+            Logger.getLogger(WaitAuctionListBehaviour.class.getName());
 
     private SubsribeToAuctionBehaviour myFSM;
 
-    private int transition;
-
-    public WaitSubscriptionReplyBehaviour(Agent a, SubsribeToAuctionBehaviour fsm)
+    public WaitAuctionListBehaviour(Agent a, SubsribeToAuctionBehaviour myFSM)
     {
         super(a);
-        this.myFSM = fsm;
+        this.myFSM = myFSM;
     }
 
     @Override
@@ -50,46 +47,10 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
         // Receive message
         ACLMessage mess = bidderAgent.receive(template);
 
-        AID seller = null;
-
-        if(mess != null)
-        {
-            if(mess.getPerformative() ==
-                    FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION)
-            {
-                // subscription succeeded
-                this.transition =
-                        SubsribeToAuctionBehaviour
-                                .TRANSITION_SUBSCRIPTION_ACCEPTED;
-
-                try
-                {
-                    seller = (AID) mess.getContentObject();
-
-                }
-                catch (UnreadableException e)
-                {
-                    WaitSubscriptionReplyBehaviour.LOGGER.log(Level.SEVERE, null, e);
-                }
-
-                this.myFSM.subscribeToAuction(seller);
-            }
-            else
-            {
-                this.transition =
-                        SubsribeToAuctionBehaviour
-                                .TRANSITION_SUBSCRIPTION_REFUSED;
-            }
-        }
+        myFSM.setRequest(mess);
 
         // transition to next step
 
-    }
-
-    @Override
-    public int onEnd()
-    {
-        return this.transition;
     }
 
     /**
@@ -115,22 +76,22 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
             topicHelper.register(topic);
 
             filter = MessageTemplate.and(
-                MessageTemplate.MatchTopic(topic),
-                MessageTemplate.or(
+                    MessageTemplate.MatchTopic(topic),
                     MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION),
-                    MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.REFUSE_AUCTION_REGISTRATION
-                    )
-                )
-            );
-
+                            FishMarket.Performatives.REPLY_AUCTION_LIST));
         }
         catch (ServiceException e)
         {
-            WaitSubscriptionReplyBehaviour.LOGGER.log(Level.SEVERE, null, e);
+            WaitAuctionListBehaviour.LOGGER.log(Level.SEVERE, null, e);
         }
 
         return filter;
+    }
+
+    @Override
+    public int onEnd()
+    {
+        // Implemented because of possible early return to end state.
+        return SubsribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED;
     }
 }
