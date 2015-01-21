@@ -25,8 +25,8 @@ public class BidderAgent extends Agent
 		// Look up market
 		super.setup();
 
-		// Register behaviour
-		this.addBehaviour(new SubscribeToAuctionBehaviour(this));
+		//find new auction
+		this.createAuctionFinderFSM();
 	}
 
 	@Override
@@ -45,6 +45,13 @@ public class BidderAgent extends Agent
 	{
 		// TODO: implement
 		this.addBehaviour(new BidderBehaviour(this, seller, maxPrice));
+	}
+
+	public void createAuctionFinderFSM()
+	{
+		// Register behaviour
+		this.addBehaviour(new SubscribeToAuctionBehaviour(this));
+
 	}
 
 	public AID getMarketAgentAID()

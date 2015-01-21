@@ -6,6 +6,7 @@ import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitAuctionListBehaviour extends OneShotBehaviour
+public class WaitAuctionListBehaviour extends Behaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -52,6 +53,14 @@ public class WaitAuctionListBehaviour extends OneShotBehaviour
         // transition to next step
 
     }
+
+    @Override
+    public boolean done()
+    {
+        // Stays alive in case we need to ask for new auction list
+        return false;
+    }
+
 
     /**
      * Creates a filter for incoming messages.

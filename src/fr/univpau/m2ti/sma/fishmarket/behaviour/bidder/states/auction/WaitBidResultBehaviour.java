@@ -6,6 +6,7 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitBidResultBehaviour extends OneShotBehaviour
+public class WaitBidResultBehaviour extends Behaviour
 {
 
     /**
@@ -28,6 +29,8 @@ public class WaitBidResultBehaviour extends OneShotBehaviour
     private BidderBehaviour myFSM;
 
     private int transition;
+
+    private boolean isDone;
 
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER;
@@ -78,6 +81,7 @@ public class WaitBidResultBehaviour extends OneShotBehaviour
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_REP_BID_OK;
                     System.out.println("I won !!!");
+                    this.isDone = true;
                 }
                 else
                 {
@@ -89,11 +93,13 @@ public class WaitBidResultBehaviour extends OneShotBehaviour
             else if (mess.getPerformative() == FishMarket.Performatives.AUCTION_CANCELLED)
             {
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
+                this.isDone = true;
             }
             else
             {
                 //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
+                this.isDone = true;
             }
         }
         else
@@ -102,6 +108,12 @@ public class WaitBidResultBehaviour extends OneShotBehaviour
             WaitBidResultBehaviour.LOGGER.log(Level.SEVERE, null, "Received null message");
         }
 
+    }
+
+    @Override
+    public boolean done()
+    {
+        return this.isDone;
     }
 
     @Override

@@ -5,6 +5,7 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehavio
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
@@ -13,7 +14,7 @@ import jade.lang.acl.MessageTemplate;
 /**
  *
  */
-public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
+public class SubscriptionProcessStartBehaviour extends Behaviour
 {
     private SubscribeToAuctionBehaviour myFsm;
 
@@ -51,6 +52,13 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 
         // transition to next step
 
+    }
+
+    @Override
+    public boolean done()
+    {
+        // Stays alive in case we need to ask for new auction list
+        return false;
     }
 
     @Override
