@@ -7,9 +7,7 @@ import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -28,28 +26,21 @@ public class WaitRegistrationRequestBehaviour extends Behaviour
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
-
-	/** Allows filtering incoming messages. */
-	private static final MessageTemplate MESSAGE_FILTER;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
 			Logger.getLogger(WaitRegistrationRequestBehaviour.class.getName());
-	
-	static
-	{
-		final AID topic =
-				TopicUtility.createTopic(
-						FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
-		MESSAGE_FILTER =
+
+	/** Allows filtering incoming messages. */
+	private static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.and(
-					MessageTemplate.MatchTopic(topic),
+					MessageTemplate.MatchTopic(
+							SellerManagementBehaviour.MESSAGE_TOPIC),
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.REQUEST_AUCTION_LIST),
 							MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
-	}
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.

@@ -5,7 +5,10 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.ConfirmReg
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.EvaluateRegistrationResquestBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.TerminateSellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers.WaitRegistrationRequestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
+import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -19,6 +22,11 @@ public class SellerManagementBehaviour extends FSMBehaviour
 {
 	/** Holds the last auction creation request. */
 	private ACLMessage request;
+	
+	/** The topic of the messages of conversations accepted by the behaviour. */
+	public static final AID MESSAGE_TOPIC = 
+			TopicUtility.createTopic(
+					FishMarket.Topics.TOPIC_AUCTION_REGISTRATION);
 	
 	/** The state in which the agent waits for auction creation requests. */
 	private static final String STATE_WAIT_AUCTION_REGISTRATION_REQUEST =

@@ -3,9 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -28,23 +26,15 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	private int transition;
 	
 	/** Allows filtering incoming messages. */
-	private static final MessageTemplate MESSAGE_FILTER;
-	
-	static
-	{
-		final AID topic =
-				TopicUtility.createTopic(
-						FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
-		
-		MESSAGE_FILTER =
-				MessageTemplate.and(
-						MessageTemplate.MatchTopic(topic),
-						MessageTemplate.or(
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.REQUEST_AUCTION_LIST),
-								MessageTemplate.MatchPerformative(
-										FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
-	}
+	private static final MessageTemplate MESSAGE_FILTER =
+			MessageTemplate.and(
+					MessageTemplate.MatchTopic(
+							BidderManagementBehaviour.MESSAGE_TOPIC),
+					MessageTemplate.or(
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.REQUEST_AUCTION_LIST),
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.REQUEST_BIDDER_SUBSCRIPTION)));
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.

@@ -6,7 +6,10 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.EvaluateSu
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.ReplyAuctionListBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.TerminateBidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders.WaitBidderRequestBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
+import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
@@ -20,6 +23,11 @@ public class BidderManagementBehaviour extends FSMBehaviour
 {
 	/** Subscription management: the bidder agent who requested a subscription to an auction. */
 	private ACLMessage request;
+	
+	/** The topic of the messages of conversations accepted by the behaviour. */
+	public static final AID MESSAGE_TOPIC = 
+			TopicUtility.createTopic(
+					FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
 	
 	/** The state in which the agent waits for bidders messages requests. */
 	private static final String STATE_WAIT_BIDDER_REQUEST =
