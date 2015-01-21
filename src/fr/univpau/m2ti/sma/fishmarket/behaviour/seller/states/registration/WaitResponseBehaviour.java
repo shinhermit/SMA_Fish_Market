@@ -1,8 +1,8 @@
-package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states;
+package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.registration;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -12,7 +12,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitResponseBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private RegisterAuctionBehaviour myFSM;
 	
 	/** Tells whether this behaviour has ended it's task or not. */
 	private boolean isDone;
@@ -39,7 +39,7 @@ public class WaitResponseBehaviour extends Behaviour
 	 */
 	public WaitResponseBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			RegisterAuctionBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -67,13 +67,13 @@ public class WaitResponseBehaviour extends Behaviour
 					FishMarket.Performatives.CONFIRM_AUCTION_REGISTRATION)
 			{
 				this.transition =
-						CreateAuctionBehaviour
+						RegisterAuctionBehaviour
 						.TRANSITION_REGISTRATION_CONFIRMED;
 			}
 			else
 			{
 				this.transition =
-						CreateAuctionBehaviour
+						RegisterAuctionBehaviour
 						.TRANSITION_REGISTRATION_REFUSED;
 			}
 		}
