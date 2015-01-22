@@ -54,6 +54,9 @@ public class ProvideAuctionListBehaviour extends OneShotBehaviour
 		reply.setPerformative(
 				FishMarket.Performatives.TO_PROVIDE);
 		
+		// Add topic
+		reply.addReceiver(BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
+		
 		try
 		{
 			reply.setContentObject(
