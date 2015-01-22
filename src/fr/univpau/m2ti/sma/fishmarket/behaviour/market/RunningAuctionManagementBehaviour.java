@@ -21,7 +21,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class AuctionManagementBehaviour extends FSMBehaviour
+public class RunningAuctionManagementBehaviour extends FSMBehaviour
 {
 	/** The AID of the seller agent who created the auction which is managed by this behaviour. */
 	private final AID mySeller;
@@ -163,7 +163,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 * @param myMarketAgent
 	 * 			the agent to which this behaviour is added.
 	 */
-	public AuctionManagementBehaviour(
+	public RunningAuctionManagementBehaviour(
 			MarketAgent myMarketAgent,
 			AID mySeller,
 			String myAuctionId)
@@ -436,7 +436,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	{
 		return MessageTemplate.and(
 						MessageTemplate.MatchTopic(
-								AuctionManagementBehaviour.MESSAGE_TOPIC),
+								RunningAuctionManagementBehaviour.MESSAGE_TOPIC),
 						MessageTemplate.MatchConversationId(
 										this.myAuctionId));
 	}

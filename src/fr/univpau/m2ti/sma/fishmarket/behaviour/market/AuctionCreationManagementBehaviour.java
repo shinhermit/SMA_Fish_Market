@@ -19,7 +19,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class SellerManagementBehaviour extends FSMBehaviour
+public class AuctionCreationManagementBehaviour extends FSMBehaviour
 {
 	/** Holds the last auction creation request. */
 	private ACLMessage request;
@@ -32,7 +32,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	/** Allows filtering incoming messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.MatchTopic(
-							SellerManagementBehaviour.MESSAGE_TOPIC);
+							AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
 	
 	/** The state in which the agent waits for auction creation requests. */
 	private static final String STATE_WAIT_REQUEST =
@@ -80,7 +80,7 @@ public class SellerManagementBehaviour extends FSMBehaviour
 	 * @param myMarketAgent
 	 * 			the agent to which this behaviour is added.
 	 */
-	public SellerManagementBehaviour(MarketAgent myMarketAgent)
+	public AuctionCreationManagementBehaviour(MarketAgent myMarketAgent)
 	{
 		super(myMarketAgent);
 		

@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 
 @SuppressWarnings("serial")
@@ -14,7 +14,7 @@ import jade.core.behaviours.OneShotBehaviour;
 public class TerminateCancelBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementBehaviour myFSM;
 	
 	/**
 	 * Creates a terminating behaviour which is to be associated with a state of the 
@@ -26,7 +26,7 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	 */
 	public TerminateCancelBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionManagementBehaviour myFSM)
+			RunningAuctionManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		

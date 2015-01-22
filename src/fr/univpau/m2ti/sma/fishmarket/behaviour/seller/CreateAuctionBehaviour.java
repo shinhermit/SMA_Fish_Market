@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -29,7 +29,7 @@ public class CreateAuctionBehaviour extends FSMBehaviour
 	
 	/** Base filter for filtering messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
-			MessageTemplate.MatchTopic(SellerManagementBehaviour.MESSAGE_TOPIC);
+			MessageTemplate.MatchTopic(AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
 	
 	/** The initial state, in which the seller creates an auction and request it's registration to the market agent. */
 	private static final String STATE_REQUEST_CREATION =

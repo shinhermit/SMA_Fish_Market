@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 
 @SuppressWarnings("serial")
@@ -69,8 +69,8 @@ public class MarketAgent extends Agent
         }
         
         // Add behaviours
-        this.addBehaviour(new BidderManagementBehaviour(this));
-        this.addBehaviour(new SellerManagementBehaviour(this));
+        this.addBehaviour(new BidderSubscriptionManagementBehaviour(this));
+        this.addBehaviour(new AuctionCreationManagementBehaviour(this));
         // Auction management behaviour are add by SellerManagementBehaviour
         // sub-behaviour (confirm auction registration behaviour)
 	}

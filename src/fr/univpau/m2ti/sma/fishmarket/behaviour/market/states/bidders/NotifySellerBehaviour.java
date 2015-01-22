@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.ACLMessage;
 public class NotifySellerBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderManagementBehaviour myFSM;
+	private BidderSubscriptionManagementBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -29,7 +29,7 @@ public class NotifySellerBehaviour extends OneShotBehaviour
 	 */
 	public NotifySellerBehaviour(
 			MarketAgent myMarketAgent,
-			BidderManagementBehaviour myFSM)
+			BidderSubscriptionManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -52,7 +52,7 @@ public class NotifySellerBehaviour extends OneShotBehaviour
 		
 		// Set topic
 		notify.addReceiver(
-				SellerManagementBehaviour.MESSAGE_TOPIC);
+				AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
 		
 		// Inform conversation ID
 		notify.setConversationId(auctionID);

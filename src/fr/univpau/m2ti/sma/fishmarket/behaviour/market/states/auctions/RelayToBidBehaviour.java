@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class RelayToBidBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementBehaviour myFSM;
 	
 	/** The transition which is to be activated next. */
 	private int transition;
@@ -35,7 +35,7 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	 */
 	public RelayToBidBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionManagementBehaviour myFSM)
+			RunningAuctionManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -49,12 +49,12 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	{
 		// Wait messages in order to choose a transition
 		boolean received = this.receive(
-				AuctionManagementBehaviour.TO_CANCEL_WAIT_DELAY);
+				RunningAuctionManagementBehaviour.TO_CANCEL_WAIT_DELAY);
 		
 		if(received)
 		{
 			this.transition =
-						AuctionManagementBehaviour.TRANSITION_TO_CANCEL;
+						RunningAuctionManagementBehaviour.TRANSITION_TO_CANCEL;
 		}
 		
 		else
@@ -71,14 +71,14 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 			
 			// Put back message topic
 			toRelay.addReceiver(
-					AuctionManagementBehaviour.MESSAGE_TOPIC);
+					RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
 			
 			// Send
 			super.myAgent.send(toRelay);
 			
 			// Select transition
 			this.transition =
-					AuctionManagementBehaviour.TRANSITION_TO_WAIT_REP_BID;
+					RunningAuctionManagementBehaviour.TRANSITION_TO_WAIT_REP_BID;
 			
 			// Delete request
 			this.myFSM.setRequest(null);
