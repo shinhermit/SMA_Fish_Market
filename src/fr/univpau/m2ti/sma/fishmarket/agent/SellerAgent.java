@@ -10,7 +10,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
 
 @SuppressWarnings("serial")
 /**
@@ -60,7 +60,7 @@ public class SellerAgent extends Agent
 				this.lookupMarketAgent();
 		
 		this.addBehaviour(
-				new RegisterAuctionBehaviour(this));
+				new CreateAuctionBehaviour(this));
 		// AuctionSellerBehaviour is to be added when the first one terminates.		
 	}
     

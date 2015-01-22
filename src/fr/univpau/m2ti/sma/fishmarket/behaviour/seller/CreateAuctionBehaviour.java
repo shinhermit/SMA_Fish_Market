@@ -16,7 +16,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class RegisterAuctionBehaviour extends FSMBehaviour
+public class CreateAuctionBehaviour extends FSMBehaviour
 {
 	/** Holds the response from the market. */
 	private ACLMessage response;
@@ -24,6 +24,10 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 	/** The number of request already sent. */
 	private int requestCount = 0;
 	
+	/** The number of cycles made to wait for bidders before starting announcing. */
+	private int waitCycleCount = 0;
+	
+	/** Base filter for filtering messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.MatchTopic(SellerManagementBehaviour.MESSAGE_TOPIC);
 	
@@ -86,7 +90,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 	 * 
 	 * @param mySellerAgent the seller agent to which the behaviour is to be added.
 	 */
-	public RegisterAuctionBehaviour(
+	public CreateAuctionBehaviour(
 			SellerAgent mySellerAgent)
 	{
 		super(mySellerAgent);
@@ -102,7 +106,7 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 				STATE_WAIT_RESPONSE);
 		
 		this.registerState(
-				new WaitBiddersBehaviour(mySellerAgent),
+				new WaitBiddersBehaviour(mySellerAgent, this),
 				STATE_WAIT_BIDDERS);
 		
 		this.registerLastState(
@@ -136,6 +140,10 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 		
 		this.registerTransition(
 				STATE_WAIT_RESPONSE, STATE_WAIT_BIDDERS,
+				TRANSITION_TO_WAIT_BIDDERS);
+		
+		this.registerTransition(
+				STATE_WAIT_BIDDERS, STATE_WAIT_BIDDERS,
 				TRANSITION_TO_WAIT_BIDDERS);
 		
 		this.registerTransition(
@@ -191,5 +199,33 @@ public class RegisterAuctionBehaviour extends FSMBehaviour
 	public int notifyNewRequest()
 	{
 		return ++this.requestCount;
+	}
+
+	/**
+	 * 
+	 * @return the number of time the agent <i>slept</i> in order to wait for bidders before starting to announce.
+	 */
+	public int getWaitCycleCount()
+	{
+		return waitCycleCount;
+	}
+
+	/**
+	 * 
+	 * @param waitCycleCount the number of time the agent <i>slept</i> in order to wait for bidders before starting to announce.
+	 */
+	public void setWaitCycleCount(int waitCycleCount)
+	{
+		this.waitCycleCount = waitCycleCount;
+	}
+	
+	/**
+	 * Notifies that a new <i>sleep</i> cycle in order to wait for bidders before starting to announce.
+	 * 
+	 * @return the update number of sent requests.
+	 */
+	public int notifyNewWaitCycle()
+	{
+		return ++this.waitCycleCount;
 	}
 }

@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -10,15 +10,22 @@ import jade.lang.acl.MessageTemplate;
 @SuppressWarnings("serial")
 public class WaitBiddersBehaviour extends WakerBehaviour
 {
+	/** The FSM behaviour to which this behaviour is to be added. */
+	private CreateAuctionBehaviour myFSM;
+	
 	/** The transition which will be selected. */
 	private int transition;
+
+	/** The duration of one cycle of wait for bidders. */
+	private static final long WAIT_BIDDER_DELAY = 5000l; // 5 sec
 	
-	private static final long WAIT_BIDDER_DELAY = 60000l; // 1 min
+	/** The max number of <i>sleep</i> cycle allowed to wait for bidders subscriptions. */
+	private static final int MAX_CYCLE_COUNT = 4;
 	
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					RegisterAuctionBehaviour.MESSAGE_FILTER,
+					CreateAuctionBehaviour.MESSAGE_FILTER,
 					MessageTemplate.MatchPerformative(
 							FishMarket.Performatives.TO_SUBSCRIBE));
 	
@@ -29,15 +36,18 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
 	public WaitBiddersBehaviour(
-			SellerAgent mySellerAgent)
+			SellerAgent mySellerAgent,
+			CreateAuctionBehaviour myFSM)
 	{
 		super(mySellerAgent, WAIT_BIDDER_DELAY);
+		
+		this.myFSM = myFSM;
 	}
 	
 	@Override
 	public void onWake()
 	{
-		this.restart();
+		this.myFSM.notifyNewWaitCycle();
 		
 		// DEBUG
 		System.out.println("Seller: awaken !");
@@ -49,12 +59,26 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 		if(mess != null)
 		{
 			this.transition =
-					RegisterAuctionBehaviour.TRANSITION_TO_TERMINATE_SUCCESS;
+					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_SUCCESS;
+			
+			this.restart();
 		}
 		else
 		{
-			this.transition =
-					RegisterAuctionBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
+			if(this.myFSM.getWaitCycleCount() > WaitBiddersBehaviour.MAX_CYCLE_COUNT)
+			{
+				this.transition =
+						CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
+				
+				this.restart();
+			}
+			else
+			{
+				this.transition =
+						CreateAuctionBehaviour.TRANSITION_TO_WAIT_BIDDERS;
+				
+				this.reset(WAIT_BIDDER_DELAY);
+			}
 		}
 	}
 

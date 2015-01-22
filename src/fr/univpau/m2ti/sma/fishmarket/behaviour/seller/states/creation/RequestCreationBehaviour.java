@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RegisterAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,7 +11,7 @@ import jade.lang.acl.ACLMessage;
 public class RequestCreationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private RegisterAuctionBehaviour myFSM;
+	private CreateAuctionBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -27,7 +27,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 	 */
 	public RequestCreationBehaviour(
 			SellerAgent mySellerAgent,
-			RegisterAuctionBehaviour myFSM)
+			CreateAuctionBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -63,12 +63,12 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			
 			// Select next transition
 			this.transition =
-					RegisterAuctionBehaviour.TRANSITION_TO_WAIT_RESPONSE;
+					CreateAuctionBehaviour.TRANSITION_TO_WAIT_RESPONSE;
 		}
 		else
 		{
 			this.transition =
-					RegisterAuctionBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
+					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
 		}
 	}
 	
