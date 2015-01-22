@@ -9,7 +9,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -28,13 +27,16 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
  */
 public class MarketAgent extends Agent
 {
-	/** The set of registered auction. */
-	private Map<Auction, Set<AID>> auctions =
-			new HashMap<Auction, Set<AID>>();
+	/** The registered auction. */
+	private Map<String, Auction> auctions;
 	
-	/** Associate an auction with it's seller agent. */
-	private Map<Auction, AID> sellers =
-			new HashMap<Auction, AID>();
+	/** Associates an auction and its subscribers. */
+	private Map<String, Set<AID>> subscribers =
+			new HashMap<String, Set<AID>>();
+	
+	/** Associate each auction with it's seller agent. */
+	private Map<String, AID> sellers =
+			new HashMap<String, AID>();
 	
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
@@ -118,7 +120,7 @@ public class MarketAgent extends Agent
 	 */
 	public boolean isRegisteredAuction(String auctionID)
 	{
-		return this.findAuction(auctionID) != null;
+		return this.auctions.containsKey(auctionID);
 	}
 	
 	/**
@@ -129,8 +131,20 @@ public class MarketAgent extends Agent
 	 */
 	public void registerAuction(Auction auction, AID seller)
 	{
-		this.auctions.put(auction, new HashSet<AID>());
-		this.sellers.put(auction, seller);
+		if(auction != null
+				&& seller != null)
+		{
+			String auctionID = auction.getID();
+			
+			this.auctions.put(auctionID, auction);
+			this.sellers.put(auctionID, seller);
+			this.subscribers.put(auctionID, new HashSet<AID>());
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.SEVERE,
+					"Trying to register null auction or null seller failed.");
+		}
 	}
 	
 	/**
@@ -139,7 +153,7 @@ public class MarketAgent extends Agent
 	 */
 	public Set<Auction> getRegisteredAuctions()
 	{
-		return new HashSet<Auction>(this.auctions.keySet());
+		return new HashSet<Auction>(this.auctions.values());
 	}
 	
 	/**
@@ -151,30 +165,7 @@ public class MarketAgent extends Agent
 	 */
 	public Auction findAuction(String auctionID)
 	{
-		if(auctionID == null)
-		{
-			return null;
-		}
-		
-		Auction auction = null;
-		boolean found = false;
-		
-		Iterator<Auction> it =
-				this.auctions.keySet().iterator();
-		
-		while(it.hasNext() && !found)
-		{
-			auction = it.next();
-			
-			found = auction.getID().equals(auctionID);
-		}
-		
-		if(!found)
-		{
-			auction = null;
-		}
-		
-		return auction;
+		return this.auctions.get(auctionID);
 	}
 	
 	/**
@@ -185,7 +176,7 @@ public class MarketAgent extends Agent
 	 */
 	public AID getSeller(String auctionID)
 	{
-		return this.sellers.get(new Auction(auctionID));
+		return this.sellers.get(auctionID);
 	}
 	
 	/**
@@ -196,10 +187,18 @@ public class MarketAgent extends Agent
 	 */
 	public void addSuscriber(String auctionID, AID bidderAID)
 	{
-		Set<AID> suscribers =
-				this.auctions.get(new Auction(auctionID));
+		Set<AID> subscribers =
+				this.subscribers.get(auctionID);
 		
-		suscribers.add(bidderAID);
+		if(subscribers != null)
+		{
+			subscribers.add(bidderAID);
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
 	}
 	
 	/**
@@ -212,10 +211,20 @@ public class MarketAgent extends Agent
 	 */
 	public boolean isSuscriber(String auctionID, AID bidderAID)
 	{
-		Set<AID> suscribers =
-				this.auctions.get(new Auction(auctionID));
+		Set<AID> subscribers =
+				this.subscribers.get(auctionID);
 		
-		return suscribers.contains(bidderAID);
+		if(subscribers != null)
+		{
+			return subscribers.contains(bidderAID);
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+			
+			return false;
+		}
 	}
 	
 	/**
@@ -227,7 +236,7 @@ public class MarketAgent extends Agent
 	 */
 	public Set<AID> getSubscribers(String auctionID)
 	{
-		return this.auctions.get(new Auction(auctionID));
+		return this.subscribers.get(auctionID);
 	}
 	
 	/**
@@ -243,6 +252,11 @@ public class MarketAgent extends Agent
 		if(auction != null)
 		{
 			auction.setStatus(status);
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
 		}
 	}
 	
@@ -260,6 +274,11 @@ public class MarketAgent extends Agent
 		{
 			auction.setCurrentPrice(price);
 		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
 	}
 	
 	/**
@@ -268,8 +287,9 @@ public class MarketAgent extends Agent
 	 */
 	public void deleteAuction(String auctionID)
 	{
-		this.auctions.remove(new Auction(auctionID));
-		this.sellers.remove(new Auction(auctionID));
+		this.auctions.remove(auctionID);
+		this.sellers.remove(auctionID);
+		this.subscribers.remove(auctionID);
 	}
     
     /**
