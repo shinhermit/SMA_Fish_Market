@@ -112,26 +112,13 @@ public class MarketAgent extends Agent
 	/**
 	 * Tells whether an auction is already registered in this market agent or not.
 	 * 
-	 * @param auction
-	 * 		the checked auction.
+	 * @param auctionID
+	 * 		the ID of the checked auction.
 	 * @return true if the auction is already registered on this market agent, false otherwise.
 	 */
-	public boolean isRegisteredAuction(Auction auction)
+	public boolean isRegisteredAuction(String auctionID)
 	{
-		if(auction == null)
-		{
-			return false;
-		}
-		
-		else if(this.auctions.keySet().contains(auction))
-		{
-			return true;
-		}
-		
-		else
-		{
-			return false;
-		}
+		return this.findAuction(auctionID) != null;
 	}
 	
 	/**
@@ -164,6 +151,11 @@ public class MarketAgent extends Agent
 	 */
 	public Auction findAuction(String auctionID)
 	{
+		if(auctionID == null)
+		{
+			return null;
+		}
+		
 		Auction auction = null;
 		boolean found = false;
 		

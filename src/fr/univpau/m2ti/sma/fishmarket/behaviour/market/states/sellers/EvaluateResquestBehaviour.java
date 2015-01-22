@@ -53,8 +53,15 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 		
 		Auction auction = new Auction(auctionId);
 		
-		if(! myMarketAgent.isRegisteredAuction(auction) )
+		// DEBUG
+		System.out.println("Market: evaluating registration of auction with id "+auctionId);
+		System.out.println("Topic is: "+SellerManagementBehaviour.MESSAGE_TOPIC);
+		
+		if(! myMarketAgent.isRegisteredAuction(auctionId) )
 		{
+			// DEBUG
+			System.out.println("Market: auction is not yet registered");
+			
 			// Register auction
 			auction.setStatus(
 					Auction.STATUS_RUNNING);
@@ -73,12 +80,19 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 		}
 		else
 		{
+			// DEBUG
+			System.out.println("Market: auction is already registered");
+			
 			// Reply refuse
 			ACLMessage reply =
 					this.myFSM.getRequest().createReply();
 			
 			reply.setPerformative(
 					FishMarket.Performatives.TO_REFUSE);
+			
+			// Set topic
+			reply.addReceiver(
+					SellerManagementBehaviour.MESSAGE_TOPIC);
 			
 			super.myAgent.send(reply);
 			

@@ -13,7 +13,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	/** The transition which will be selected. */
 	private int transition;
 	
-	private static final long WAIT_BIDDER_DELAY = 5000l; // 1 min
+	private static final long WAIT_BIDDER_DELAY = 5*60000l; // 1 min
 	
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =

@@ -415,7 +415,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 	 */
 	public static String createAuctionId(AID sellerAID)
 	{
-		return sellerAID.toString();
+		return sellerAID.getName().toString();
 	}
 	
 	/**
