@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -36,6 +37,15 @@ public class PickAuctionBehaviour extends Behaviour
 
     private int transition;
 
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    BidderManagementBehaviour.MESSAGE_FILTER,
+                    MessageTemplate.MatchPerformative(
+                            FishMarket.Performatives.TO_PROVIDE
+                    )
+            );
+
+
     public PickAuctionBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
@@ -65,29 +75,39 @@ public class PickAuctionBehaviour extends Behaviour
 
         if (content != null)
         {
-            // pick a random auction
-            String selectedAuction = this.pickRandomAuctionSeller(
-                    (HashSet<Auction>) content
-            );
+            HashSet<Auction> auctionList = (HashSet<Auction>) content;
 
-            if (selectedAuction != null)
+            if (auctionList.size() > 0)
             {
-                //an auction has been found
-                ACLMessage reply = mess.createReply();
-                reply.setPerformative(FishMarket.Performatives.TO_CREATE);
+                // pick a random auction
+                String selectedAuction =
+                        this.pickRandomAuctionSeller(auctionList);
 
-                this.transition = SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 
-                try
+                if (selectedAuction != null)
                 {
-                    reply.setContentObject(selectedAuction);
-                }
-                catch (IOException e)
-                {
-                    PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
-                }
+                    //an auction has been found
+                    ACLMessage reply = mess.createReply();
+                    reply.setPerformative(FishMarket.Performatives.TO_CREATE);
 
-                bidderAgent.send(reply);
+                    this.transition =
+                            SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+
+                    try
+                    {
+                        reply.setContentObject(selectedAuction);
+                    }
+                    catch (IOException e)
+                    {
+                        PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
+                    }
+
+                    bidderAgent.send(reply);
+                }
+                else
+                {
+                    requestNewList = true;
+                }
             }
             else
             {

@@ -1,6 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -21,14 +23,13 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
     private BidderBehaviour myFSM;
 
     /** Message filtering */
-    private static final MessageTemplate MESSAGE_FILTER;
-
-    static
-    {
-        MESSAGE_FILTER = MessageTemplate.MatchPerformative(
-                FishMarket.Performatives.TO_ATTRIBUTE
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    BidderManagementBehaviour.MESSAGE_FILTER,
+                    MessageTemplate.MatchPerformative(
+                            FishMarket.Performatives.TO_ATTRIBUTE
+            )
         );
-    }
 
     public WaitAttributionBehaviour(Agent a, BidderBehaviour fsm)
     {

@@ -2,12 +2,13 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -26,6 +27,14 @@ public class WaitAuctionListBehaviour extends Behaviour
 
     private SubscribeToAuctionBehaviour myFSM;
 
+    private static final MessageTemplate MESSAGE_FILTER =
+        MessageTemplate.and(
+                BidderManagementBehaviour.MESSAGE_FILTER,
+                MessageTemplate.MatchPerformative(
+                        FishMarket.Performatives.TO_PROVIDE
+                )
+        );
+
     public WaitAuctionListBehaviour(Agent a, SubscribeToAuctionBehaviour myFSM)
     {
         super(a);
@@ -39,16 +48,19 @@ public class WaitAuctionListBehaviour extends Behaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
-        // wait for incoming message
-        this.block();
-
-        // Filter to extract incoming message
-        MessageTemplate template = this.createFilter();
 
         // Receive message
-        ACLMessage mess = bidderAgent.receive(template);
+        ACLMessage mess = bidderAgent.receive(MESSAGE_FILTER);
 
-        myFSM.setRequest(mess);
+        if (mess != null)
+        {
+            myFSM.setRequest(mess);
+        }
+        else
+        {
+            // wait for incoming message
+            this.block();
+        }
 
         // transition to next step
 
@@ -59,42 +71,6 @@ public class WaitAuctionListBehaviour extends Behaviour
     {
         // Stays alive in case we need to ask for new auction list
         return false;
-    }
-
-
-    /**
-     * Creates a filter for incoming messages.
-     *
-     * @return a message template which can be used to filter incoming messages.
-     */
-    private MessageTemplate createFilter()
-    {
-        MessageTemplate filter = null;
-
-        // Create message filter
-        TopicManagementHelper topicHelper;
-        try
-        {
-            topicHelper = (TopicManagementHelper) myAgent.getHelper(
-                    TopicManagementHelper.SERVICE_NAME);
-
-            final AID topic =
-                    topicHelper.createTopic(
-                            FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
-
-            topicHelper.register(topic);
-
-            filter = MessageTemplate.and(
-                    MessageTemplate.MatchTopic(topic),
-                    MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.TO_PROVIDE));
-        }
-        catch (ServiceException e)
-        {
-            WaitAuctionListBehaviour.LOGGER.log(Level.SEVERE, null, e);
-        }
-
-        return filter;
     }
 
     @Override
