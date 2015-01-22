@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitCreationRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private SellerManagementBehaviour myFSM;
+	private AuctionCreationManagementBehaviour myFSM;
 	
 	/** The selected next transition. */
 	private int transition;
@@ -25,7 +25,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.and(
-					SellerManagementBehaviour.MESSAGE_FILTER,
+					AuctionCreationManagementBehaviour.MESSAGE_FILTER,
 					MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.TO_CREATE));
 	
@@ -39,7 +39,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 	 */
 	public WaitCreationRequestBehaviour(
 			MarketAgent myMarketAgent,
-			SellerManagementBehaviour myFSM)
+			AuctionCreationManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -61,7 +61,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		
 		if( ((MarketAgent)myAgent).isDone() )
 		{
-			this.transition = SellerManagementBehaviour.
+			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_TERMINATE;
 			
 			// Reset blocking state
@@ -71,7 +71,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		{
 			this.myFSM.setRequest(mess);
 			
-			this.transition = SellerManagementBehaviour.
+			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_EVALUATE_REQUEST;
 			
 			// Reset blocking state
@@ -79,7 +79,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		}
 		else
 		{
-			this.transition = SellerManagementBehaviour.
+			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_WAIT_REQUEST;
 		}
 	}

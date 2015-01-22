@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitToAttributeBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementBehaviour myFSM;
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
@@ -35,7 +35,7 @@ public class WaitToAttributeBehaviour extends Behaviour
 	 */
 	public WaitToAttributeBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionManagementBehaviour myFSM)
+			RunningAuctionManagementBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
