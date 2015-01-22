@@ -73,15 +73,21 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 					AID bidderAID = request.getSender();
 					
 					// Register subscription
-					
 					myMarketAgent.addSuscriber(auctionId, bidderAID);
 					
 					// Reply accept
 					reply.setPerformative(
 							FishMarket.Performatives.TO_ACCEPT);
 					
-					reply.setConversationId(auctionId);		
+					// Set topic
+					reply.addReceiver(
+							BidderManagementBehaviour.MESSAGE_TOPIC);
 					
+					// Inform conversation ID
+					reply.setConversationId(auctionId);
+					reply.setContent(auctionId);
+					
+					// Send
 					myMarketAgent.send(reply);
 				}
 				

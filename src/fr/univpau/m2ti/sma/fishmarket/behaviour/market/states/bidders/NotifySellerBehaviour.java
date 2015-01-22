@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.SellerManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -49,7 +50,13 @@ public class NotifySellerBehaviour extends OneShotBehaviour
 		ACLMessage notify = new ACLMessage(
 				FishMarket.Performatives.TO_SUBSCRIBE);
 		
+		// Set topic
+		notify.addReceiver(
+				SellerManagementBehaviour.MESSAGE_TOPIC);
+		
+		// Inform conversation ID
 		notify.setConversationId(auctionID);
+		notify.setContent(auctionID);
 		
 		notify.addReceiver(
 				myMarketAgent.getSeller(auctionID));
