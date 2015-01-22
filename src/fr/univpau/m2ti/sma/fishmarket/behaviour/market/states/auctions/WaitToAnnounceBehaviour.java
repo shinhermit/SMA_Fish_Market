@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,13 +14,13 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitToAnnounceBehaviour extends Behaviour
+public class WaitToAnnounceBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private AuctionManagementBehaviour myFSM;
 	
-	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone;
+	/** The transition which will be selected. */
+	private int transition;
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
@@ -48,8 +48,6 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
@@ -65,16 +63,32 @@ public class WaitToAnnounceBehaviour extends Behaviour
 		
 		if(mess != null)
 		{
-			this.myFSM.setRequest(mess);
+			this.restart();
 			
-			this.isDone = true;
+			if(mess.getPerformative() ==
+					FishMarket.Performatives.TO_ANNOUNCE)
+			{
+				this.myFSM.setRequest(mess);
+				
+				this.transition = AuctionManagementBehaviour.
+						TRANSITION_TO_RELAY_ANNOUNCE;
+			}
+			else
+			{
+				this.transition = AuctionManagementBehaviour.
+						TRANSITION_TO_CANCEL;
+			}
+		}
+		else
+		{
+			this.transition = AuctionManagementBehaviour.
+					TRANSITION_TO_WAIT_TO_ANNOUNCE;
 		}
 	}
-
-	@Override
-	public boolean done()
+	
+	public int onEnd()
 	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		return this.transition;
 	}
 	
 	/**
@@ -86,7 +100,10 @@ public class WaitToAnnounceBehaviour extends Behaviour
 	{
 		return MessageTemplate.and(
 				this.myFSM.getMessageFilter(),
-				MessageTemplate.MatchPerformative(
-						FishMarket.Performatives.TO_ANNOUNCE));
+				MessageTemplate.or(
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_ANNOUNCE),
+						MessageTemplate.MatchPerformative(
+								FishMarket.Performatives.TO_CANCEL)));
 	}
 }

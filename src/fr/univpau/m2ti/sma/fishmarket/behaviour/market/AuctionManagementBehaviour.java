@@ -120,31 +120,35 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 			"STATE_TERMINATE_SUCCESS";
 	
 	/** The ending state of this FSM after a cancellation of the auction. */
-	private static final String STATE_TERMINATE_CANCELLED =
-			"STATE_TERMINATE_CANCELLED";
+	private static final String STATE_TERMINATE_CANCEL =
+			"STATE_TERMINATE_CANCEL";
 	
-	/** Return code to activates the appropriate transitions when <i>to_announce</i> is received. */
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>to_announce</code>. */
+	public static final int TRANSITION_TO_WAIT_TO_ANNOUNCE;
+	
+	/** Return code to activates the appropriate transitions when <code>to_announce</code> is received. */
 	public static final int TRANSITION_TO_RELAY_ANNOUNCE;
 	
-	/** Return code to activates the appropriate transitions when <i>to_bid</i> is received. */
+	/** Return code to activates the appropriate transitions when <code>to_bid</code> is received. */
 	public static final int TRANSITION_TO_RELAY_BID;
 	
-	/** Return code to activates the appropriate transitions when <i>auction_cancelled</i> is received. */
+	/** Return code to activates the appropriate transitions when <code>auction_cancelled</code> is received. */
 	public static final int TRANSITION_TO_CANCEL;
 	
-	/** Return code to activates the appropriate transitions when <i>auction_cancelled</i> is received. */
+	/** Return code to activates the appropriate transitions when <code>auction_cancelled</code> is received. */
 	public static final int TRANSITION_TO_WAIT_REP_BID;
 	
-	/** Return code to activates the appropriate transitions when <i>rep_bid_ok</i> is received. */
+	/** Return code to activates the appropriate transitions when <code>rep_bid_ok</code> is received. */
 	public static final int TRANSITION_TO_RELAY_REP_BID_OK;
 	
-	/** Return code to activates the appropriate transitions when <i>rep_bid_nok</i> is received. */
+	/** Return code to activates the appropriate transitions when <code>rep_bid_nok</code> is received. */
 	public static final int TRANSITION_TO_RELAY_REP_BID_NOK;
 	
 	static
 	{
 		int start = -1;
 		
+		TRANSITION_TO_WAIT_TO_ANNOUNCE = ++start;
 		TRANSITION_TO_RELAY_ANNOUNCE = ++start;
 		TRANSITION_TO_RELAY_BID = ++start;
 		TRANSITION_TO_CANCEL = ++start;
@@ -225,11 +229,20 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 				STATE_TERMINATE_SUCCESS);
 		
 		this.registerLastState(new TerminateCancelBehaviour(myMarketAgent, this),
-				STATE_TERMINATE_CANCELLED);
+				STATE_TERMINATE_CANCEL);
 		
 		// Register transitions
-		this.registerDefaultTransition(STATE_WAIT_TO_ANNOUNCE,
-				STATE_RELAY_TO_ANNOUNCE);
+		this.registerTransition(STATE_WAIT_TO_ANNOUNCE,
+				STATE_WAIT_TO_ANNOUNCE,
+				TRANSITION_TO_WAIT_TO_ANNOUNCE);
+		
+		this.registerTransition(STATE_WAIT_TO_ANNOUNCE,
+				STATE_RELAY_TO_ANNOUNCE,
+				TRANSITION_TO_RELAY_ANNOUNCE);
+		
+		this.registerTransition(STATE_WAIT_TO_ANNOUNCE,
+				STATE_TERMINATE_CANCEL,
+				TRANSITION_TO_CANCEL);
 		
 		this.registerDefaultTransition(STATE_RELAY_TO_ANNOUNCE,
 				STATE_WAIT_TO_BID);
@@ -238,7 +251,7 @@ public class AuctionManagementBehaviour extends FSMBehaviour
 				STATE_WAIT_TO_ANNOUNCE);
 		
 		this.registerDefaultTransition(STATE_RELAY_AUCTION_CANCELLED,
-				STATE_TERMINATE_CANCELLED);
+				STATE_TERMINATE_CANCEL);
 		
 		this.registerDefaultTransition(STATE_RELAY_REP_BID_OK,
 				STATE_WAIT_TO_ATTRIBUTE);

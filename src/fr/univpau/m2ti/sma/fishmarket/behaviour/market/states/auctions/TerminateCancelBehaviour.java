@@ -42,5 +42,6 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		myMarketAgent.deleteAuction(this.myFSM.getAuctionId());
 		
 		// Say bye !
+		System.out.println("Market: auction cancelled.");
 	}
 }
