@@ -1,8 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -25,7 +24,7 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER =
             MessageTemplate.and(
-                    BidderManagementBehaviour.MESSAGE_FILTER,
+                    BidderSubscriptionManagementBehaviour.MESSAGE_FILTER,
                     MessageTemplate.MatchPerformative(
                             FishMarket.Performatives.TO_ATTRIBUTE
             )
@@ -41,7 +40,7 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
     public void action() {
         System.out.println("action => " + getBehaviourName());
 
-        this.block();
+        this.myFSM.block();
 
         ACLMessage message = myAgent.receive(MESSAGE_FILTER);
 

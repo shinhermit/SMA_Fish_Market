@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitSubscriptionReplyBehaviour extends Behaviour
+public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -28,6 +29,19 @@ public class WaitSubscriptionReplyBehaviour extends Behaviour
     private SubscribeToAuctionBehaviour myFSM;
 
     private int transition;
+
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    BidderSubscriptionManagementBehaviour.MESSAGE_FILTER,
+                    MessageTemplate.or(
+                            MessageTemplate.MatchPerformative(
+                                    FishMarket.Performatives.TO_ACCEPT
+                            ),
+                            MessageTemplate.MatchPerformative(
+                                    FishMarket.Performatives.TO_REFUSE
+                            )
+                    )
+            );
 
     public WaitSubscriptionReplyBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
@@ -42,14 +56,8 @@ public class WaitSubscriptionReplyBehaviour extends Behaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
-        // wait for incoming message
-        this.block();
-
-        // Filter to extract incoming message
-        MessageTemplate template = this.createFilter();
-
         // Receive message
-        ACLMessage mess = bidderAgent.receive(template);
+        ACLMessage mess = bidderAgent.receive(MESSAGE_FILTER);
 
         AID seller = null;
 
@@ -82,63 +90,19 @@ public class WaitSubscriptionReplyBehaviour extends Behaviour
                                 .TRANSITION_SUBSCRIPTION_REFUSED;
             }
         }
+        else
+        {
+            // wait for incoming message
+            this.block();
+        }
 
         // transition to next step
 
     }
 
     @Override
-    public boolean done()
-    {
-        // Dies with fsm
-        return false;
-    }
-
-    @Override
     public int onEnd()
     {
         return this.transition;
-    }
-
-    /**
-     * Creates a filter for incoming messages.
-     *
-     * @return a message template which can be used to filter incoming messages.
-     */
-    private MessageTemplate createFilter()
-    {
-        MessageTemplate filter = null;
-
-        // Create message filter
-        TopicManagementHelper topicHelper;
-        try
-        {
-            topicHelper = (TopicManagementHelper) myAgent.getHelper(
-                    TopicManagementHelper.SERVICE_NAME);
-
-            final AID topic =
-                    topicHelper.createTopic(
-                            FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION);
-
-            topicHelper.register(topic);
-
-            filter = MessageTemplate.and(
-                MessageTemplate.MatchTopic(topic),
-                MessageTemplate.or(
-                    MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.TO_ACCEPT),
-                    MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.TO_REFUSE
-                    )
-                )
-            );
-
-        }
-        catch (ServiceException e)
-        {
-            WaitSubscriptionReplyBehaviour.LOGGER.log(Level.SEVERE, null, e);
-        }
-
-        return filter;
     }
 }

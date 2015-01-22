@@ -2,15 +2,12 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 /**
  *
@@ -37,11 +34,12 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
         AID marketAID = bidderAgent.getMarketAgentAID();
 
         ACLMessage requestAuctionListMessage =
-                new ACLMessage(FishMarket.Performatives.TO_PROVIDE);
+                new ACLMessage(FishMarket.Performatives.TO_REQUEST);
 
         requestAuctionListMessage.addReceiver(marketAID);
 
-        requestAuctionListMessage.addReceiver(AuctionManagementBehaviour.MESSAGE_TOPIC);
+        requestAuctionListMessage.addReceiver(
+                BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
 
 
         bidderAgent.send(requestAuctionListMessage);
