@@ -40,7 +40,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 			"STATE_WAIT_BIDDER_REQUEST";
 	
 	/** The state in which the agent replies to a request for the list of available auction. */
-	private static final String STATE_PRIVIDE_AUCTION_LIST =
+	private static final String STATE_PROVIDE_AUCTION_LIST =
 			"STATE_PRIVIDE_AUCTION_LIST";
 	
 	/** The state in which the agent evaluates a request for a subscription to an auction. */
@@ -118,7 +118,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 				STATE_WAIT_BIDDER_REQUEST);
 		
 		this.registerState(new ProvideAuctionListBehaviour(myMarketAgent, this),
-				STATE_PRIVIDE_AUCTION_LIST);
+				STATE_PROVIDE_AUCTION_LIST);
 		
 		this.registerState(new EvaluateSubscriptionRequestBehaviour(myMarketAgent, this),
 				STATE_EVALUATE_SUBSCRIPTION_REQUEST);
@@ -131,7 +131,7 @@ public class BidderManagementBehaviour extends FSMBehaviour
 		
 		// Register transitions
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
-				STATE_PRIVIDE_AUCTION_LIST,
+				STATE_PROVIDE_AUCTION_LIST,
 				TRANSITION_TO_PROVIDE_AUCTION_LIST);
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
@@ -139,10 +139,14 @@ public class BidderManagementBehaviour extends FSMBehaviour
 				TRANSITION_TO_VALUATE_REQUEST);
 		
 		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
+				STATE_WAIT_BIDDER_REQUEST,
+				TRANSITION_TO_WAIT_REQUEST);
+		
+		this.registerTransition(STATE_WAIT_BIDDER_REQUEST,
 				STATE_TERMINATE_BIDDER_MANAGEMENT,
 				TRANSITION_TO_TERMINATE);
 		
-		this.registerDefaultTransition(STATE_PRIVIDE_AUCTION_LIST,
+		this.registerDefaultTransition(STATE_PROVIDE_AUCTION_LIST,
 				STATE_WAIT_BIDDER_REQUEST);
 		
 		this.registerTransition(STATE_EVALUATE_SUBSCRIPTION_REQUEST,

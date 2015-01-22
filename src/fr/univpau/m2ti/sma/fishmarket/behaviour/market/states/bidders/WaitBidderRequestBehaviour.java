@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,13 +14,10 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitBidderRequestBehaviour extends Behaviour
+public class WaitBidderRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private BidderManagementBehaviour myFSM;
-	
-	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone;
 	
 	/** Will hold the selected transition among those to the next possible states. */
 	private int transition;
@@ -55,8 +52,6 @@ public class WaitBidderRequestBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
@@ -71,7 +66,7 @@ public class WaitBidderRequestBehaviour extends Behaviour
 		{
 			this.myFSM.setRequest(mess);
 			
-			this.isDone = true;
+			this.restart();
 			
 			if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_REQUEST)
@@ -87,19 +82,17 @@ public class WaitBidderRequestBehaviour extends Behaviour
 						.TRANSITION_TO_VALUATE_REQUEST;
 			}
 		}
-	}
-
-	@Override
-	public boolean done()
-	{
-		return isDone || ((MarketAgent)myAgent).isDone();
+		else
+		{
+			this.transition =
+					BidderManagementBehaviour
+					.TRANSITION_TO_WAIT_REQUEST;
+		}
 	}
 
 	@Override
 	public int onEnd()
 	{
-		return ((MarketAgent)myAgent).isDone() ?
-				BidderManagementBehaviour.TRANSITION_TO_TERMINATE :
-					this.transition;
+		return this.transition;
 	}
 }
