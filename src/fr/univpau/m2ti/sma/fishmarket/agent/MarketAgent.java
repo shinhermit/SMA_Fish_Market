@@ -28,7 +28,8 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 public class MarketAgent extends Agent
 {
 	/** The registered auction. */
-	private Map<String, Auction> auctions;
+	private Map<String, Auction> auctions =
+			new HashMap<String, Auction>();
 	
 	/** Associates an auction and its subscribers. */
 	private Map<String, Set<AID>> subscribers =
