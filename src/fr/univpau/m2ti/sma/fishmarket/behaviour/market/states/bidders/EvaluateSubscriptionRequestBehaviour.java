@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -18,7 +18,7 @@ import jade.lang.acl.ACLMessage;
 public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderSubscriptionManagementBehaviour myFSM;
+	private BidderSubscriptionManagementFSMBehaviour myFSM;
 	
 	/** The status of the evaluation (in case of refuse). */
 	private int status;
@@ -36,7 +36,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	 */
 	public EvaluateSubscriptionRequestBehaviour(
 			MarketAgent myMarketAgent,
-			BidderSubscriptionManagementBehaviour myFSM)
+			BidderSubscriptionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -81,7 +81,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 					
 					// Set topic
 					reply.addReceiver(
-							BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
+							BidderSubscriptionManagementFSMBehaviour.MESSAGE_TOPIC);
 					
 					// Inform conversation ID
 					reply.setConversationId(auctionId);
@@ -95,29 +95,29 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 				else if(requestedAuction.getStatus() == Auction.STATUS_OVER)
 				{
 					this.status = 
-							BidderSubscriptionManagementBehaviour.STATUS_REFUSE_AUCTION_OVER;
+							BidderSubscriptionManagementFSMBehaviour.STATUS_REFUSE_AUCTION_OVER;
 				}
 				else if(requestedAuction.getStatus() == Auction.STATUS_CANCELLED)
 				{
 					this.status = 
-							BidderSubscriptionManagementBehaviour.STATUS_REFUSE_AUCTION_CANCELLED;
+							BidderSubscriptionManagementFSMBehaviour.STATUS_REFUSE_AUCTION_CANCELLED;
 				}
 				else
 				{
 					this.status = 
-							BidderSubscriptionManagementBehaviour.STATUS_REFUSE_ALREADY_REGISTERED;
+							BidderSubscriptionManagementFSMBehaviour.STATUS_REFUSE_ALREADY_REGISTERED;
 				}
 			}
 			else
 			{
 				this.status = 
-						BidderSubscriptionManagementBehaviour.STATUS_REFUSE_AUCTION_NOT_FOUND;
+						BidderSubscriptionManagementFSMBehaviour.STATUS_REFUSE_AUCTION_NOT_FOUND;
 			}
 		}
 		else
 		{
 			this.status = 
-					BidderSubscriptionManagementBehaviour.STATUS_REFUSE_SELLER_AID_NOT_UNDERSTOOD;
+					BidderSubscriptionManagementFSMBehaviour.STATUS_REFUSE_SELLER_AID_NOT_UNDERSTOOD;
 		}
 	}
 	
@@ -125,7 +125,7 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 	public int onEnd()
 	{
 		return (this.subscriptionAccepted) ?
-				BidderSubscriptionManagementBehaviour.TRANSITION_TO_NOTIFY_SELLER :
+				BidderSubscriptionManagementFSMBehaviour.TRANSITION_TO_NOTIFY_SELLER :
 					this.replyRefuse();
 	}
 	
@@ -148,6 +148,6 @@ public class EvaluateSubscriptionRequestBehaviour extends OneShotBehaviour
 		
 		super.myAgent.send(reply);
 		
-		return BidderSubscriptionManagementBehaviour.TRANSITION_TO_WAIT_REQUEST;
+		return BidderSubscriptionManagementFSMBehaviour.TRANSITION_TO_WAIT_REQUEST;
 	}
 }

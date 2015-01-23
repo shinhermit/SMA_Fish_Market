@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitCreationRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionCreationManagementBehaviour myFSM;
+	private AuctionCreationManagementFSMBehaviour myFSM;
 	
 	/** The selected next transition. */
 	private int transition;
@@ -25,7 +25,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.and(
-					AuctionCreationManagementBehaviour.MESSAGE_FILTER,
+					AuctionCreationManagementFSMBehaviour.MESSAGE_FILTER,
 					MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.TO_CREATE));
 	
@@ -39,7 +39,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 	 */
 	public WaitCreationRequestBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionCreationManagementBehaviour myFSM)
+			AuctionCreationManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -61,7 +61,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 			// DEBUG
 			System.out.println("Market: setting transition to terminate !");
 			
-			this.transition = AuctionCreationManagementBehaviour.
+			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_TERMINATE;
 		}
 		else if(mess != null)
@@ -71,7 +71,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 			// DEBUG
 			System.out.println("Market: setting transition to evaluate request !");
 			
-			this.transition = AuctionCreationManagementBehaviour.
+			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_EVALUATE_REQUEST;
 		}
 		else
@@ -79,7 +79,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 			// DEBUG
 			System.out.println("Market: setting transition to wait request !");
 			
-			this.transition = AuctionCreationManagementBehaviour.
+			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_WAIT_REQUEST;
 			
 			// DEBUG

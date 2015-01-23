@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -12,14 +12,13 @@ import jade.lang.acl.MessageTemplate;
 public class WaitMoreBidBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private FishSellerBehaviour myFSM;
+	private RunningAuctionSellerFSMBehaviour myFSM;
 	
 	/** The selected transition to the next state. */
-	private int transition =
-			FishSellerBehaviour.TRANSITION_TO_ANNOUNCE;
+	private int transition;
 	
 	/** The time to wait for more bid. */
-	public static final long MORE_BID_WAIT_DURATION = 20000l; // 20 sec
+	public static final long WAIT_MORE_BID_DURATION = 20*1000l; // 20 sec
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -29,9 +28,9 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	 */
 	public WaitMoreBidBehaviour(
 			SellerAgent mySellerAgent,
-			FishSellerBehaviour myFSM)
+			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent, MORE_BID_WAIT_DURATION);
+		super(mySellerAgent, WAIT_MORE_BID_DURATION);
 		
 		this.myFSM = myFSM;
 	}
@@ -39,12 +38,15 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	@Override
 	public void onWake()
 	{
+		// DEBUG
+		System.out.println("Seller: wait more bid timeout !");
+		
 		ACLMessage mess = null;
 		
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
 		
-		// Receive messages
+		// Empty message queue
 		do
 		{
 			mess = myAgent.receive(
@@ -61,24 +63,36 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		
 		boolean repBidOk = false;
 		this.transition =
-				FishSellerBehaviour.TRANSITION_TO_ANNOUNCE;
+				RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
 		
 		if(nextPrice < maxPrice)
 		{
 			mySellerAgent.increasePrice();
+			
+			// DEBUG
+			System.out.println("Seller: transition is set to announce, with price increased by priceStep !");
 		}
 		else if(nextPriceStep >= minPriceStep)
 		{
 			mySellerAgent.decreasePriceStep();
 			
 			mySellerAgent.increasePrice();
+			
+			// DEBUG
+			System.out.println("Seller: transition is set to announce, with price increased by priceStep/2 !");
+			
+			this.transition =
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
 		}
 		else
 		{
 			repBidOk = true;
 			
+			// DEBUG
+			System.out.println("Seller: setting transition to attribute !");
+			
 			this.transition =
-					FishSellerBehaviour.TRANSITION_TO_ATTRIBUTE;
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ATTRIBUTE;
 		}
 		
 		// send rep_bid
@@ -91,7 +105,7 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 		
 		// Set topic
 		reply.addReceiver(
-				RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		// Set conversation id
 		reply.setConversationId(

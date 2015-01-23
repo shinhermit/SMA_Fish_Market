@@ -1,25 +1,27 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitSecondBidBehaviour extends OneShotBehaviour
+public class WaitSecondBidBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private FishSellerBehaviour myFSM;
+	private RunningAuctionSellerFSMBehaviour myFSM;
 	
 	/** The selected transition to the next state. */
-	private int transition =
-			FishSellerBehaviour.TRANSITION_TO_ATTRIBUTE;
+	private int transition;
 	
-	/** The time to wait for the second bid. */
-	private static final long SECOND_BID_WAIT_DURATION = 20000l; // 20 sec
+	/** The time to wait for the first bid. */
+	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 1000l; // 1 sec
+	
+	/** The time to wait for the first bid. */
+	private static final int WAIT_SECOND_MAX_CYCLE_COUNT = 10*60; // to reach 10 min
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -29,34 +31,59 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 	 */
 	public WaitSecondBidBehaviour(
 			SellerAgent mySellerAgent,
-			FishSellerBehaviour myFSM)
+			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent);
+		super(mySellerAgent, WAIT_SECOND_BID_CYCLE_DURATION);
 		
 		this.myFSM = myFSM;
 	}
 	
 	@Override
-	public void action()
+	public void onWake()
 	{
-		this.block(SECOND_BID_WAIT_DURATION);
+		this.myFSM.notifyNewWaitCycle();
+		
+		// DEBUG
+		System.out.println("Seller: checking messages for second bid.");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				this.getMessageFilter());
 		
-		SellerAgent mySellerAgent =
-				(SellerAgent)super.myAgent;
-		
 		if(mess != null)
 		{
+			this.myFSM.resetWaitCycleCount();
+			
 			this.transition =
-					FishSellerBehaviour.TRANSITION_TO_WAIT_MORE_BID;
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_MORE_BID;
+			
+			// DEBUG
+			System.out.println("Seller: setting transition to wait more bid.");
+		}
+		else if(this.myFSM.getWaitCycleCount() <
+						WAIT_SECOND_MAX_CYCLE_COUNT)
+		{
+			// DEBUG
+			System.out.println("Seller: setting transition to wait second bid.");
+			
+			// Continue to wait
+			this.transition =
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
+			
+			this.reset(WAIT_SECOND_BID_CYCLE_DURATION);
 		}
 		else
 		{
+			this.myFSM.resetWaitCycleCount();
+			
+			// DEBUG
+			System.out.println("Seller: setting transition to attribute.");
+			
 			this.transition =
-					FishSellerBehaviour.TRANSITION_TO_ATTRIBUTE;
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ATTRIBUTE;
+			
+			SellerAgent mySellerAgent =
+					(SellerAgent)super.myAgent;
 			
 			// send rep_bid(OK)
 			ACLMessage reply = new ACLMessage(
@@ -68,7 +95,7 @@ public class WaitSecondBidBehaviour extends OneShotBehaviour
 			
 			// Set topic
 			reply.addReceiver(
-					RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+					RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 			
 			// Set conversation id
 			reply.setConversationId(

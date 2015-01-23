@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,13 +11,13 @@ import jade.lang.acl.MessageTemplate;
 public class WaitBiddersBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private CreateAuctionSellerFSMBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
 
 	/** The duration of one cycle of wait for bidders. */
-	private static final long WAIT_BIDDER_DELAY = 5000l; // 5 sec
+	private static final long WAIT_BIDDER_CYCLE_DURATION = 5000l; // 5 sec
 	
 	/** The max number of <i>sleep</i> cycle allowed to wait for bidders subscriptions. */
 	private static final int MAX_CYCLE_COUNT = 4;
@@ -25,7 +25,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					CreateAuctionBehaviour.MESSAGE_FILTER,
+					CreateAuctionSellerFSMBehaviour.MESSAGE_FILTER,
 					MessageTemplate.MatchPerformative(
 							FishMarket.Performatives.TO_SUBSCRIBE));
 	
@@ -37,9 +37,9 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	 */
 	public WaitBiddersBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			CreateAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent, WAIT_BIDDER_DELAY);
+		super(mySellerAgent, WAIT_BIDDER_CYCLE_DURATION);
 		
 		this.myFSM = myFSM;
 	}
@@ -59,7 +59,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 		if(mess != null)
 		{
 			this.transition =
-					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_SUCCESS;
+					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_SUCCESS;
 			
 			// DEBUG
 			System.out.println("Seller: setting transition to terminate success !");
@@ -69,7 +69,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 			if(this.myFSM.getWaitCycleCount() > WaitBiddersBehaviour.MAX_CYCLE_COUNT)
 			{
 				this.transition =
-						CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
+						CreateAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
 				
 				// DEBUG
 				System.out.println("Seller: setting transition to terminate cancel !");
@@ -77,12 +77,12 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 			else
 			{
 				this.transition =
-						CreateAuctionBehaviour.TRANSITION_TO_WAIT_BIDDERS;
+						CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_BIDDERS;
 				
 				// DEBUG
 				System.out.println("Seller: setting transition to wait bidders !");
 				
-				this.reset(WAIT_BIDDER_DELAY);
+				this.reset(WAIT_BIDDER_CYCLE_DURATION);
 			}
 		}
 	}

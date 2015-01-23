@@ -1,24 +1,26 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitFirstBidBehaviour extends OneShotBehaviour
+public class WaitFirstBidBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private FishSellerBehaviour myFSM;
+	private RunningAuctionSellerFSMBehaviour myFSM;
 	
 	/** The selected transition to the next state. */
-	private int transition =
-			FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
+	private int transition;
 	
 	/** The time to wait for the first bid. */
-	private static final long FIRST_BID_WAIT_DURATION = 20000l; // 20 sec
+	private static final long WAIT_FIRST_BID_CYCLE_DURATION = 1000l; // 1 sec
+	
+	/** The time to wait for the first bid. */
+	private static final int WAIT_FIRST_MAX_CYCLE_COUNT = 10*60; // to reach 10 min
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -28,32 +30,55 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 	 */
 	public WaitFirstBidBehaviour(
 			SellerAgent mySellerAgent,
-			FishSellerBehaviour myFSM)
+			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent);
+		super(mySellerAgent, WAIT_FIRST_BID_CYCLE_DURATION);
 		
 		this.myFSM = myFSM;
 	}
 	
 	@Override
-	public void action()
+	public void onWake()
 	{
-		this.block(FIRST_BID_WAIT_DURATION);
+		this.myFSM.notifyNewWaitCycle();
+		
+		// DEBUG
+		System.out.println("Seller: checking messages for first bid.");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				this.getMessageFilter());
 		
-		SellerAgent mySellerAgent =
-				(SellerAgent)super.myAgent;
-		
 		if(mess != null)
 		{
+			this.myFSM.resetWaitCycleCount();
+			
+			// DEBUG
+			System.out.println("Seller: setting transition to wait second bid.");
+			
 			this.transition =
-					FishSellerBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
+		}
+		else if(this.myFSM.getWaitCycleCount() <
+					WAIT_FIRST_MAX_CYCLE_COUNT)
+		{
+			// DEBUG
+			System.out.println("Seller: setting transition to wait first bid.");
+			
+			// Continue to wait
+			this.transition =
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_FIRST_BID;
+			
+			this.reset(WAIT_FIRST_BID_CYCLE_DURATION);
 		}
 		else
 		{
+			this.myFSM.resetWaitCycleCount();
+			
+			SellerAgent mySellerAgent =
+					(SellerAgent)super.myAgent;
+			
+			// Either: make new announce with lower price OR cancel
 			float newStep = mySellerAgent.getPriceStep() / 2f;
 			float newPrice = mySellerAgent.getCurrentPrice() - newStep;
 			
@@ -63,13 +88,19 @@ public class WaitFirstBidBehaviour extends OneShotBehaviour
 				mySellerAgent.decreasePriceStep();
 				mySellerAgent.decreasePrice();
 				
+				// DEBUG
+				System.out.println("Seller: setting transition to announce.");
+				
 				this.transition =
-						FishSellerBehaviour.TRANSITION_TO_ANNOUNCE;
+						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
 			}
 			else
 			{
+				// DEBUG
+				System.out.println("Seller: setting transition to terminate cancel.");
+				
 				this.transition =
-						FishSellerBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
+						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
 			}
 		}
 	}

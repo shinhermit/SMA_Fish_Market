@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
@@ -18,7 +18,7 @@ import jade.lang.acl.ACLMessage;
 public class EvaluateResquestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionCreationManagementBehaviour myFSM;
+	private AuctionCreationManagementFSMBehaviour myFSM;
 	
 	/** The next selected transition. */
 	private int transition;
@@ -33,7 +33,7 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 	 */
 	public EvaluateResquestBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionCreationManagementBehaviour myFSM)
+			AuctionCreationManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -48,14 +48,14 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 		ACLMessage request = this.myFSM.getRequest();
 		
 		String auctionId =
-				RunningAuctionManagementBehaviour.createAuctionId(
+				RunningAuctionManagementFSMBehaviour.createAuctionId(
 						request.getSender());
 		
 		Auction auction = new Auction(auctionId);
 		
 		// DEBUG
 		System.out.println("Market: evaluating registration of auction with id "+auctionId);
-		System.out.println("Topic is: "+AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
+		System.out.println("Topic is: "+AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		if(! myMarketAgent.isRegisteredAuction(auctionId) )
 		{
@@ -76,7 +76,7 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 			
 			// Next transition
 			this.transition =
-					AuctionCreationManagementBehaviour.TRANSITION_TO_CONFIRM_CREATION;
+					AuctionCreationManagementFSMBehaviour.TRANSITION_TO_CONFIRM_CREATION;
 		}
 		else
 		{
@@ -92,13 +92,13 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 			
 			// Set topic
 			reply.addReceiver(
-					AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
+					AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 			
 			super.myAgent.send(reply);
 			
 			// Next transition
 			this.transition =
-					AuctionCreationManagementBehaviour.TRANSITION_TO_WAIT_REQUEST;
+					AuctionCreationManagementFSMBehaviour.TRANSITION_TO_WAIT_REQUEST;
 			
 			this.myFSM.setRequest(null);
 		}

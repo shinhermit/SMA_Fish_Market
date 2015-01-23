@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitToBidBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementFSMBehaviour myFSM;
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
@@ -38,7 +38,7 @@ public class WaitToBidBehaviour extends Behaviour
 	 */
 	public WaitToBidBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementBehaviour myFSM)
+			RunningAuctionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -72,20 +72,20 @@ public class WaitToBidBehaviour extends Behaviour
 					FishMarket.Performatives.TO_BID)
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour
+						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_RELAY_BID;
 			}
 			else if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ANNOUNCE)
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour
+						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_RELAY_ANNOUNCE;
 			}
 			else
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour
+						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_CANCEL;
 			}
 		}

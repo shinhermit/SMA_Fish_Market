@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitRepBidBehaviour extends Behaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementFSMBehaviour myFSM;
 	
 	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
 	private boolean isDone;
@@ -38,7 +38,7 @@ public class WaitRepBidBehaviour extends Behaviour
 	 */
 	public WaitRepBidBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementBehaviour myFSM)
+			RunningAuctionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -74,7 +74,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					FishMarket.Performatives.REP_BID)
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
+						RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
 				
 				String content = (String) mess.getContent();
 				
@@ -85,7 +85,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					if(repBidOk)
 					{
 						this.transition =
-									RunningAuctionManagementBehaviour.TRANSITION_TO_RELAY_REP_BID_OK;
+									RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_OK;
 					}
 				}
 			}
@@ -94,7 +94,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					FishMarket.Performatives.TO_BID)
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour
+						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_RELAY_BID;
 			}
 			
@@ -102,7 +102,7 @@ public class WaitRepBidBehaviour extends Behaviour
 					FishMarket.Performatives.TO_CANCEL)
 			{
 				this.transition =
-						RunningAuctionManagementBehaviour
+						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_CANCEL;
 			}
 		}

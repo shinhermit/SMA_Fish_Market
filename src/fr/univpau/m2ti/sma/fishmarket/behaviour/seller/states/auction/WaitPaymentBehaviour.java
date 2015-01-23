@@ -1,20 +1,20 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitPaymentBehaviour extends Behaviour
+public class WaitPaymentBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private FishSellerBehaviour myFSM;
+	private RunningAuctionSellerFSMBehaviour myFSM;
 	
-	/** Tells whether this behaviour has ended it's task or not. */
-	private boolean isDone;
+	/** The transition which will be chosen next. */
+	private int transition;
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
@@ -28,7 +28,7 @@ public class WaitPaymentBehaviour extends Behaviour
 	 */
 	public WaitPaymentBehaviour(
 			SellerAgent mySellerAgent,
-			FishSellerBehaviour myFSM)
+			RunningAuctionSellerFSMBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -41,9 +41,8 @@ public class WaitPaymentBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
-		this.block();
+		// DEBUG
+		System.out.println("Seller: checking message for to_pay !");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
@@ -51,14 +50,32 @@ public class WaitPaymentBehaviour extends Behaviour
 		
 		if(mess != null)
 		{
-			this.isDone = true;
+			// DEBUG
+			System.out.println("Seller: setting transition to terminate sucess !");
+			
+			// Auction over
+			this.transition =
+					RunningAuctionSellerFSMBehaviour
+					.TRANSITION_TO_TERMINATE_SUCCESS;
+		}
+		else
+		{
+			// DEBUG
+			System.out.println("Seller: setting transition to wait to pay !");
+			
+			// Continue to wait
+			this.transition =
+					RunningAuctionSellerFSMBehaviour
+					.TRANSITION_TO_WAIT_TO_PAY;
+			
+			this.myFSM.block();
 		}
 	}
-
+	
 	@Override
-	public boolean done()
+	public int onEnd()
 	{
-		return this.isDone;
+		return this.transition;
 	}
 	
 	/**

@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitToAnnounceBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementFSMBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -35,7 +35,7 @@ public class WaitToAnnounceBehaviour extends OneShotBehaviour
 	 */
 	public WaitToAnnounceBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementBehaviour myFSM)
+			RunningAuctionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -70,18 +70,18 @@ public class WaitToAnnounceBehaviour extends OneShotBehaviour
 			{
 				this.myFSM.setRequest(mess);
 				
-				this.transition = RunningAuctionManagementBehaviour.
+				this.transition = RunningAuctionManagementFSMBehaviour.
 						TRANSITION_TO_RELAY_ANNOUNCE;
 			}
 			else
 			{
-				this.transition = RunningAuctionManagementBehaviour.
+				this.transition = RunningAuctionManagementFSMBehaviour.
 						TRANSITION_TO_CANCEL;
 			}
 		}
 		else
 		{
-			this.transition = RunningAuctionManagementBehaviour.
+			this.transition = RunningAuctionManagementFSMBehaviour.
 					TRANSITION_TO_WAIT_TO_ANNOUNCE;
 		}
 	}

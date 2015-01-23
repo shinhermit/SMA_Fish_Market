@@ -20,7 +20,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class BidderSubscriptionManagementBehaviour extends FSMBehaviour
+public class BidderSubscriptionManagementFSMBehaviour extends FSMBehaviour
 {
 	/** Subscription management: the bidder agent who requested a subscription to an auction. */
 	private ACLMessage request;
@@ -33,7 +33,7 @@ public class BidderSubscriptionManagementBehaviour extends FSMBehaviour
 	/** Allows filtering incoming messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
 				MessageTemplate.MatchTopic(
-						BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
+						BidderSubscriptionManagementFSMBehaviour.MESSAGE_TOPIC);
 	
 	/** The state in which the agent waits for bidders messages requests. */
 	private static final String STATE_WAIT_BIDDER_REQUEST =
@@ -108,7 +108,7 @@ public class BidderSubscriptionManagementBehaviour extends FSMBehaviour
 	 * @param myMarketAgent
 	 * 			the agent to which this behaviour is added.
 	 */
-	public BidderSubscriptionManagementBehaviour(MarketAgent myMarketAgent)
+	public BidderSubscriptionManagementFSMBehaviour(MarketAgent myMarketAgent)
 	{
 		super(myMarketAgent);
 		

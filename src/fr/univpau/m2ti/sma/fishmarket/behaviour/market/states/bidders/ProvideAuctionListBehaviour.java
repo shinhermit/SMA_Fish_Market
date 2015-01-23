@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
@@ -22,7 +22,7 @@ import jade.lang.acl.ACLMessage;
 public class ProvideAuctionListBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderSubscriptionManagementBehaviour myFSM;
+	private BidderSubscriptionManagementFSMBehaviour myFSM;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -38,7 +38,7 @@ public class ProvideAuctionListBehaviour extends OneShotBehaviour
 	 */
 	public ProvideAuctionListBehaviour(
 			MarketAgent myMarketAgent,
-			BidderSubscriptionManagementBehaviour myFSM)
+			BidderSubscriptionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -55,7 +55,7 @@ public class ProvideAuctionListBehaviour extends OneShotBehaviour
 				FishMarket.Performatives.TO_PROVIDE);
 		
 		// Add topic
-		reply.addReceiver(BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
+		reply.addReceiver(BidderSubscriptionManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		try
 		{

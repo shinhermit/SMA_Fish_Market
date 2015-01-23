@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -16,7 +16,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class CreateAuctionBehaviour extends FSMBehaviour
+public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 {
 	/** Holds the response from the market. */
 	private ACLMessage response;
@@ -29,7 +29,7 @@ public class CreateAuctionBehaviour extends FSMBehaviour
 	
 	/** Base filter for filtering messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
-			MessageTemplate.MatchTopic(AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
+			MessageTemplate.MatchTopic(AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 	
 	/** The initial state, in which the seller creates an auction and request it's registration to the market agent. */
 	private static final String STATE_REQUEST_CREATION =
@@ -90,7 +90,7 @@ public class CreateAuctionBehaviour extends FSMBehaviour
 	 * 
 	 * @param mySellerAgent the seller agent to which the behaviour is to be added.
 	 */
-	public CreateAuctionBehaviour(
+	public CreateAuctionSellerFSMBehaviour(
 			SellerAgent mySellerAgent)
 	{
 		super(mySellerAgent);
@@ -222,7 +222,7 @@ public class CreateAuctionBehaviour extends FSMBehaviour
 	/**
 	 * Notifies that a new <i>sleep</i> cycle in order to wait for bidders before starting to announce.
 	 * 
-	 * @return the update number of sent requests.
+	 * @return the updated number of wait cycles.
 	 */
 	public int notifyNewWaitCycle()
 	{

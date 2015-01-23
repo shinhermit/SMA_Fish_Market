@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.ACLMessage;
 public class ConfirmCreationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private AuctionCreationManagementBehaviour myFSM;
+	private AuctionCreationManagementFSMBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which is to be associated with a state of the 
@@ -29,7 +29,7 @@ public class ConfirmCreationBehaviour extends OneShotBehaviour
 	 */
 	public ConfirmCreationBehaviour(
 			MarketAgent myMarketAgent,
-			AuctionCreationManagementBehaviour myFSM)
+			AuctionCreationManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -46,7 +46,7 @@ public class ConfirmCreationBehaviour extends OneShotBehaviour
 		
 		// Create FSM Behaviour to manage the auction
 		myMarketAgent.addBehaviour(
-				new RunningAuctionManagementBehaviour(myMarketAgent,
+				new RunningAuctionManagementFSMBehaviour(myMarketAgent,
 						request.getSender(), request.getConversationId()));
 		
 		// Send reply
@@ -57,7 +57,7 @@ public class ConfirmCreationBehaviour extends OneShotBehaviour
 		
 		// Set topic
 		reply.addReceiver(
-				AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
+				AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		// Set conversation ID
 		reply.setConversationId(request.getConversationId());

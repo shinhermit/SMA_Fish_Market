@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.FishSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,7 +11,7 @@ import jade.lang.acl.ACLMessage;
 public class TerminateCancelBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private FishSellerBehaviour myFSM;
+	private RunningAuctionSellerFSMBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -21,7 +21,7 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	 */
 	public TerminateCancelBehaviour(
 			SellerAgent mySellerAgent,
-			FishSellerBehaviour myFSM)
+			RunningAuctionSellerFSMBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -44,7 +44,7 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		
 		// Set topic
 		cancelMess.addReceiver(
-				RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		// Set conversation id
 		cancelMess.setConversationId(

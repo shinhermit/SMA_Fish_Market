@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.MessageTemplate;
@@ -13,10 +13,13 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class FishSellerBehaviour extends FSMBehaviour
+public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 {
 	/** The id of the conversation of this auction. */
 	private final String conversationId;
+	
+	/** The number of block cycles h=which have been made in order to wait for incoming bids. */
+	private int waitCycleCount = 0;
 	
 	/** The state in which the seller makes an announcement of the current price. */
 	private static final String STATE_ANNONCE_PRICE =
@@ -57,11 +60,20 @@ public class FishSellerBehaviour extends FSMBehaviour
 	/** The code to activate the transition which leads to the state to terminate when the auction is cancelled. */
 	public static final int TRANSITION_TO_TERMINATE_CANCEL;
 	
+	/** The code to activate the transition which allows to continue to wait for a first incoming bid. */
+	public static final int TRANSITION_TO_WAIT_FIRST_BID;
+	
 	/** The code to activate the transition which leads to the state to wait for a second bid after the first has been received. */
 	public static final int TRANSITION_TO_WAIT_SECOND_BID;
 	
 	/** The code to activate the transition which leads to the state which allows to attribute the fish supply. */
 	public static final int TRANSITION_TO_ATTRIBUTE;
+	
+	/** The code to activate the transition which leads to the state which allows to attribute the fish supply. */
+	public static final int TRANSITION_TO_WAIT_TO_PAY;
+	
+	/** The code to activate the transition which leads to the state which allows to attribute the fish supply. */
+	public static final int TRANSITION_TO_TERMINATE_SUCCESS;
 	
 	/** The code to activate the transition which leads to the state to wait for more bids. */
 	public static final int TRANSITION_TO_WAIT_MORE_BID;
@@ -74,10 +86,13 @@ public class FishSellerBehaviour extends FSMBehaviour
 		int start = -1;
 		
 		TRANSITION_TO_TERMINATE_CANCEL = ++start;
+		TRANSITION_TO_WAIT_FIRST_BID = ++start;
 		TRANSITION_TO_WAIT_SECOND_BID = ++start;
 		TRANSITION_TO_WAIT_MORE_BID = ++start;
 		TRANSITION_TO_ATTRIBUTE = ++start;
 		TRANSITION_TO_ANNOUNCE = ++start;
+		TRANSITION_TO_WAIT_TO_PAY = ++start;
+		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
 	}
 	
 	/**
@@ -85,7 +100,7 @@ public class FishSellerBehaviour extends FSMBehaviour
 	 * 
 	 * @param mySellerAgent the seller agent to which the behaviour is to be added.
 	 */
-	public FishSellerBehaviour(
+	public RunningAuctionSellerFSMBehaviour(
 			SellerAgent mySellerAgent, String conversationId)
 	{
 		super(mySellerAgent);
@@ -138,6 +153,9 @@ public class FishSellerBehaviour extends FSMBehaviour
 				STATE_ANNONCE_PRICE, STATE_WAIT_FIRST_BID);
 		
 		this.registerTransition(STATE_WAIT_FIRST_BID,
+				STATE_WAIT_FIRST_BID, TRANSITION_TO_WAIT_FIRST_BID);
+		
+		this.registerTransition(STATE_WAIT_FIRST_BID,
 				STATE_WAIT_SECOND_BID, TRANSITION_TO_WAIT_SECOND_BID);
 		
 		this.registerTransition(STATE_WAIT_FIRST_BID,
@@ -145,6 +163,9 @@ public class FishSellerBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_WAIT_FIRST_BID,
 				STATE_TERMINATE_CANCEL, TRANSITION_TO_TERMINATE_CANCEL);
+		
+		this.registerTransition(STATE_WAIT_SECOND_BID,
+				STATE_WAIT_SECOND_BID, TRANSITION_TO_WAIT_SECOND_BID);
 		
 		this.registerTransition(STATE_WAIT_SECOND_BID,
 				STATE_SEND_TO_ATTRIBUTE, TRANSITION_TO_ATTRIBUTE);
@@ -164,8 +185,11 @@ public class FishSellerBehaviour extends FSMBehaviour
 		this.registerDefaultTransition(
 				STATE_SEND_TO_GIVE, STATE_WAIT_TO_PAY);
 		
-		this.registerDefaultTransition(
-				STATE_WAIT_TO_PAY, STATE_TERMINATE_SUCCESS);
+		this.registerTransition(STATE_WAIT_TO_PAY,
+				STATE_WAIT_TO_PAY, TRANSITION_TO_WAIT_TO_PAY);
+		
+		this.registerTransition(STATE_WAIT_TO_PAY,
+				STATE_TERMINATE_SUCCESS, TRANSITION_TO_TERMINATE_SUCCESS);
 	}
 
 	/**
@@ -185,8 +209,43 @@ public class FishSellerBehaviour extends FSMBehaviour
 	{
 		return MessageTemplate.and(
 				MessageTemplate.MatchTopic(
-						RunningAuctionManagementBehaviour.MESSAGE_TOPIC),
+						RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC),
 				MessageTemplate.MatchConversationId(
 						this.conversationId));
+	}
+
+	/**
+	 * 
+	 * @return the number of block cycles h=which have been made in order to wait for incoming bids.
+	 */
+	public int getWaitCycleCount()
+	{
+		return waitCycleCount;
+	}
+
+	/**
+	 * 
+	 * @param waitCycleCount the number of block cycles h=which have been made in order to wait for incoming bids.
+	 */
+	public void setWaitCycleCount(int waitCycleCount)
+	{
+		this.waitCycleCount = waitCycleCount;
+	}
+	
+	/**
+	 * Resets the number of block cycles h=which have been made in order to wait for incoming bids.
+	 */
+	public void resetWaitCycleCount()
+	{
+		this.waitCycleCount = 0;
+	}
+	
+	/**
+	 * Notifies that a new sleep cycle in order to wait for bidders before starting to announce.
+	 * @return the updated number of wait cycles.
+	 */
+	public int notifyNewWaitCycle()
+	{
+		return ++ this.waitCycleCount;
 	}
 }

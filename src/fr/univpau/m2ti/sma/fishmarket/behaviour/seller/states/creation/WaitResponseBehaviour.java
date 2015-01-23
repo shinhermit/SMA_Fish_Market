@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,7 +11,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitResponseBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private CreateAuctionSellerFSMBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -19,7 +19,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					CreateAuctionBehaviour.MESSAGE_FILTER,
+					CreateAuctionSellerFSMBehaviour.MESSAGE_FILTER,
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.TO_ACCEPT),
@@ -34,7 +34,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 	 */
 	public WaitResponseBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			CreateAuctionSellerFSMBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -62,7 +62,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 					FishMarket.Performatives.TO_ACCEPT)
 			{
 				this.transition =
-						CreateAuctionBehaviour
+						CreateAuctionSellerFSMBehaviour
 						.TRANSITION_TO_WAIT_BIDDERS;
 				
 				// DEBUG
@@ -71,7 +71,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 			else
 			{
 				this.transition =
-						CreateAuctionBehaviour
+						CreateAuctionSellerFSMBehaviour
 						.TRANSITION_TO_REQUEST_CREATION;
 				
 				// DEBUG
@@ -81,7 +81,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 		else
 		{
 			this.transition =
-					CreateAuctionBehaviour
+					CreateAuctionSellerFSMBehaviour
 					.TRANSITION_TO_WAIT_RESPONSE;
 			
 			// DEBUG

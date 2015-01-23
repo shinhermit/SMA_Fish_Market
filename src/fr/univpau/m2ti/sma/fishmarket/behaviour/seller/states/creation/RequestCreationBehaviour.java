@@ -1,8 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,7 +11,7 @@ import jade.lang.acl.ACLMessage;
 public class RequestCreationBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
-	private CreateAuctionBehaviour myFSM;
+	private CreateAuctionSellerFSMBehaviour myFSM;
 	
 	/** The transition which will be selected. */
 	private int transition;
@@ -27,7 +27,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 	 */
 	public RequestCreationBehaviour(
 			SellerAgent mySellerAgent,
-			CreateAuctionBehaviour myFSM)
+			CreateAuctionSellerFSMBehaviour myFSM)
 	{
 		super(mySellerAgent);
 		
@@ -53,7 +53,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			
 			// Set topic
 			mess.addReceiver(
-					AuctionCreationManagementBehaviour.MESSAGE_TOPIC);
+					AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 			
 			// Add starting price
 			mess.setContent(String.valueOf(
@@ -66,7 +66,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			
 			// Select next transition
 			this.transition =
-					CreateAuctionBehaviour.TRANSITION_TO_WAIT_RESPONSE;
+					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_RESPONSE;
 			
 			// DEBUG
 			System.out.println("Seller: transition set to wait response !");
@@ -74,7 +74,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 		else
 		{
 			this.transition =
-					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
+					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
 			
 			// DEBUG
 			System.out.println("Seller: transition set to terminate failure !");

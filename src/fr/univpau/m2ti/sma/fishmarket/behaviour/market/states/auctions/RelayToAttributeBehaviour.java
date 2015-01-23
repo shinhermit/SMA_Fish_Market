@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -15,7 +15,7 @@ import jade.lang.acl.ACLMessage;
 public class RelayToAttributeBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementBehaviour myFSM;
+	private RunningAuctionManagementFSMBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -27,7 +27,7 @@ public class RelayToAttributeBehaviour extends OneShotBehaviour
 	 */
 	public RelayToAttributeBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementBehaviour myFSM)
+			RunningAuctionManagementFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -46,7 +46,7 @@ public class RelayToAttributeBehaviour extends OneShotBehaviour
 		
 		// Relayed message topic
 		toRelay.addReceiver(
-				RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		super.myAgent.send(toRelay);
 		
