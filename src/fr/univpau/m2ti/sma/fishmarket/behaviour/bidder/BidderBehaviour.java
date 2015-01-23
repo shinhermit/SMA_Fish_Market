@@ -43,11 +43,23 @@ public class BidderBehaviour extends FSMBehaviour
 	/** Return code which activates the transition confirming that our subscription was accepted. */
 	public static final int TRANSITION_RECEIVED_REP_BID_NOK;
 
+	public static final int TRANSITION_GO_GET_FISH;
+
+	public static final int TRANSITION_TO_PAYMENT;
+
 	/** Return code which activates the transition confirming that our subscription was accepted. */
 	public static final int TRANSITION_RECEIVED_AUCTION_CANCELLED;
 
 	/** Return code which activates the transition confirming that our subscription was accepted. */
 	public static final int TRANSITION_RECEIVED_AUCTION_OVER;
+
+	public static final int TRANSITION_WAIT_FIRST_ANNOUNCE;
+
+	public static final int TRANSITION_WAIT_BID_RESULT;
+
+	public static final int TRANSITION_WAIT_ATTRIBUTION;
+
+	public static final int TRANSITION_WAIT_FISH;
 
 	static
 	{
@@ -57,28 +69,31 @@ public class BidderBehaviour extends FSMBehaviour
 		TRANSITION_BID = ++start;
 		TRANSITION_RECEIVED_REP_BID_OK = ++start;
 		TRANSITION_RECEIVED_REP_BID_NOK = ++start;
+		TRANSITION_GO_GET_FISH = ++start;
+		TRANSITION_TO_PAYMENT = ++start;
 		TRANSITION_RECEIVED_AUCTION_CANCELLED = ++start;
 		TRANSITION_RECEIVED_AUCTION_OVER = ++start;
+		TRANSITION_WAIT_FIRST_ANNOUNCE = ++start;
+		TRANSITION_WAIT_BID_RESULT = ++start;
+		TRANSITION_WAIT_ATTRIBUTION = ++start;
+		TRANSITION_WAIT_FISH = ++start;
 	}
 
 	/** Message holder */
 	private ACLMessage request;
 
-	private AID seller;
-
-	private long maxPrice;
+	private float maxPrice;
 
 	/** Price at last bid */
-	private long biddingPrice;
+	private float biddingPrice;
 
-	public BidderBehaviour (Agent a, AID auctionSeller, long maxPrice)
+	public BidderBehaviour (Agent a, float maxPrice)
 	{
 		super(a);
-		this.seller = auctionSeller;
 		this.maxPrice = maxPrice;
 
 		// Declare and register states
-		this.registerState(
+		this.registerFirstState(
 				new InitialOrAfterFailedBidBehaviour(a, this),
 				STATE_INITIAL_OR_AFTER_FAILED_BID
 		);
@@ -108,17 +123,17 @@ public class BidderBehaviour extends FSMBehaviour
 				STATE_PAYMENT
 		);
 
-		this.registerState(
+		this.registerLastState(
 				new AuctionOverSuccessfullyBehaviour(a, this),
 				STATE_AUCTION_OVER_SUCCESSFULLY
 		);
 
-		this.registerState(
+		this.registerLastState(
 				new AuctionOverUnsuccessfullyBehaviour(a, this),
 				STATE_AUCTION_OVER_UNSUCESSFULLY
 		);
 
-		this.registerState(
+		this.registerLastState(
 				new OtherBidderWonBehaviour(a, this),
 				STATE_OTHER_BIDDER_WON
 		);
@@ -128,6 +143,12 @@ public class BidderBehaviour extends FSMBehaviour
 				STATE_INITIAL_OR_AFTER_FAILED_BID,
 				STATE_ABOUT_TO_BID,
 				BidderBehaviour.TRANSITION_RECEIVED_FIRST_ANNOUNCE
+		);
+
+		this.registerTransition(
+				STATE_INITIAL_OR_AFTER_FAILED_BID,
+				STATE_INITIAL_OR_AFTER_FAILED_BID,
+				BidderBehaviour.TRANSITION_WAIT_FIRST_ANNOUNCE
 		);
 
 		this.registerTransition(
@@ -150,18 +171,38 @@ public class BidderBehaviour extends FSMBehaviour
 
 		this.registerTransition(
 				STATE_WAIT_BID_RESULT,
+				STATE_WAIT_BID_RESULT,
+				BidderBehaviour.TRANSITION_WAIT_BID_RESULT
+		);
+
+		this.registerTransition(
+				STATE_WAIT_BID_RESULT,
 				STATE_INITIAL_OR_AFTER_FAILED_BID,
 				BidderBehaviour.TRANSITION_RECEIVED_REP_BID_NOK
 		);
 
-		this.registerDefaultTransition(
+		this.registerTransition(
 				STATE_WAIT_ATTRIBUTION,
-				STATE_WAIT_FISH
+				STATE_WAIT_FISH,
+				BidderBehaviour.TRANSITION_GO_GET_FISH
 		);
 
-		this.registerDefaultTransition(
+		this.registerTransition(
+				STATE_WAIT_ATTRIBUTION,
+				STATE_WAIT_ATTRIBUTION,
+				BidderBehaviour.TRANSITION_WAIT_ATTRIBUTION
+		);
+
+		this.registerTransition(
 				STATE_WAIT_FISH,
-				STATE_PAYMENT
+				STATE_PAYMENT,
+				BidderBehaviour.TRANSITION_TO_PAYMENT
+		);
+
+		this.registerTransition(
+				STATE_WAIT_FISH,
+				STATE_WAIT_FISH,
+				BidderBehaviour.TRANSITION_WAIT_FISH
 		);
 
 		this.registerDefaultTransition(
@@ -226,17 +267,17 @@ public class BidderBehaviour extends FSMBehaviour
 		this.request = request;
 	}
 
-	public long getPriceLimit()
+	public float getPriceLimit()
 	{
 		return this.maxPrice;
 	}
 
-	public void setBiddingPrice(long biddingPrice)
+	public void setBiddingPrice(float biddingPrice)
 	{
 		this.biddingPrice = biddingPrice;
 	}
 
-	public long getBiddingPrice()
+	public float getBiddingPrice()
 	{
 		return this.biddingPrice;
 	}

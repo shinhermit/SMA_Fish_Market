@@ -1,6 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -20,15 +22,18 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
 
     private BidderBehaviour myFSM;
 
-    /** Message filtering */
-    private static final MessageTemplate MESSAGE_FILTER;
+    private int transition;
 
-    static
-    {
-        MESSAGE_FILTER = MessageTemplate.MatchPerformative(
-                FishMarket.Performatives.TO_ATTRIBUTE
-        );
-    }
+    /** Message filtering */
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    MessageTemplate.MatchTopic(
+                            RunningAuctionManagementBehaviour.MESSAGE_TOPIC
+                    ),
+                    MessageTemplate.MatchPerformative(
+                            FishMarket.Performatives.TO_ATTRIBUTE
+                    )
+            );
 
     public WaitAttributionBehaviour(Agent a, BidderBehaviour fsm)
     {
@@ -40,13 +45,24 @@ public class WaitAttributionBehaviour extends OneShotBehaviour
     public void action() {
         System.out.println("action => " + getBehaviourName());
 
-        this.block();
-
         ACLMessage message = myAgent.receive(MESSAGE_FILTER);
+
 
         if (message != null)
         {
             System.out.println("Received attribution");
+            this.transition = BidderBehaviour.TRANSITION_GO_GET_FISH;
         }
+        else
+        {
+            this.myFSM.block();
+            this.transition = BidderBehaviour.TRANSITION_WAIT_ATTRIBUTION;
+        }
+    }
+
+    @Override
+    public int onEnd()
+    {
+        return this.transition;
     }
 }

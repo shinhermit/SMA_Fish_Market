@@ -3,6 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
 
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class WaitBidResultBehaviour extends Behaviour
+public class WaitBidResultBehaviour extends OneShotBehaviour
 {
 
     /**
@@ -31,25 +32,25 @@ public class WaitBidResultBehaviour extends Behaviour
     private int transition;
 
     /** Message filtering */
-    private static final MessageTemplate MESSAGE_FILTER;
-
-    static
-    {
-        MESSAGE_FILTER =
-                MessageTemplate.or(
-                        MessageTemplate.MatchPerformative(
-                                FishMarket.Performatives.REP_BID
-                        ),
-                        MessageTemplate.or(
-                                MessageTemplate.MatchPerformative(
-                                        FishMarket.Performatives.TO_CANCEL
-                                ),
-                                MessageTemplate.MatchPerformative(
-                                        FishMarket.Performatives.AUCTION_OVER
-                                )
-                        )
-                );
-    }
+    private static final MessageTemplate MESSAGE_FILTER=
+            MessageTemplate.and(
+                    MessageTemplate.MatchTopic(
+                            RunningAuctionManagementBehaviour.MESSAGE_TOPIC
+                    ),
+                    MessageTemplate.or(
+                            MessageTemplate.MatchPerformative(
+                                    FishMarket.Performatives.REP_BID
+                            ),
+                            MessageTemplate.or(
+                                    MessageTemplate.MatchPerformative(
+                                            FishMarket.Performatives.TO_CANCEL
+                                    ),
+                                    MessageTemplate.MatchPerformative(
+                                            FishMarket.Performatives.AUCTION_OVER
+                                    )
+                            )
+                    )
+            );
 
     public WaitBidResultBehaviour(Agent a, BidderBehaviour fsm)
     {
@@ -63,8 +64,6 @@ public class WaitBidResultBehaviour extends Behaviour
 
        // waiting for bid results.
 
-        this.block();
-
         ACLMessage mess = myAgent.receive(MESSAGE_FILTER);
 
         if (mess != null)
@@ -74,15 +73,15 @@ public class WaitBidResultBehaviour extends Behaviour
             if (mess.getPerformative() == FishMarket.Performatives.REP_BID)
             {
                 // Bid results
-                String bidResult = mess.getContent();
-                if (bidResult.equals("OK")) // Constant ?
+                boolean bidResult = Boolean.valueOf(mess.getContent());
+                if (bidResult == true)
                 {
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_REP_BID_OK;
                     System.out.println("I won !!!");
                 }
                 else
                 {
-                    //bidResult.equals("NOK")
+                    //bid not won
                     this.transition = BidderBehaviour.TRANSITION_RECEIVED_REP_BID_NOK;
                     System.out.println("Several bidders");
                 }
@@ -99,19 +98,11 @@ public class WaitBidResultBehaviour extends Behaviour
         }
         else
         {
-            //Should not happen
-            WaitBidResultBehaviour.LOGGER.log(Level.SEVERE, null, "Received null message");
+            this.myFSM.block();
+            this.transition = BidderBehaviour.TRANSITION_WAIT_BID_RESULT;
         }
 
     }
-
-    @Override
-    public boolean done()
-    {
-        // Dies with fsm
-        return false;
-    }
-
 
     @Override
     public int onEnd()

@@ -60,6 +60,10 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 	 */
 	public static final int TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
 
+	public static final int TRANSITION_WAIT_AUCTION_LIST;
+
+	public static final int TRANSITION_WAIT_SUBSCRIPTION_RESULT;
+
 	/**
 	 * An empty auction list has been received.
 	 */
@@ -70,9 +74,9 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 	 */
 	private ACLMessage request;
 
-	private AID lastSubscribedAuction;
+	private String lastSubscribedAuction;
 
-	private Set<AID> subscribedAuctions = new HashSet<AID>();
+	private Set<String> subscribedAuctions = new HashSet<String>();
 
 	static
 	{
@@ -84,6 +88,8 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		TRANSITION_SUBSCRIPTION_REFUSED = ++start;
 		TRANSITION_EXIT_SUBSCRIPTION_PROCESS = ++start;
 		TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START = ++start;
+		TRANSITION_WAIT_AUCTION_LIST = ++start;
+		TRANSITION_WAIT_SUBSCRIPTION_RESULT = ++start;
 
 		start = -1;
 		STATUS_EMPTY_AUCTION_LIST = ++start;
@@ -138,7 +144,7 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		SubscriptionProcessEndBehaviour subscriptionProcessEndBehaviour =
 				new SubscriptionProcessEndBehaviour(a);
 
-		this.registerState(
+		this.registerLastState(
 				subscriptionProcessEndBehaviour,
 				STATE_SUBSCRIPTION_PROCESS_END
 		);
@@ -157,9 +163,21 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		);
 
 		this.registerTransition(
+				STATE_WAIT_AUCTION_LIST,
+				STATE_WAIT_AUCTION_LIST,
+				SubscribeToAuctionBehaviour.TRANSITION_WAIT_AUCTION_LIST
+		);
+
+		this.registerTransition(
 				STATE_PICK_AUCTION,
 				STATE_WAIT_SUBSCRIPTION_REPLY,
 				SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION
+		);
+
+		this.registerTransition(
+				STATE_WAIT_SUBSCRIPTION_REPLY,
+				STATE_WAIT_SUBSCRIPTION_REPLY,
+				SubscribeToAuctionBehaviour.TRANSITION_WAIT_SUBSCRIPTION_RESULT
 		);
 
 		// Return to process start when auction list empty
@@ -187,9 +205,10 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
 		);
 
+		//TODO : where do we go after subscribing to an auction
 		this.registerDefaultTransition(
 				STATE_CREATE_BIDDER_FSM,
-				STATE_PICK_AUCTION
+				STATE_SUBSCRIPTION_PROCESS_END
 		);
 
 		//transitions to subscription process end
@@ -234,7 +253,7 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 	 *
 	 * @param seller
 	 */
-	public void subscribeToAuction(AID seller)
+	public void subscribeToAuction(String seller)
 	{
 		this.subscribedAuctions.add(seller);
 	}
@@ -242,7 +261,7 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 	/**
 	 * Returns true if auction has already been subscribed to.
 	 *
-	 * @param seller
+	 * @param auctionId
 	 * @return
 	 */
 	public boolean hasSubscribedToAuction(String auctionId)
@@ -250,12 +269,12 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		return this.subscribedAuctions.contains(auctionId);
 	}
 
-	public void setLastSubscribedAuction(AID auction)
+	public void setLastSubscribedAuction(String auction)
 	{
 		this.lastSubscribedAuction = auction;
 	}
 
-	public AID getLastSubscribedAuction()
+	public String getLastSubscribedAuction()
 	{
 		return this.lastSubscribedAuction;
 	}

@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class PickAuctionBehaviour extends Behaviour
+public class PickAuctionBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -35,6 +36,15 @@ public class PickAuctionBehaviour extends Behaviour
     private Random randomGenerator;
 
     private int transition;
+
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    BidderSubscriptionManagementBehaviour.MESSAGE_FILTER,
+                    MessageTemplate.MatchPerformative(
+                            FishMarket.Performatives.TO_PROVIDE
+                    )
+            );
+
 
     public PickAuctionBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
@@ -54,68 +64,76 @@ public class PickAuctionBehaviour extends Behaviour
         Object content = null;
         boolean requestNewList = false;
 
-        try
+        if (mess != null)
         {
-            content = mess.getContentObject();
-        }
-        catch (UnreadableException e)
-        {
-            PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
-        }
-
-        if (content != null)
-        {
-            // pick a random auction
-            String selectedAuction = this.pickRandomAuctionSeller(
-                    (HashSet<Auction>) content
-            );
-
-            if (selectedAuction != null)
+            try
             {
-                //an auction has been found
-                ACLMessage reply = mess.createReply();
-                reply.setPerformative(FishMarket.Performatives.TO_CREATE);
+                content = mess.getContentObject();
+            }
+            catch (UnreadableException e)
+            {
+                PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
+            }
 
-                this.transition = SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+            if (content != null)
+            {
+                HashSet<Auction> auctionList = (HashSet<Auction>) content;
 
-                try
+                if (auctionList.size() > 0)
                 {
-                    reply.setContentObject(selectedAuction);
-                }
-                catch (IOException e)
-                {
-                    PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
-                }
+                    // pick a random auction
+                    String selectedAuction =
+                            this.pickRandomAuctionSeller(auctionList);
 
-                bidderAgent.send(reply);
+
+                    if (selectedAuction != null)
+                    {
+                        //an auction has been found
+                        ACLMessage reply = mess.createReply();
+                        reply.setPerformative(
+                                FishMarket.Performatives.TO_SUBSCRIBE
+                        );
+
+                        reply.addReceiver(
+                                BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC
+                        );
+
+                        this.transition =
+                                SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+
+                        reply.setContent(selectedAuction);
+
+                        bidderAgent.send(reply);
+                    }
+                    else
+                    {
+                        requestNewList = true;
+                    }
+                }
+                else
+                {
+                    requestNewList = true;
+                }
             }
             else
             {
                 requestNewList = true;
             }
+
+            if (requestNewList)
+            {
+                // could not select item
+                this.transition =
+                        SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
+            }
+
         }
         else
         {
-            requestNewList = true;
+
         }
-
-        if (requestNewList)
-        {
-            // could not select item
-            this.transition =
-                    SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
-        }
-
-
         // transition to next step
 
-    }
-
-    @Override
-    public boolean done()
-    {
-        // Stays alive in case we need to pick a new auction list
-        return false;
     }
 
     @Override

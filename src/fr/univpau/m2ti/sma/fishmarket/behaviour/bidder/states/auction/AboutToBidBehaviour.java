@@ -1,6 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class AboutToBidBehaviour extends Behaviour
+public class AboutToBidBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -26,6 +28,9 @@ public class AboutToBidBehaviour extends Behaviour
 
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER;
+
+    //set to true when block is called
+    private boolean blocked = false;
 
     static
     {
@@ -59,16 +64,20 @@ public class AboutToBidBehaviour extends Behaviour
         // read price from last announce
         ACLMessage mess = this.myFSM.getRequest();
 
-        long price = Long.parseLong(mess.getContent());
+        float price = Float.parseFloat(mess.getContent());
 
         // Is price low enough ?
-        if (this.myFSM.getPriceLimit() > price)
+        if (this.myFSM.getPriceLimit() > price && !blocked)
         {
             //bidding is possible
             ACLMessage bid = mess.createReply();
             bid.setPerformative(FishMarket.Performatives.TO_BID);
             bid.setContent(String.valueOf(price));
-
+            bid.clearAllReceiver();
+            bid.addReceiver(((BidderAgent)super.myAgent).getMarketAgentAID());
+            bid.addReceiver(RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+            bid.setConversationId(this.myFSM.getRequest().getConversationId());
+            bid.setSender(super.myAgent.getAID());
             super.myAgent.send(bid);
 
             // Store bidding price
@@ -78,16 +87,11 @@ public class AboutToBidBehaviour extends Behaviour
         }
         else
         {
-            //Price is too high, waiting for price decrease
-            this.block();
-
             ACLMessage newMessage = myAgent.receive(MESSAGE_FILTER);
-
-            this.myFSM.setRequest(newMessage);
 
             if (newMessage != null)
             {
-                this.myFSM.setRequest(mess);
+                this.myFSM.setRequest(newMessage);
 
                 if (newMessage.getPerformative() == FishMarket.Performatives.TO_ANNOUNCE)
                 {
@@ -105,17 +109,11 @@ public class AboutToBidBehaviour extends Behaviour
             }
             else
             {
-                //Should not happen
-                AboutToBidBehaviour.LOGGER.log(Level.SEVERE, null, "Received null message");
+                //Price is too high, waiting for price decrease
+                this.myFSM.block();
+                blocked = true;
             }
         }
-    }
-
-    @Override
-    public boolean done()
-    {
-        // Dies with fsm
-        return false;
     }
 
     @Override

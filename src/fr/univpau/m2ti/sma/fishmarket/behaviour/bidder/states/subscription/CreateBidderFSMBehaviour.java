@@ -1,6 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -33,19 +34,22 @@ public class CreateBidderFSMBehaviour extends OneShotBehaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
-        bidderAgent.createBidderFSM(
-            this.myFSM.getLastSubscribedAuction(),
-            this.getNewPriceLimit(1000, 2000)
+//        bidderAgent.createBidderFSM(
+//            this.getNewPriceLimit(1000, 2000)
+//        );
+
+        bidderAgent.addBehaviour(
+                new BidderBehaviour(super.myAgent, this.getNewPriceLimit(1000, 2000))
         );
     }
 
-    private long getNewPriceLimit(long min, long max)
+    private float getNewPriceLimit(float min, float max)
     {
         Random rand = new Random();
 
-        if (min == Long.MAX_VALUE)
+        if (min == Float.MAX_VALUE)
         {
-            min = Long.MAX_VALUE - 1;
+            min = Float.MAX_VALUE - 1;
         }
 
         if (max <= min)
@@ -53,20 +57,20 @@ public class CreateBidderFSMBehaviour extends OneShotBehaviour
             max = min + 1;
         }
 
-        long randLong = rand.nextLong();
+        float randFloat = rand.nextFloat();
 
-        if (randLong < min)
+        if (randFloat < min)
         {
-            randLong = randLong + min;
+            randFloat = randFloat + min;
         }
 
-        if (randLong > max)
+        if (randFloat > max)
         {
-            randLong = (randLong % (max - min)) + min;
+            randFloat = (randFloat % ((long)(max - min))) + min;
         }
 
 
-        return randLong;
+        return randFloat;
     }
 
 }

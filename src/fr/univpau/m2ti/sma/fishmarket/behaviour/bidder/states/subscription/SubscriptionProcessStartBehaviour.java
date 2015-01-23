@@ -2,19 +2,17 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.messaging.TopicUtility;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 /**
  *
  */
-public class SubscriptionProcessStartBehaviour extends Behaviour
+public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 {
     private SubscribeToAuctionBehaviour myFsm;
 
@@ -32,18 +30,16 @@ public class SubscriptionProcessStartBehaviour extends Behaviour
                 (BidderAgent) super.myAgent;
 
         // Prepare and send message
+        // TODO : faire le lookup une fois pour toutes
         AID marketAID = bidderAgent.getMarketAgentAID();
 
         ACLMessage requestAuctionListMessage =
-                new ACLMessage(FishMarket.Performatives.TO_PROVIDE);
+                new ACLMessage(FishMarket.Performatives.TO_REQUEST);
+
         requestAuctionListMessage.addReceiver(marketAID);
 
-        final AID topic =
-                TopicUtility.createTopic(
-                        FishMarket.Topics.TOPIC_BIDDERS_SUBSCRIPTION
-                );
-
-        requestAuctionListMessage.addReceiver(topic);
+        requestAuctionListMessage.addReceiver(
+                BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
 
 
         bidderAgent.send(requestAuctionListMessage);
@@ -53,15 +49,9 @@ public class SubscriptionProcessStartBehaviour extends Behaviour
     }
 
     @Override
-    public boolean done()
-    {
-        // Stays alive in case we need to ask for new auction list
-        return false;
-    }
-
-    @Override
     public int onEnd() {
         // Implemented because of possible early return to end state.
+        System.out.println("SubscriptionProcessStartBehaviour : in onEnd");
         return SubscribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST;
     }
 }

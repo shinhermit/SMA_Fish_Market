@@ -20,6 +20,6 @@ public class SubscriptionProcessEndBehaviour extends OneShotBehaviour
 
     @Override
     public void action() {
-
+        System.out.println("action => " + getBehaviourName());
     }
 }

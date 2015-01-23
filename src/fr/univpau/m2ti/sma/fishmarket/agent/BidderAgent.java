@@ -41,10 +41,10 @@ public class BidderAgent extends Agent
 	 *
 	 * @param seller
 	 */
-	public void createBidderFSM(AID seller, long maxPrice)
+	public void createBidderFSM(float maxPrice)
 	{
 		// TODO: implement
-		this.addBehaviour(new BidderBehaviour(this, seller, maxPrice));
+		this.addBehaviour(new BidderBehaviour(this, maxPrice));
 	}
 
 	public void createAuctionFinderFSM()
