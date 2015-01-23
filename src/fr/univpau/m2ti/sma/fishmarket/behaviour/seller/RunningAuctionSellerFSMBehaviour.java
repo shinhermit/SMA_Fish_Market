@@ -124,19 +124,19 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 				new WaitMoreBidBehaviour(mySellerAgent, this),
 				STATE_WAIT_MORE_BID);
 		
-		this.registerLastState(
+		this.registerState(
 				new AttributeFishSupplyBehaviour(mySellerAgent, this),
 				STATE_SEND_TO_ATTRIBUTE);
 		
-		this.registerLastState(
+		this.registerState(
 				new GiveFishSupplyBehaviour(mySellerAgent, this),
 				STATE_SEND_TO_GIVE);
 		
-		this.registerLastState(
+		this.registerState(
 				new WaitPaymentBehaviour(mySellerAgent, this),
 				STATE_WAIT_TO_PAY);
 		
-		this.registerLastState(
+		this.registerState(
 				new WaitPaymentBehaviour(mySellerAgent, this),
 				STATE_WAIT_TO_PAY);
 		
