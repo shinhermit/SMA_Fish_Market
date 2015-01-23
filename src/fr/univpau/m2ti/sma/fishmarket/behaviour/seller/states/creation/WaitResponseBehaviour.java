@@ -45,10 +45,7 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 	public void action()
 	{
 		// DEBUG
-		System.out.println("Seller: waiting response !");
-		
-		// Wait that myAgent receives message
-		this.block();
+		System.out.println("Seller: checking messages !");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
@@ -67,12 +64,18 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 				this.transition =
 						CreateAuctionBehaviour
 						.TRANSITION_TO_WAIT_BIDDERS;
+				
+				// DEBUG
+				System.out.println("Seller: setting transition to wait bidders !");
 			}
 			else
 			{
 				this.transition =
 						CreateAuctionBehaviour
 						.TRANSITION_TO_REQUEST_CREATION;
+				
+				// DEBUG
+				System.out.println("Seller: setting transition to request creation !");
 			}
 		}
 		else
@@ -80,6 +83,15 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 			this.transition =
 					CreateAuctionBehaviour
 					.TRANSITION_TO_WAIT_RESPONSE;
+			
+			// DEBUG
+			System.out.println("Seller: transition to wait response !");
+			
+			// DEBUG
+			System.out.println("Seller: blocking FSM for wainting messages !");
+			
+			// Wait that myAgent receives message
+			this.myFSM.block();
 		}
 	}
 

@@ -50,7 +50,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 		this.myFSM.notifyNewWaitCycle();
 		
 		// DEBUG
-		System.out.println("Seller: awaken !");
+		System.out.println("Seller: waiting bidder sleep delay over !");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
@@ -61,7 +61,8 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 			this.transition =
 					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_SUCCESS;
 			
-			this.restart();
+			// DEBUG
+			System.out.println("Seller: setting transition to terminate success !");
 		}
 		else
 		{
@@ -70,12 +71,16 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 				this.transition =
 						CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
 				
-				this.restart();
+				// DEBUG
+				System.out.println("Seller: setting transition to terminate cancel !");
 			}
 			else
 			{
 				this.transition =
 						CreateAuctionBehaviour.TRANSITION_TO_WAIT_BIDDERS;
+				
+				// DEBUG
+				System.out.println("Seller: setting transition to wait bidders !");
 				
 				this.reset(WAIT_BIDDER_DELAY);
 			}

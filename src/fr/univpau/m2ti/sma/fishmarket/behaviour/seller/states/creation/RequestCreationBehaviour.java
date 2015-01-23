@@ -39,6 +39,9 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 	{
 		if(this.myFSM.getRequestCount() < MAX_REQUEST_ATTEMPTS)
 		{
+			// DEBUG
+			System.out.println("Seller: requesting auction creation !");
+			
 			SellerAgent mySellerAgent =
 					(SellerAgent) super.myAgent;
 			
@@ -64,11 +67,17 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			// Select next transition
 			this.transition =
 					CreateAuctionBehaviour.TRANSITION_TO_WAIT_RESPONSE;
+			
+			// DEBUG
+			System.out.println("Seller: transition set to wait response !");
 		}
 		else
 		{
 			this.transition =
 					CreateAuctionBehaviour.TRANSITION_TO_TERMINATE_FAILURE;
+			
+			// DEBUG
+			System.out.println("Seller: transition set to terminate failure !");
 		}
 	}
 	
