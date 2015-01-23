@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 
@@ -35,7 +35,7 @@ public class WaitBidResultBehaviour extends OneShotBehaviour
     private static final MessageTemplate MESSAGE_FILTER=
             MessageTemplate.and(
                     MessageTemplate.MatchTopic(
-                    		RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC
+                    		RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
                     ),
                     MessageTemplate.or(
                             MessageTemplate.MatchPerformative(

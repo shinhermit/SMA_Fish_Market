@@ -21,7 +21,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
+public class RunningAuctionMarketFSMBehaviour extends FSMBehaviour
 {
 	/** The AID of the seller agent who created the auction which is managed by this behaviour. */
 	private final AID mySeller;
@@ -67,10 +67,6 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	/** The state in which the agent relays a cancellation of the auction by the seller to the bidders. */
 	private static final String STATE_RELAY_AUCTION_CANCELLED =
 			"STATE_RELAY_AUCTION_CANCELLED";
-	
-	/** The state in which the agent waits for the response to the bids from the seller. */
-	private static final String STATE_WAIT_REP_BID =
-			"STATE_WAIT_REP_BID";
 	
 	/** The state in which the agent relays the positive response to the bid from the seller to one bidder. */
 	private static final String STATE_RELAY_REP_BID_OK =
@@ -130,13 +126,10 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	public static final int TRANSITION_TO_WAIT_TO_BID;
 	
 	/** Return code to activates the appropriate transitions when <code>to_bid</code> is received. */
-	public static final int TRANSITION_TO_RELAY_BID;
+	public static final int TRANSITION_TO_RELAY_TO_BID;
 	
 	/** Return code to activates the appropriate transitions when <code>auction_cancelled</code> is received. */
 	public static final int TRANSITION_TO_CANCEL;
-	
-	/** Return code to activates the appropriate transitions when <code>auction_cancelled</code> is received. */
-	public static final int TRANSITION_TO_WAIT_REP_BID;
 	
 	/** Return code to activates the appropriate transitions when <code>rep_bid_ok</code> is received. */
 	public static final int TRANSITION_TO_RELAY_REP_BID_OK;
@@ -174,9 +167,8 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		
 		TRANSITION_TO_WAIT_TO_ANNOUNCE = ++start;
 		TRANSITION_TO_RELAY_TO_ANNOUNCE = ++start;
-		TRANSITION_TO_RELAY_BID = ++start;
+		TRANSITION_TO_RELAY_TO_BID = ++start;
 		TRANSITION_TO_CANCEL = ++start;
-		TRANSITION_TO_WAIT_REP_BID = ++start;
 		TRANSITION_TO_RELAY_REP_BID_OK = ++start;
 		TRANSITION_TO_RELAY_REP_BID_NOK = ++start;
 		TRANSITION_TO_WAIT_TO_BID = ++start;
@@ -196,7 +188,7 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	 * @param myMarketAgent
 	 * 			the agent to which this behaviour is added.
 	 */
-	public RunningAuctionManagementFSMBehaviour(
+	public RunningAuctionMarketFSMBehaviour(
 			MarketAgent myMarketAgent,
 			AID mySeller,
 			String myAuctionId)
@@ -215,9 +207,6 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		
 		this.registerState(new WaitToBidBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_BID);
-		
-		this.registerState(new WaitRepBidBehaviour(myMarketAgent, this),
-				STATE_WAIT_REP_BID);
 		
 		this.registerState(new WaitToAttributeBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_ATTRIBUTE);
@@ -285,44 +274,27 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 				TRANSITION_TO_WAIT_TO_BID);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
-				STATE_RELAY_TO_BID,
-				TRANSITION_TO_RELAY_BID);
-		
-		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_TO_ANNOUNCE,
 				TRANSITION_TO_RELAY_TO_ANNOUNCE);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
-				STATE_RELAY_AUCTION_CANCELLED,
-				TRANSITION_TO_CANCEL);
+				STATE_RELAY_TO_BID,
+				TRANSITION_TO_RELAY_TO_BID);
 		
-		this.registerTransition(STATE_RELAY_TO_BID,
-				STATE_WAIT_REP_BID,
-				TRANSITION_TO_WAIT_REP_BID);
-		
-		this.registerTransition(STATE_RELAY_TO_BID,
-				STATE_RELAY_AUCTION_CANCELLED,
-				TRANSITION_TO_CANCEL);
-		
-		this.registerTransition(STATE_WAIT_REP_BID,
-				STATE_WAIT_REP_BID,
-				TRANSITION_TO_WAIT_REP_BID);
-		
-		this.registerTransition(STATE_WAIT_REP_BID,
+		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_REP_BID_OK,
 				TRANSITION_TO_RELAY_REP_BID_OK);
 		
-		this.registerTransition(STATE_WAIT_REP_BID,
+		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_REP_BID_NOK,
 				TRANSITION_TO_RELAY_REP_BID_NOK);
 		
-		this.registerTransition(STATE_WAIT_REP_BID,
-				STATE_RELAY_TO_BID,
-				TRANSITION_TO_RELAY_BID);
-		
-		this.registerTransition(STATE_WAIT_REP_BID,
+		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
 				TRANSITION_TO_CANCEL);
+		
+		this.registerDefaultTransition(STATE_RELAY_TO_BID,
+				STATE_WAIT_TO_BID);
 		
 		this.registerDefaultTransition(STATE_RELAY_REP_BID_NOK,
 				STATE_WAIT_TO_ANNOUNCE);
@@ -506,7 +478,7 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	{
 		return MessageTemplate.and(
 						MessageTemplate.MatchTopic(
-								RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC),
+								RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC),
 						MessageTemplate.MatchConversationId(
 										this.myAuctionId));
 	}

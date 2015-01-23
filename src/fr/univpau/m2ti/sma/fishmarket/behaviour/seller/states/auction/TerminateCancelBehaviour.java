@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
@@ -47,7 +47,7 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		
 		// Set topic
 		cancelMess.addReceiver(
-				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
 		// Set conversation id
 		cancelMess.setConversationId(

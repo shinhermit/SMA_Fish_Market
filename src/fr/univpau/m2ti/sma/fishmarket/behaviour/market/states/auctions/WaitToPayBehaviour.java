@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitToPayBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementFSMBehaviour myFSM;
+	private RunningAuctionMarketFSMBehaviour myFSM;
 	
 	/** Will hold the selected transition among those to the next possible states. */
 	private int transition;
@@ -35,7 +35,7 @@ public class WaitToPayBehaviour extends OneShotBehaviour
 	 */
 	public WaitToPayBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementFSMBehaviour myFSM)
+			RunningAuctionMarketFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -64,13 +64,13 @@ public class WaitToPayBehaviour extends OneShotBehaviour
 			// DEBUG
 			System.out.println("Market: setting transition to relay to pay");
 			
-			this.transition = RunningAuctionManagementFSMBehaviour.
+			this.transition = RunningAuctionMarketFSMBehaviour.
 					TRANSITION_TO_RELAY_TO_PAY;
 		}
 		else
 		{
 			// Continue to wait
-			this.transition = RunningAuctionManagementFSMBehaviour.
+			this.transition = RunningAuctionMarketFSMBehaviour.
 					TRANSITION_TO_WAIT_TO_PAY;
 			
 			// DEBUG

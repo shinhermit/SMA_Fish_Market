@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -32,7 +32,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
 
     private static final MessageTemplate MESSAGE_FILTER =
             MessageTemplate.and(
-            		BidderSubscriptionManagementFSMBehaviour.MESSAGE_FILTER,
+            		BidderSubscriptionMarketFSMBehaviour.MESSAGE_FILTER,
                     MessageTemplate.or(
                             MessageTemplate.MatchPerformative(
                                     FishMarket.Performatives.TO_ACCEPT

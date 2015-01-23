@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.creation;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.AuctionCreationManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
@@ -53,7 +53,7 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 			
 			// Set topic
 			mess.addReceiver(
-					AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
+					CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 			
 			// Add starting price
 			mess.setContent(String.valueOf(

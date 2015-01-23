@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction.*;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.MessageTemplate;
@@ -209,7 +209,7 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	{
 		return MessageTemplate.and(
 				MessageTemplate.MatchTopic(
-						RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC),
+						RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC),
 				MessageTemplate.MatchConversationId(
 						this.conversationId));
 	}

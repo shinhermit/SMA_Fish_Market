@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
@@ -39,7 +39,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
 
     private static final MessageTemplate MESSAGE_FILTER =
             MessageTemplate.and(
-                    BidderSubscriptionManagementFSMBehaviour.MESSAGE_FILTER,
+                    BidderSubscriptionMarketFSMBehaviour.MESSAGE_FILTER,
                     MessageTemplate.MatchPerformative(
                             FishMarket.Performatives.TO_PROVIDE
                     )
@@ -95,7 +95,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
                         );
 
                         reply.addReceiver(
-                        		BidderSubscriptionManagementFSMBehaviour.MESSAGE_TOPIC
+                        		BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC
                         );
 
                         this.transition =

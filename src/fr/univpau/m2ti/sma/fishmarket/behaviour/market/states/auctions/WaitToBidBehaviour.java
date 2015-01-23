@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitToBidBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementFSMBehaviour myFSM;
+	private RunningAuctionMarketFSMBehaviour myFSM;
 	
 	/** Will hold the selected transition among those to the next possible states. */
 	private int transition;
@@ -35,7 +35,7 @@ public class WaitToBidBehaviour extends OneShotBehaviour
 	 */
 	public WaitToBidBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementFSMBehaviour myFSM)
+			RunningAuctionMarketFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -68,8 +68,8 @@ public class WaitToBidBehaviour extends OneShotBehaviour
 				System.out.println("Market: setting transition to relay bid");
 				
 				this.transition =
-						RunningAuctionManagementFSMBehaviour
-						.TRANSITION_TO_RELAY_BID;
+						RunningAuctionMarketFSMBehaviour
+						.TRANSITION_TO_RELAY_TO_BID;
 			}
 			else if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ANNOUNCE)
@@ -78,8 +78,32 @@ public class WaitToBidBehaviour extends OneShotBehaviour
 				System.out.println("Market: setting transition to relay to announce");
 				
 				this.transition =
-						RunningAuctionManagementFSMBehaviour
+						RunningAuctionMarketFSMBehaviour
 						.TRANSITION_TO_RELAY_TO_ANNOUNCE;
+			}
+			else if(mess.getPerformative() ==
+					FishMarket.Performatives.REP_BID)
+			{
+				boolean repBidOk = Boolean.parseBoolean(mess.getContent());
+				
+				if(repBidOk)
+				{
+					// DEBUG
+					System.out.println("Market: setting transition to relay rep bid ok");
+					
+					this.transition =
+							RunningAuctionMarketFSMBehaviour
+							.TRANSITION_TO_RELAY_REP_BID_OK;
+				}
+				else
+				{
+					// DEBUG
+					System.out.println("Market: setting transition to relay rep bid nok");
+					
+					this.transition =
+							RunningAuctionMarketFSMBehaviour
+							.TRANSITION_TO_RELAY_REP_BID_NOK;
+				}
 			}
 			else
 			{
@@ -87,14 +111,14 @@ public class WaitToBidBehaviour extends OneShotBehaviour
 				System.out.println("Market: setting transition to cancel");
 				
 				this.transition =
-						RunningAuctionManagementFSMBehaviour
+						RunningAuctionMarketFSMBehaviour
 						.TRANSITION_TO_CANCEL;
 			}
 		}
 		else
 		{
 			// Continue to wait
-			this.transition = RunningAuctionManagementFSMBehaviour.
+			this.transition = RunningAuctionMarketFSMBehaviour.
 					TRANSITION_TO_WAIT_TO_BID;
 			
 			// DEBUG
@@ -123,9 +147,12 @@ public class WaitToBidBehaviour extends OneShotBehaviour
 						MessageTemplate.MatchPerformative(
 								FishMarket.Performatives.TO_BID),
 						MessageTemplate.or(
-						MessageTemplate.MatchPerformative(
-								FishMarket.Performatives.TO_ANNOUNCE),
-						MessageTemplate.MatchPerformative(
-								FishMarket.Performatives.TO_CANCEL))));
+								MessageTemplate.MatchPerformative(
+										FishMarket.Performatives.TO_ANNOUNCE),
+								MessageTemplate.or(
+										MessageTemplate.MatchPerformative(
+												FishMarket.Performatives.REP_BID),
+										MessageTemplate.MatchPerformative(
+												FishMarket.Performatives.TO_CANCEL)))));
 	}
 }

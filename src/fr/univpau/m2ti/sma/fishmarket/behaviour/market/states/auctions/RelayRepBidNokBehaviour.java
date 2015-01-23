@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -16,7 +16,7 @@ import jade.lang.acl.ACLMessage;
 public class RelayRepBidNokBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private RunningAuctionManagementFSMBehaviour myFSM;
+	private RunningAuctionMarketFSMBehaviour myFSM;
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -28,7 +28,7 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 	 */
 	public RelayRepBidNokBehaviour(
 			MarketAgent myMarketAgent,
-			RunningAuctionManagementFSMBehaviour myFSM)
+			RunningAuctionMarketFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -55,7 +55,7 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 		
 		// Message topic
 		toRelay.addReceiver(
-				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
 		// Conversation ID
 		toRelay.setConversationId(

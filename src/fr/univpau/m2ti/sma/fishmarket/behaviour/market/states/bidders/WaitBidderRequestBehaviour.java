@@ -1,7 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.bidders;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +17,7 @@ import jade.lang.acl.MessageTemplate;
 public class WaitBidderRequestBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
-	private BidderSubscriptionManagementFSMBehaviour myFSM;
+	private BidderSubscriptionMarketFSMBehaviour myFSM;
 	
 	/** Will hold the selected transition among those to the next possible states. */
 	private int transition;
@@ -25,7 +25,7 @@ public class WaitBidderRequestBehaviour extends OneShotBehaviour
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
-					BidderSubscriptionManagementFSMBehaviour.MESSAGE_FILTER,
+					BidderSubscriptionMarketFSMBehaviour.MESSAGE_FILTER,
 					MessageTemplate.or(
 							MessageTemplate.MatchPerformative(
 									FishMarket.Performatives.TO_REQUEST),
@@ -42,7 +42,7 @@ public class WaitBidderRequestBehaviour extends OneShotBehaviour
 	 */
 	public WaitBidderRequestBehaviour(
 			MarketAgent myMarketAgent,
-			BidderSubscriptionManagementFSMBehaviour myFSM)
+			BidderSubscriptionMarketFSMBehaviour myFSM)
 	{
 		super(myMarketAgent);
 		
@@ -72,20 +72,20 @@ public class WaitBidderRequestBehaviour extends OneShotBehaviour
 					FishMarket.Performatives.TO_REQUEST)
 			{
 				this.transition =
-						BidderSubscriptionManagementFSMBehaviour
+						BidderSubscriptionMarketFSMBehaviour
 						.TRANSITION_TO_PROVIDE_AUCTION_LIST;
 			}
 			else
 			{
 				this.transition =
-						BidderSubscriptionManagementFSMBehaviour
+						BidderSubscriptionMarketFSMBehaviour
 						.TRANSITION_TO_VALUATE_REQUEST;
 			}
 		}
 		else
 		{
 			this.transition =
-					BidderSubscriptionManagementFSMBehaviour
+					BidderSubscriptionMarketFSMBehaviour
 					.TRANSITION_TO_WAIT_REQUEST;
 		}
 	}
