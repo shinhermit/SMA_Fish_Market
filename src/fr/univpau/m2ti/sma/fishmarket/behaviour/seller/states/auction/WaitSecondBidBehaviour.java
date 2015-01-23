@@ -21,7 +21,7 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 1000l; // 1 sec
 	
 	/** The time to wait for the first bid. */
-	private static final int WAIT_SECOND_MAX_CYCLE_COUNT = 10*60; // to reach 10 min
+	private static final int WAIT_SECOND_MAX_CYCLE_COUNT = 5; // to reach 5 sec
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.

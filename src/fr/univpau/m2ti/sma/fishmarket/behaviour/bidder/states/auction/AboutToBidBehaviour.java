@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -75,7 +75,7 @@ public class AboutToBidBehaviour extends OneShotBehaviour
             bid.setContent(String.valueOf(price));
             bid.clearAllReceiver();
             bid.addReceiver(((BidderAgent)super.myAgent).getMarketAgentAID());
-            bid.addReceiver(RunningAuctionManagementBehaviour.MESSAGE_TOPIC);
+            bid.addReceiver(RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
             bid.setConversationId(this.myFSM.getRequest().getConversationId());
             bid.setSender(super.myAgent.getAID());
             super.myAgent.send(bid);

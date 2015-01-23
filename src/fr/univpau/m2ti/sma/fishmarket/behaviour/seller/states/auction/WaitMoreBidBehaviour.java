@@ -18,7 +18,7 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	private int transition;
 	
 	/** The time to wait for more bid. */
-	public static final long WAIT_MORE_BID_DURATION = 20*1000l; // 20 sec
+	public static final long WAIT_MORE_BID_DURATION = 5*1000l; // 5 sec
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.

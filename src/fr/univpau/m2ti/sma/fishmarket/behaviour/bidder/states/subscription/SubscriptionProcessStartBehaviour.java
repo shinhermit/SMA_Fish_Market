@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
@@ -39,7 +39,7 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
         requestAuctionListMessage.addReceiver(marketAID);
 
         requestAuctionListMessage.addReceiver(
-                BidderSubscriptionManagementBehaviour.MESSAGE_TOPIC);
+        		BidderSubscriptionManagementFSMBehaviour.MESSAGE_TOPIC);
 
 
         bidderAgent.send(requestAuctionListMessage);
