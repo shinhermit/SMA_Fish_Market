@@ -85,6 +85,9 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 			SellerAgent mySellerAgent =
 					(SellerAgent)super.myAgent;
 			
+			// DEBUG
+			System.out.println("Seller: sending rep bid ok.");
+			
 			// send rep_bid(OK)
 			ACLMessage reply = new ACLMessage(
 					FishMarket.Performatives.REP_BID);
