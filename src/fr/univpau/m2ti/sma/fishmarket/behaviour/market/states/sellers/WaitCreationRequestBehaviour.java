@@ -52,35 +52,41 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
-		// Wait that myAgent receives message
-		this.block();
-		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				WaitCreationRequestBehaviour.MESSAGE_FILTER);
 		
 		if( ((MarketAgent)myAgent).isDone() )
 		{
+			// DEBUG
+			System.out.println("Market: setting transition to terminate !");
+			
 			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_TERMINATE;
-			
-			// Reset blocking state
-			this.restart();
 		}
 		else if(mess != null)
 		{
 			this.myFSM.setRequest(mess);
 			
+			// DEBUG
+			System.out.println("Market: setting transition to evaluate request !");
+			
 			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_EVALUATE_REQUEST;
-			
-			// Reset blocking state
-			this.restart();
 		}
 		else
 		{
+			// DEBUG
+			System.out.println("Market: setting transition to wait request !");
+			
 			this.transition = AuctionCreationManagementBehaviour.
 					TRANSITION_TO_WAIT_REQUEST;
+			
+			// DEBUG
+			System.out.println("Market: blocking FSM to wait for messages !");
+			
+			// Wait that myAgent receives message
+			this.myFSM.block();
 		}
 	}
 	
