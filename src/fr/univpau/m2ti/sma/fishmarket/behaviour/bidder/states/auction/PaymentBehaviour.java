@@ -1,6 +1,8 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -33,6 +35,10 @@ public class PaymentBehaviour extends OneShotBehaviour
 
         ACLMessage payment = mess.createReply();
 
+        payment.setConversationId(mess.getConversationId());
+        payment.clearAllReceiver();
+        payment.addReceiver(((BidderAgent) super.myAgent).getMarketAgentAID());
+        payment.addReceiver(RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
         payment.setPerformative(FishMarket.Performatives.TO_PAY);
         payment.setContent(String.valueOf(this.myFSM.getBiddingPrice()));
 
