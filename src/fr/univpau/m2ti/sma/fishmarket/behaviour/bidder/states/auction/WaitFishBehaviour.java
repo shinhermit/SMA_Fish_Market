@@ -54,10 +54,17 @@ public class WaitFishBehaviour extends OneShotBehaviour
         }
         else
         {
+            System.out.println("Received Fish");
             this.myFSM.block();
             this.transition = BidderBehaviour.TRANSITION_WAIT_FISH;
         }
 
+    }
+
+    @Override
+    public int onEnd()
+    {
+        return this.transition;
     }
 }
 
