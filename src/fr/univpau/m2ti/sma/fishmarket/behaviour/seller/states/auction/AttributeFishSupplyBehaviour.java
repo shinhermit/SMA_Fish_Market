@@ -31,6 +31,9 @@ public class AttributeFishSupplyBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: sending to attribute !");
+		
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		

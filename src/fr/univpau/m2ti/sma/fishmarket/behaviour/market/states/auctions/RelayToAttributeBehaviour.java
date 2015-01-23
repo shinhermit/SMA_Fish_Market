@@ -40,16 +40,22 @@ public class RelayToAttributeBehaviour extends OneShotBehaviour
 		// DEBUG
 		System.out.println("Market: relaying to attribute !");
 		
-		ACLMessage toRelay = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
 		
-		toRelay.clearAllReceiver();
+		// RELAY
+		ACLMessage toRelay = new ACLMessage(
+				request.getPerformative());
 		
 		toRelay.addReceiver(
 				this.myFSM.getSelectedBidder());
 		
-		// Put back message topic
+		// Message topic
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+		
+		// Conversation ID
+		toRelay.setConversationId(
+				request.getConversationId());
 		
 		super.myAgent.send(toRelay);
 		

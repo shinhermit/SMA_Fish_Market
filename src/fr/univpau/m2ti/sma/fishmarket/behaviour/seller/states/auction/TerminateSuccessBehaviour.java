@@ -31,6 +31,9 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: sending auction over !");
+		
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		

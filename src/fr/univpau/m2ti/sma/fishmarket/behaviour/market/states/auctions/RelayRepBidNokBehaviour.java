@@ -41,9 +41,11 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 		// DEBUG
 		System.out.println("Market: relaying rep bid nok !");
 		
-		ACLMessage toRelay = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
 		
-		toRelay.clearAllReceiver();
+		// RELAY
+		ACLMessage toRelay = new ACLMessage(
+				request.getPerformative());
 		
 		// Receivers
 		for(AID bidder : this.myFSM.getBidders())
@@ -51,9 +53,16 @@ public class RelayRepBidNokBehaviour extends OneShotBehaviour
 			toRelay.addReceiver(bidder);
 		}
 		
-		// Put back message topic
+		// Message topic
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+		
+		// Conversation ID
+		toRelay.setConversationId(
+				request.getConversationId());
+		
+		// Content (false)
+		toRelay.setContent(request.getContent());
 		
 		super.myAgent.send(toRelay);
 		

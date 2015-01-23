@@ -31,6 +31,9 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: sending to announce !");
+		
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		

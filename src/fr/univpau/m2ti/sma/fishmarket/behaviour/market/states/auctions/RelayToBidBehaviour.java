@@ -65,19 +65,27 @@ public class RelayToBidBehaviour extends WakerBehaviour
 			// DEBUG
 			System.out.println("Market: relaying to bid !");
 			
-			ACLMessage toRelay = this.myFSM.getRequest();
+			ACLMessage request = this.myFSM.getRequest();
 			
-			this.myFSM.addBidder(toRelay.getSender());
+			this.myFSM.addBidder(request.getSender());
 			
-			// relay
-			toRelay.clearAllReceiver();
+			// RELAY
+			ACLMessage toRelay = new ACLMessage(
+					request.getPerformative());
 			
 			// set seller agent as receiver
 			toRelay.addReceiver(this.myFSM.getSeller());
 			
-			// Put back message topic
+			// Message topic
 			toRelay.addReceiver(
 					RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+			
+			// Conversation ID
+			toRelay.setConversationId(
+					request.getConversationId());
+			
+			// Content (price)
+			toRelay.setContent(request.getContent());
 			
 			// Send
 			super.myAgent.send(toRelay);
@@ -85,6 +93,9 @@ public class RelayToBidBehaviour extends WakerBehaviour
 			// Select transition
 			this.transition =
 					RunningAuctionManagementFSMBehaviour.TRANSITION_TO_WAIT_REP_BID;
+			
+			// DEBUG
+			System.out.println("Market: setting transition to wwait rep bid !");
 			
 			// Delete request
 			this.myFSM.setRequest(null);

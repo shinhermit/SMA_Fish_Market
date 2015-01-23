@@ -31,6 +31,9 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: sending to cancel !");
+		
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
 		

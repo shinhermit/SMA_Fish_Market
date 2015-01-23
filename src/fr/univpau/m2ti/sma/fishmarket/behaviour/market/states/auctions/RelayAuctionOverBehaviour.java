@@ -42,12 +42,14 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 		// DEBUG
 		System.out.println("Market: relaying auction over !");
 		
-		ACLMessage toRelay = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
 		
 		MarketAgent myMarketAgent =
 				(MarketAgent) super.myAgent;
 		
-		toRelay.clearAllReceiver();
+		// RELAY
+		ACLMessage toRelay = new ACLMessage(
+				request.getPerformative());
 		
 		// Receivers
 		for(AID subscriber : myMarketAgent.getSubscribers(
@@ -56,9 +58,13 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 			toRelay.addReceiver(subscriber);
 		}
 		
-		// Put back message topic
+		// Message topic
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+		
+		// Conversation ID
+		toRelay.setConversationId(
+				request.getConversationId());
 		
 		myMarketAgent.send(toRelay);
 		

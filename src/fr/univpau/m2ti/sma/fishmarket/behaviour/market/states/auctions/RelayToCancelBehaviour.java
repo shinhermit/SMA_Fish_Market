@@ -42,12 +42,14 @@ public class RelayToCancelBehaviour extends OneShotBehaviour
 		// DEBUG
 		System.out.println("Market: relaying to cancel !");
 		
-		ACLMessage toRelay = this.myFSM.getRequest();
+		ACLMessage request = this.myFSM.getRequest();
 		
 		MarketAgent myMarketAgent =
 				(MarketAgent) super.myAgent;
 		
-		toRelay.clearAllReceiver();
+		// RELAY
+		ACLMessage toRelay = new ACLMessage(
+				request.getPerformative());
 		
 		for(AID subscriber : myMarketAgent.getSubscribers(
 				this.myFSM.getAuctionId()))
@@ -55,9 +57,13 @@ public class RelayToCancelBehaviour extends OneShotBehaviour
 			toRelay.addReceiver(subscriber);
 		}
 		
-		// Put back message topic
+		// Message topic
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
+		
+		// Conversation ID
+		toRelay.setConversationId(
+				request.getConversationId());
 		
 		myMarketAgent.send(toRelay);
 		

@@ -31,6 +31,9 @@ public class GiveFishSupplyBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: sending to give !");
+		
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		

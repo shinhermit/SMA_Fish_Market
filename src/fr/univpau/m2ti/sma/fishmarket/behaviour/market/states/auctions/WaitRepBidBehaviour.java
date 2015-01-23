@@ -66,12 +66,6 @@ public class WaitRepBidBehaviour extends OneShotBehaviour
 			if( performative ==
 					FishMarket.Performatives.REP_BID)
 			{
-				// DEBUG
-				System.out.println("Market: setting transition to relay rep bid nok");
-				
-				this.transition =
-						RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
-				
 				String content = (String) mess.getContent();
 				
 				if(content != null)
@@ -86,6 +80,22 @@ public class WaitRepBidBehaviour extends OneShotBehaviour
 						this.transition =
 									RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_OK;
 					}
+					else
+					{
+						// DEBUG
+						System.out.println("Market: setting transition to relay rep bid nok");
+						
+						this.transition =
+								RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
+					}
+				}
+				else
+				{
+					// DEBUG
+					System.out.println("Market: setting transition to relay rep bid nok");
+					
+					this.transition =
+							RunningAuctionManagementFSMBehaviour.TRANSITION_TO_RELAY_REP_BID_NOK;
 				}
 			}
 			

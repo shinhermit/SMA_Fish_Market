@@ -74,7 +74,7 @@ public class WaitToGiveBehaviour extends OneShotBehaviour
 					TRANSITION_TO_WAIT_TO_GIVE;
 			
 			// DEBUG
-			System.out.println("Market: setting transition to wait wait to give");
+			System.out.println("Market: setting transition to wait to give");
 			
 			this.myFSM.block();
 		}
