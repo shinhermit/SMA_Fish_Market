@@ -49,12 +49,13 @@ public class WaitFishBehaviour extends OneShotBehaviour
 
         if (message != null)
         {
+            this.myFSM.setRequest(message);
             System.out.println("Received Fish");
             this.transition = BidderBehaviour.TRANSITION_TO_PAYMENT;
         }
         else
         {
-            System.out.println("Received Fish");
+            System.out.println("Waiting for fish");
             this.myFSM.block();
             this.transition = BidderBehaviour.TRANSITION_WAIT_FISH;
         }
