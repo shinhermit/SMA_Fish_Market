@@ -37,6 +37,9 @@ public class RelayRepBidOkBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying rep bid ok !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		toRelay.clearAllReceiver();

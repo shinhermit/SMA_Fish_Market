@@ -37,6 +37,9 @@ public class RelayToGiveBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying to give !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		toRelay.clearAllReceiver();

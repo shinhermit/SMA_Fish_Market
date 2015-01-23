@@ -38,6 +38,9 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying to announce !");
+		
 		MarketAgent myMarketAgent = (MarketAgent)
 				super.myAgent;
 		

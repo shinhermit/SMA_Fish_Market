@@ -39,6 +39,9 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying auction over !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		MarketAgent myMarketAgent =

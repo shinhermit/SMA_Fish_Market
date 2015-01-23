@@ -37,6 +37,9 @@ public class RelayToAttributeBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying to attribute !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		toRelay.clearAllReceiver();

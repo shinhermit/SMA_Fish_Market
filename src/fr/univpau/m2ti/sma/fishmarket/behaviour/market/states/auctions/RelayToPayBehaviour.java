@@ -37,6 +37,9 @@ public class RelayToPayBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying to pay !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		toRelay.clearAllReceiver();

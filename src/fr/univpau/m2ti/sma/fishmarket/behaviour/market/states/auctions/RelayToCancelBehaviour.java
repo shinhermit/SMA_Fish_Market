@@ -39,6 +39,9 @@ public class RelayToCancelBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Market: relaying to cancel !");
+		
 		ACLMessage toRelay = this.myFSM.getRequest();
 		
 		MarketAgent myMarketAgent =

@@ -48,9 +48,6 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
 	public static final long BID_WAIT_DELAY = 10000; // 10 sec
 	
-	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
-	public static final long TO_CANCEL_WAIT_DELAY = 500; // 0.5 sec
-	
 	/** The state in which the agent waits for a first announcement from the seller. */
 	private static final String STATE_WAIT_TO_ANNOUNCE =
 			"STATE_WAIT_TO_ANNOUNCE";

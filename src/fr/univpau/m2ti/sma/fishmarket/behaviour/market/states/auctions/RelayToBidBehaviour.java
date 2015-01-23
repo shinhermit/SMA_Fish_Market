@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,7 +14,7 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class RelayToBidBehaviour extends OneShotBehaviour
+public class RelayToBidBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private RunningAuctionManagementFSMBehaviour myFSM;
@@ -24,6 +24,9 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
+	
+	/** The amount of time to wait for incoming messages before relaying a <i>to_bid</i>.*/
+	public static final long WAIT_TO_CANCEL_DURATION = 500; // 0.5 sec
 	
 	/**
 	 * Creates a behaviour which is to be associated with a MarketAgent FSMBehaviour's state.
@@ -37,7 +40,7 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 			MarketAgent myMarketAgent,
 			RunningAuctionManagementFSMBehaviour myFSM)
 	{
-		super(myMarketAgent);
+		super(myMarketAgent, WAIT_TO_CANCEL_DURATION);
 		
 		this.myFSM = myFSM;
 		
@@ -45,20 +48,23 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	}
 
 	@Override
-	public void action()
+	public void onWake()
 	{
-		// Wait messages in order to choose a transition
-		boolean received = this.receive(
-				RunningAuctionManagementFSMBehaviour.TO_CANCEL_WAIT_DELAY);
-		
-		if(received)
+		if(this.cancelReceived(
+				WAIT_TO_CANCEL_DURATION))
 		{
+			// DEBUG
+			System.out.println("Market: relaying to cancel !");
+			
 			this.transition =
 						RunningAuctionManagementFSMBehaviour.TRANSITION_TO_CANCEL;
 		}
 		
 		else
 		{
+			// DEBUG
+			System.out.println("Market: relaying to bid !");
+			
 			ACLMessage toRelay = this.myFSM.getRequest();
 			
 			this.myFSM.addBidder(toRelay.getSender());
@@ -96,7 +102,7 @@ public class RelayToBidBehaviour extends OneShotBehaviour
 	 * 
 	 * @return true if a message has actually been received, false otherwise.
 	 */
-	private boolean receive(final long millis)
+	private boolean cancelReceived(final long millis)
 	{
 		boolean received = false;
 		
