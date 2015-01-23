@@ -31,11 +31,11 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		// DEBUG
-		System.out.println("Seller: sending to announce !");
-		
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
+		
+		// DEBUG
+		System.out.println("Seller: sending to_announce("+mySellerAgent.getCurrentPrice()+") !");
 		
 		ACLMessage mess = new ACLMessage(
 				FishMarket.Performatives.TO_ANNOUNCE);
@@ -58,5 +58,8 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 		
 		// Send
 		mySellerAgent.send(mess);
+		
+		// DEBUG (break point)
+		System.out.println();
 	}
 }

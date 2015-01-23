@@ -54,5 +54,8 @@ public class GiveFishSupplyBehaviour extends OneShotBehaviour
 		
 		// send
 		mySellerAgent.send(mess);
+		
+		// DEBUG (break point)
+		System.out.println();
 	}
 }

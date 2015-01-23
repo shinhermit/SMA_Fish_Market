@@ -18,7 +18,7 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 	private int transition;
 	
 	/** The time to wait for the first bid. */
-	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 30000l; // 30 sec
+	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 1000l; // 30 sec
 	
 	/** The time to wait for the first bid. */
 	private static final int WAIT_SECOND_MAX_CYCLE_COUNT = 5; // to reach 5 sec
@@ -69,8 +69,6 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 			// Continue to wait
 			this.transition =
 					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
-			
-			this.reset(WAIT_SECOND_BID_CYCLE_DURATION);
 		}
 		else
 		{
@@ -115,6 +113,9 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 	@Override
 	public int onEnd()
 	{
+		// For any future return to this state
+		this.reset(WAIT_SECOND_BID_CYCLE_DURATION);
+		
 		return this.transition;
 	}
 	

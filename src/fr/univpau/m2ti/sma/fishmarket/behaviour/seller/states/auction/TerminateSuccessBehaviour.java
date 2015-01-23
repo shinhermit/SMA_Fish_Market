@@ -54,5 +54,8 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		
 		// Send
 		mySellerAgent.send(mess);
+		
+		// DEBUG (break point)
+		System.out.println();
 	}
 }

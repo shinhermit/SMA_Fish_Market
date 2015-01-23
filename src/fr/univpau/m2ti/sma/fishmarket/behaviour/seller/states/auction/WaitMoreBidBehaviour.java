@@ -18,7 +18,7 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	private int transition;
 	
 	/** The time to wait for more bid. */
-	public static final long WAIT_MORE_BID_DURATION = 5*1000l; // 5 sec
+	public static final long WAIT_MORE_BID_DURATION = 1000l; // 5 sec
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -80,9 +80,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 			
 			// DEBUG
 			System.out.println("Seller: transition is set to announce, with price increased by priceStep/2 !");
-			
-			this.transition =
-					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
 		}
 		else
 		{
@@ -94,6 +91,9 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 			this.transition =
 					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ATTRIBUTE;
 		}
+		
+		// DEBUG
+		System.out.println("Seller: sending rep_bid("+repBidOk+") !");
 		
 		// send rep_bid
 		ACLMessage reply = new ACLMessage(
@@ -121,6 +121,9 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	@Override
 	public int onEnd()
 	{
+		// For any future return to this state
+		this.reset(WAIT_MORE_BID_DURATION);
+		
 		return this.transition;
 	}
 	

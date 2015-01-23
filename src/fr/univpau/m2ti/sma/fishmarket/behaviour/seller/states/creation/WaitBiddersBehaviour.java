@@ -90,6 +90,9 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	@Override
 	public int onEnd()
 	{
+		// For any future return to this state
+		this.reset(WAIT_BIDDER_CYCLE_DURATION);
+		
 		return this.transition;
 	}
 }

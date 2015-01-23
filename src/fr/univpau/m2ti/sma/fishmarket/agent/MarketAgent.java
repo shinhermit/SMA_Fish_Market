@@ -77,7 +77,7 @@ public class MarketAgent extends Agent
         // Auction management behaviour are add by SellerManagementBehaviour
         // sub-behaviour (confirm auction registration behaviour)
 
-		this.createMarketUsers(1, 2);
+//		this.createMarketUsers(1, 2);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)

@@ -68,8 +68,6 @@ public class WaitFirstBidBehaviour extends WakerBehaviour
 			// Continue to wait
 			this.transition =
 					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_FIRST_BID;
-			
-			this.reset(WAIT_FIRST_BID_CYCLE_DURATION);
 		}
 		else
 		{
@@ -108,6 +106,9 @@ public class WaitFirstBidBehaviour extends WakerBehaviour
 	@Override
 	public int onEnd()
 	{
+		// For any future return to this state
+		this.reset(WAIT_FIRST_BID_CYCLE_DURATION);
+		
 		return this.transition;
 	}
 	
