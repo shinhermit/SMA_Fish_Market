@@ -44,7 +44,7 @@ public class RelayToAttributeBehaviour extends OneShotBehaviour
 		toRelay.addReceiver(
 				this.myFSM.getSelectedBidder());
 		
-		// Relayed message topic
+		// Put back message topic
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 		

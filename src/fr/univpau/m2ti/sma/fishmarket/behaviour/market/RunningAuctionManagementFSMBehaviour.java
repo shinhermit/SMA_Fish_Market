@@ -439,7 +439,16 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	
 	/**
 	 * 
-	 * @param bidder the <code>AID</code> of a bidder agent.
+	 * @return the list of bidders for the last received <code>to_announce</code>.
+	 */
+	public Set<AID> getBidders()
+	{
+		return this.bidders;
+	}
+	
+	/**
+	 * 
+	 * @param bidder the <code>AID</code> of a bidder agent which is to be added to the list od bidder for the last received <code>to_announce</code>.
 	 */
 	public void addBidder(AID bidder)
 	{

@@ -57,7 +57,7 @@ public class RelayAuctionOverBehaviour extends OneShotBehaviour
 		toRelay.addReceiver(
 				RunningAuctionManagementFSMBehaviour.MESSAGE_TOPIC);
 		
-		super.myAgent.send(toRelay);
+		myMarketAgent.send(toRelay);
 		
 		// Delete request
 		this.myFSM.setRequest(null);
