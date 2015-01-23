@@ -51,38 +51,45 @@ public class WaitToAnnounceBehaviour extends OneShotBehaviour
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
-		// Wait that myAgent receives message
-		this.block();
-		
-		MarketAgent myMarketAgent =
-				(MarketAgent) super.myAgent;
+		// DEBUG
+		System.out.println("Market: checking messages for to announce");
 		
 		// Receive messages
-		ACLMessage mess = myMarketAgent.receive(
+		ACLMessage mess = super.myAgent.receive(
 				this.messageFilter);
 		
 		if(mess != null)
 		{
-			this.restart();
-			
 			if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ANNOUNCE)
 			{
 				this.myFSM.setRequest(mess);
 				
+				// DEBUG
+				System.out.println("Market: setting transition to relay to announce");
+				
 				this.transition = RunningAuctionManagementFSMBehaviour.
-						TRANSITION_TO_RELAY_ANNOUNCE;
+						TRANSITION_TO_RELAY_TO_ANNOUNCE;
 			}
 			else
 			{
+				// DEBUG
+				System.out.println("Market: setting transition to cancel");
+				
 				this.transition = RunningAuctionManagementFSMBehaviour.
 						TRANSITION_TO_CANCEL;
 			}
 		}
 		else
 		{
+			// Continue to wait
 			this.transition = RunningAuctionManagementFSMBehaviour.
 					TRANSITION_TO_WAIT_TO_ANNOUNCE;
+			
+			// DEBUG
+			System.out.println("Market: setting transition to wait to announce");
+			
+			this.myFSM.block();
 		}
 	}
 	

@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,13 +14,13 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitAuctionOverBehaviour extends Behaviour
+public class WaitAuctionOverBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private RunningAuctionManagementFSMBehaviour myFSM;
 	
-	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone;
+	/** Will hold the selected transition among those to the next possible states. */
+	private int transition;
 	
 	/** Allows filtering incoming messages. */
 	private final MessageTemplate messageFilter;
@@ -47,13 +47,11 @@ public class WaitAuctionOverBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
-		// Wait that myAgent receives message
-		this.block();
+		// DEBUG
+		System.out.println("Market: checking messages for auction over");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
@@ -63,14 +61,26 @@ public class WaitAuctionOverBehaviour extends Behaviour
 		{
 			this.myFSM.setRequest(mess);
 			
-			this.isDone = true;
+			this.transition = RunningAuctionManagementFSMBehaviour.
+					TRANSITION_TO_RELAY_AUCTION_OVER;
+		}
+		else
+		{
+			// Continue to wait
+			this.transition = RunningAuctionManagementFSMBehaviour.
+					TRANSITION_TO_WAIT_AUCTION_OVER;
+			
+			// DEBUG
+			System.out.println("Market: setting transition to wait wait auction over");
+			
+			this.myFSM.block();
 		}
 	}
 
 	@Override
-	public boolean done()
+	public int onEnd()
 	{
-		return isDone;
+		return this.transition;
 	}
 	
 	/**

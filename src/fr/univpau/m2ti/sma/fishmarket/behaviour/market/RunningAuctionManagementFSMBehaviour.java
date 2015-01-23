@@ -127,7 +127,10 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	public static final int TRANSITION_TO_WAIT_TO_ANNOUNCE;
 	
 	/** Return code to activates the appropriate transitions when <code>to_announce</code> is received. */
-	public static final int TRANSITION_TO_RELAY_ANNOUNCE;
+	public static final int TRANSITION_TO_RELAY_TO_ANNOUNCE;
+	
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>to_bid</code>. */
+	public static final int TRANSITION_TO_WAIT_TO_BID;
 	
 	/** Return code to activates the appropriate transitions when <code>to_bid</code> is received. */
 	public static final int TRANSITION_TO_RELAY_BID;
@@ -144,17 +147,50 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 	/** Return code to activates the appropriate transitions when <code>rep_bid_nok</code> is received. */
 	public static final int TRANSITION_TO_RELAY_REP_BID_NOK;
 	
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>to_attribute</code>. */
+	public static final int TRANSITION_TO_WAIT_TO_ATTRIBUTE;
+	
+	/** Return code to activates the appropriate transitions when <code>to_attribute</code> is received. */
+	public static final int TRANSITION_TO_RELAY_TO_ATTRIBUTE;
+	
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>to_give</code>. */
+	public static final int TRANSITION_TO_WAIT_TO_GIVE;
+	
+	/** Return code to activates the appropriate transitions when <code>to_give</code> is received. */
+	public static final int TRANSITION_TO_RELAY_TO_GIVE;
+	
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>to_pay</code>. */
+	public static final int TRANSITION_TO_WAIT_TO_PAY;
+	
+	/** Return code to activates the appropriate transitions when <code>to_pay</code> is received. */
+	public static final int TRANSITION_TO_RELAY_TO_PAY;
+	
+	/** Return code to activates the appropriate transitions to keep waiting for incoming <code>auction_over</code>. */
+	public static final int TRANSITION_TO_WAIT_AUCTION_OVER;
+	
+	/** Return code to activates the appropriate transitions when <code>auction_over</code> is received. */
+	public static final int TRANSITION_TO_RELAY_AUCTION_OVER;
+	
 	static
 	{
 		int start = -1;
 		
 		TRANSITION_TO_WAIT_TO_ANNOUNCE = ++start;
-		TRANSITION_TO_RELAY_ANNOUNCE = ++start;
+		TRANSITION_TO_RELAY_TO_ANNOUNCE = ++start;
 		TRANSITION_TO_RELAY_BID = ++start;
 		TRANSITION_TO_CANCEL = ++start;
 		TRANSITION_TO_WAIT_REP_BID = ++start;
 		TRANSITION_TO_RELAY_REP_BID_OK = ++start;
 		TRANSITION_TO_RELAY_REP_BID_NOK = ++start;
+		TRANSITION_TO_WAIT_TO_BID = ++start;
+		TRANSITION_TO_WAIT_TO_ATTRIBUTE = ++start;
+		TRANSITION_TO_WAIT_TO_GIVE = ++start;
+		TRANSITION_TO_WAIT_TO_PAY = ++start;
+		TRANSITION_TO_WAIT_AUCTION_OVER = ++start;
+		TRANSITION_TO_RELAY_TO_ATTRIBUTE = ++start;
+		TRANSITION_TO_RELAY_TO_GIVE = ++start;
+		TRANSITION_TO_RELAY_TO_PAY = ++start;
+		TRANSITION_TO_RELAY_AUCTION_OVER = ++start;
 	}
 	
 	/**
@@ -238,7 +274,7 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_WAIT_TO_ANNOUNCE,
 				STATE_RELAY_TO_ANNOUNCE,
-				TRANSITION_TO_RELAY_ANNOUNCE);
+				TRANSITION_TO_RELAY_TO_ANNOUNCE);
 		
 		this.registerTransition(STATE_WAIT_TO_ANNOUNCE,
 				STATE_TERMINATE_CANCEL,
@@ -247,38 +283,9 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		this.registerDefaultTransition(STATE_RELAY_TO_ANNOUNCE,
 				STATE_WAIT_TO_BID);
 		
-		this.registerDefaultTransition(STATE_RELAY_REP_BID_NOK,
-				STATE_WAIT_TO_ANNOUNCE);
-		
-		this.registerDefaultTransition(STATE_RELAY_AUCTION_CANCELLED,
-				STATE_TERMINATE_CANCEL);
-		
-		this.registerDefaultTransition(STATE_RELAY_REP_BID_OK,
-				STATE_WAIT_TO_ATTRIBUTE);
-		
-		this.registerDefaultTransition(STATE_WAIT_TO_ATTRIBUTE,
-				STATE_RELAY_TO_ATTRIBUTE);
-		
-		this.registerDefaultTransition(STATE_RELAY_TO_ATTRIBUTE,
-				STATE_WAIT_TO_GIVE);
-		
-		this.registerDefaultTransition(STATE_WAIT_TO_GIVE,
-				STATE_RELAY_TO_GIVE);
-		
-		this.registerDefaultTransition(STATE_RELAY_TO_GIVE,
-				STATE_WAIT_TO_PAY);
-		
-		this.registerDefaultTransition(STATE_WAIT_TO_PAY,
-				STATE_RELAY_TO_PAY);
-		
-		this.registerDefaultTransition(STATE_RELAY_TO_PAY,
-				STATE_WAIT_AUCTION_OVER);
-		
-		this.registerDefaultTransition(STATE_WAIT_AUCTION_OVER,
-				STATE_RELAY_AUCTION_OVER);
-		
-		this.registerDefaultTransition(STATE_RELAY_AUCTION_OVER,
-				STATE_TERMINATE_SUCCESS);
+		this.registerTransition(STATE_WAIT_TO_BID,
+				STATE_WAIT_TO_BID,
+				TRANSITION_TO_WAIT_TO_BID);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_TO_BID,
@@ -286,7 +293,7 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_TO_ANNOUNCE,
-				TRANSITION_TO_RELAY_ANNOUNCE);
+				TRANSITION_TO_RELAY_TO_ANNOUNCE);
 		
 		this.registerTransition(STATE_WAIT_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
@@ -299,6 +306,10 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		this.registerTransition(STATE_RELAY_TO_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
 				TRANSITION_TO_CANCEL);
+		
+		this.registerTransition(STATE_WAIT_REP_BID,
+				STATE_WAIT_REP_BID,
+				TRANSITION_TO_WAIT_REP_BID);
 		
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_REP_BID_OK,
@@ -315,6 +326,59 @@ public class RunningAuctionManagementFSMBehaviour extends FSMBehaviour
 		this.registerTransition(STATE_WAIT_REP_BID,
 				STATE_RELAY_AUCTION_CANCELLED,
 				TRANSITION_TO_CANCEL);
+		
+		this.registerDefaultTransition(STATE_RELAY_REP_BID_NOK,
+				STATE_WAIT_TO_ANNOUNCE);
+		
+		this.registerDefaultTransition(STATE_RELAY_AUCTION_CANCELLED,
+				STATE_TERMINATE_CANCEL);
+		
+		this.registerDefaultTransition(STATE_RELAY_REP_BID_OK,
+				STATE_WAIT_TO_ATTRIBUTE);
+		
+		this.registerTransition(STATE_WAIT_TO_ATTRIBUTE,
+				STATE_WAIT_TO_ATTRIBUTE,
+				TRANSITION_TO_WAIT_TO_ATTRIBUTE);
+		
+		this.registerTransition(STATE_WAIT_TO_ATTRIBUTE,
+				STATE_RELAY_TO_ATTRIBUTE,
+				TRANSITION_TO_RELAY_TO_ATTRIBUTE);
+		
+		this.registerDefaultTransition(STATE_RELAY_TO_ATTRIBUTE,
+				STATE_WAIT_TO_GIVE);
+		
+		this.registerTransition(STATE_WAIT_TO_GIVE,
+				STATE_WAIT_TO_GIVE,
+				TRANSITION_TO_WAIT_TO_GIVE);
+		
+		this.registerTransition(STATE_WAIT_TO_GIVE,
+				STATE_RELAY_TO_GIVE,
+				TRANSITION_TO_RELAY_TO_GIVE);
+		
+		this.registerDefaultTransition(STATE_RELAY_TO_GIVE,
+				STATE_WAIT_TO_PAY);
+		
+		this.registerTransition(STATE_WAIT_TO_PAY,
+				STATE_WAIT_TO_PAY,
+				TRANSITION_TO_WAIT_TO_PAY);
+		
+		this.registerTransition(STATE_WAIT_TO_PAY,
+				STATE_RELAY_TO_PAY,
+				TRANSITION_TO_RELAY_TO_PAY);
+		
+		this.registerDefaultTransition(STATE_RELAY_TO_PAY,
+				STATE_WAIT_AUCTION_OVER);
+		
+		this.registerTransition(STATE_WAIT_AUCTION_OVER,
+				STATE_WAIT_AUCTION_OVER,
+				TRANSITION_TO_WAIT_AUCTION_OVER);
+		
+		this.registerTransition(STATE_WAIT_AUCTION_OVER,
+				STATE_RELAY_AUCTION_OVER,
+				TRANSITION_TO_RELAY_AUCTION_OVER);
+		
+		this.registerDefaultTransition(STATE_RELAY_AUCTION_OVER,
+				STATE_TERMINATE_SUCCESS);
 	}
 	
 	/**

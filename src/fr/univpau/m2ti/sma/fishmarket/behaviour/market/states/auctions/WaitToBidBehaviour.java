@@ -3,7 +3,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -14,13 +14,10 @@ import jade.lang.acl.MessageTemplate;
  * @author Josuah Aron
  *
  */
-public class WaitToBidBehaviour extends Behaviour
+public class WaitToBidBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this representative state is attached. */
 	private RunningAuctionManagementFSMBehaviour myFSM;
-	
-	/** Tells whether this behaviour is over or not. Over when an auction creation request has been received.*/
-	private boolean isDone;
 	
 	/** Will hold the selected transition among those to the next possible states. */
 	private int transition;
@@ -50,13 +47,11 @@ public class WaitToBidBehaviour extends Behaviour
 	@Override
 	public void action()
 	{
-		this.isDone = false;
-		
 		// Delete any previous request
 		this.myFSM.setRequest(null);
 		
-		// Wait that myAgent receives message
-		this.block();
+		// DEBUG
+		System.out.println("Market: checking messages for to bid");
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
@@ -66,11 +61,12 @@ public class WaitToBidBehaviour extends Behaviour
 		{
 			this.myFSM.setRequest(mess);
 			
-			this.isDone = true;
-			
 			if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_BID)
 			{
+				// DEBUG
+				System.out.println("Market: setting transition to relay bid");
+				
 				this.transition =
 						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_RELAY_BID;
@@ -78,23 +74,34 @@ public class WaitToBidBehaviour extends Behaviour
 			else if(mess.getPerformative() ==
 					FishMarket.Performatives.TO_ANNOUNCE)
 			{
+				// DEBUG
+				System.out.println("Market: setting transition to relay to announce");
+				
 				this.transition =
 						RunningAuctionManagementFSMBehaviour
-						.TRANSITION_TO_RELAY_ANNOUNCE;
+						.TRANSITION_TO_RELAY_TO_ANNOUNCE;
 			}
 			else
 			{
+				// DEBUG
+				System.out.println("Market: setting transition to cancel");
+				
 				this.transition =
 						RunningAuctionManagementFSMBehaviour
 						.TRANSITION_TO_CANCEL;
 			}
 		}
-	}
-
-	@Override
-	public boolean done()
-	{
-		return this.isDone;
+		else
+		{
+			// Continue to wait
+			this.transition = RunningAuctionManagementFSMBehaviour.
+					TRANSITION_TO_WAIT_TO_BID;
+			
+			// DEBUG
+			System.out.println("Market: setting transition to wait to bid");
+			
+			this.myFSM.block();
+		}
 	}
 
 	@Override
