@@ -51,14 +51,18 @@ public class WaitAuctionListBehaviour extends OneShotBehaviour
 
         if (mess != null)
         {
+            //TODO : remove
+            System.out.println("List received");
+
             myFSM.setRequest(mess);
             this.transition = SubscribeToAuctionBehaviour.TRANSITION_AUCTION_LIST_RECEIVED;
-            this.myFSM.restart();
+            //this.myFSM.restart();
         }
         else
         {
             // wait for incoming message
-            this.transition = SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_WAIT_AUCTION_LIST;
+            this.transition = SubscribeToAuctionBehaviour.TRANSITION_WAIT_AUCTION_LIST;
+
             this.myFSM.block();
         }
 

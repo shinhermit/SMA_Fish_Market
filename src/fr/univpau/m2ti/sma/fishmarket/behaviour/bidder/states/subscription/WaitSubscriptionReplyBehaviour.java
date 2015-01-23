@@ -59,10 +59,11 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
         // Receive message
         ACLMessage mess = bidderAgent.receive(MESSAGE_FILTER);
 
-        AID seller = null;
+        String seller = null;
 
         if(mess != null)
         {
+            this.myFSM.restart();
             if(mess.getPerformative() ==
                     FishMarket.Performatives.TO_ACCEPT)
             {
@@ -71,15 +72,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
                         SubscribeToAuctionBehaviour
                                 .TRANSITION_SUBSCRIPTION_ACCEPTED;
 
-                try
-                {
-                    seller = (AID) mess.getContentObject();
-
-                }
-                catch (UnreadableException e)
-                {
-                    WaitSubscriptionReplyBehaviour.LOGGER.log(Level.SEVERE, null, e);
-                }
+                seller =  mess.getContent();
 
                 this.myFSM.subscribeToAuction(seller);
             }
@@ -93,7 +86,10 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
         else
         {
             // wait for incoming message
-            this.block();
+            this.myFSM.block();
+            this.transition =
+                    SubscribeToAuctionBehaviour
+                        .TRANSITION_WAIT_SUBSCRIPTION_RESULT;
         }
 
         // transition to next step

@@ -101,15 +101,7 @@ public class PickAuctionBehaviour extends OneShotBehaviour
                         this.transition =
                                 SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
 
-                        try
-                        {
-                            reply.setContentObject(selectedAuction);
-                        }
-                        catch (IOException e)
-                        {
-                            PickAuctionBehaviour.LOGGER
-                                    .log(Level.SEVERE, null, e);
-                        }
+                        reply.setContent(selectedAuction);
 
                         bidderAgent.send(reply);
                     }

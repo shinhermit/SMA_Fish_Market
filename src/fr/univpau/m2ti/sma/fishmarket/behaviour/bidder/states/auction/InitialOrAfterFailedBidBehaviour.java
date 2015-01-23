@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionManagementBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 /**
  *
  */
-public class InitialOrAfterFailedBidBehaviour extends Behaviour
+public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
@@ -24,25 +25,25 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
     private BidderBehaviour myFSM;
 
     /** Allows filtering incoming messages. */
-    private static final MessageTemplate MESSAGE_FILTER;
-
-    static
-    {
-        MESSAGE_FILTER =
-            MessageTemplate.or(
-                    MessageTemplate.MatchPerformative(
-                            FishMarket.Performatives.TO_ANNOUNCE
+    private static final MessageTemplate MESSAGE_FILTER =
+            MessageTemplate.and(
+                    MessageTemplate.MatchTopic(
+                            RunningAuctionManagementBehaviour.MESSAGE_TOPIC
                     ),
                     MessageTemplate.or(
                             MessageTemplate.MatchPerformative(
-                                    FishMarket.Performatives.TO_CANCEL
+                                    FishMarket.Performatives.TO_ANNOUNCE
                             ),
-                            MessageTemplate.MatchPerformative(
-                                    FishMarket.Performatives.AUCTION_OVER
+                            MessageTemplate.or(
+                                    MessageTemplate.MatchPerformative(
+                                            FishMarket.Performatives.TO_CANCEL
+                                    ),
+                                    MessageTemplate.MatchPerformative(
+                                            FishMarket.Performatives.AUCTION_OVER
+                                    )
                             )
                     )
             );
-    }
 
     private int transition;
 
@@ -60,9 +61,6 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
-        // waiting for an announce
-
-        this.block();
 
         ACLMessage mess = bidderAgent.receive(MESSAGE_FILTER);
 
@@ -86,22 +84,13 @@ public class InitialOrAfterFailedBidBehaviour extends Behaviour
         }
         else
         {
-            //Should not happen
-            InitialOrAfterFailedBidBehaviour.LOGGER
-                    .log(Level.SEVERE, null, "Received null message");
+            this.myFSM.block();
+            this.transition = BidderBehaviour.TRANSITION_WAIT_FIRST_ANNOUNCE;
         }
 
         // transition to next step
 
     }
-
-    @Override
-    public boolean done()
-    {
-        // Dies with fsm
-        return false;
-    }
-
 
     @Override
     public int onEnd()
