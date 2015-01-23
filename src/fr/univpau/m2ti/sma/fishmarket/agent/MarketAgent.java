@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
-import jade.domain.JADEAgentManagement.CreateAgent;
 import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")
@@ -77,7 +76,8 @@ public class MarketAgent extends Agent
         // Auction management behaviour are add by SellerManagementBehaviour
         // sub-behaviour (confirm auction registration behaviour)
 
-//		this.createMarketUsers(1, 2);
+        // DEBUG
+		this.createMarketUsers(1, 2);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)
