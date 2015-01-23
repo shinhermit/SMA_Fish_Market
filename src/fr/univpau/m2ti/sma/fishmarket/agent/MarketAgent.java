@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.wrapper.AgentContainer;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -17,6 +18,8 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import jade.domain.JADEAgentManagement.CreateAgent;
+import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")
 /**
@@ -73,6 +76,43 @@ public class MarketAgent extends Agent
         this.addBehaviour(new CreateAuctionMarketFSMBehaviour(this));
         // Auction management behaviour are add by SellerManagementBehaviour
         // sub-behaviour (confirm auction registration behaviour)
+
+		this.createMarketUsers(1, 2);
+	}
+
+	private void createMarketUsers(int numSellers, int numBidders)
+	{
+		AgentContainer container =
+				 this.getContainerController();
+
+		for (int i = 0; i < numSellers; i++)
+		{
+			String agentName = "seller" + String.valueOf(i);
+			try
+			{
+				container.createNewAgent(agentName, SellerAgent.class.getName(), null).start();
+				System.out.println("Created agent " + agentName);
+			}
+			catch (StaleProxyException e)
+			{
+				MarketAgent.LOGGER.log(Level.SEVERE, null, e);
+			}
+		}
+
+		for (int i = 0; i < numBidders; i++)
+		{
+			String agentName = "bidder" + String.valueOf(i);
+			try
+			{
+				container.createNewAgent(agentName, BidderAgent.class.getName(), null).start();
+				System.out.println("Created agent " + agentName);
+			}
+			catch (StaleProxyException e)
+			{
+				MarketAgent.LOGGER.log(Level.SEVERE, null, e);
+			}
+		}
+
 	}
 	
 	@Override
