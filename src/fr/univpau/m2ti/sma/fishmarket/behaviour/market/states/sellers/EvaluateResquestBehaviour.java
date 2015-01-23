@@ -54,7 +54,7 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 		Auction auction = new Auction(auctionId);
 		
 		// DEBUG
-		System.out.println("Market: evaluating registration of auction with id "+auctionId);
+		System.out.println("Market: evaluating creation request of auction with id "+auctionId);
 		System.out.println("Topic is: "+AuctionCreationManagementFSMBehaviour.MESSAGE_TOPIC);
 		
 		if(! myMarketAgent.isRegisteredAuction(auctionId) )

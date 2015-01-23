@@ -17,7 +17,7 @@ public class WaitBiddersBehaviour extends WakerBehaviour
 	private int transition;
 
 	/** The duration of one cycle of wait for bidders. */
-	private static final long WAIT_BIDDER_CYCLE_DURATION = 5000l; // 5 sec
+	private static final long WAIT_BIDDER_CYCLE_DURATION = 60*1000l; // 1 min
 	
 	/** The max number of <i>sleep</i> cycle allowed to wait for bidders subscriptions. */
 	private static final int MAX_CYCLE_COUNT = 4;

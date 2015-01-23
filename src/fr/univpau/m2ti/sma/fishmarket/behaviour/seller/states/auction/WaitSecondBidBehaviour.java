@@ -18,7 +18,7 @@ public class WaitSecondBidBehaviour extends WakerBehaviour
 	private int transition;
 	
 	/** The time to wait for the first bid. */
-	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 1000l; // 1 sec
+	private static final long WAIT_SECOND_BID_CYCLE_DURATION = 30000l; // 30 sec
 	
 	/** The time to wait for the first bid. */
 	private static final int WAIT_SECOND_MAX_CYCLE_COUNT = 5; // to reach 5 sec

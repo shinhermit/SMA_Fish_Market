@@ -59,7 +59,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		if( ((MarketAgent)myAgent).isDone() )
 		{
 			// DEBUG
-			System.out.println("Market: setting transition to terminate !");
+			System.out.println("Market: setting transition to terminate auction creation request management!");
 			
 			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_TERMINATE;
@@ -69,7 +69,7 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 			this.myFSM.setRequest(mess);
 			
 			// DEBUG
-			System.out.println("Market: setting transition to evaluate request !");
+			System.out.println("Market: setting transition to evaluate auction creation request !");
 			
 			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_EVALUATE_REQUEST;
@@ -77,13 +77,13 @@ public class WaitCreationRequestBehaviour extends OneShotBehaviour
 		else
 		{
 			// DEBUG
-			System.out.println("Market: setting transition to wait request !");
+			System.out.println("Market: setting transition to wait auction creation request !");
 			
 			this.transition = AuctionCreationManagementFSMBehaviour.
 					TRANSITION_TO_WAIT_REQUEST;
 			
 			// DEBUG
-			System.out.println("Market: blocking FSM to wait for messages !");
+			System.out.println("Market: blocking FSM to wait for auction creation request !");
 			
 			// Wait that myAgent receives message
 			this.myFSM.block();
