@@ -340,6 +340,8 @@ public class MarketAgent extends Agent
 		this.auctions.remove(auctionID);
 		this.sellers.remove(auctionID);
 		this.subscribers.remove(auctionID);
+		
+		this.myView.refresh();
 	}
 	
 	/**

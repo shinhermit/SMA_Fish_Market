@@ -39,6 +39,15 @@ public class SellerAgent extends Agent
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
 	
+	/** The amount of time to wait for bids after an announce. */
+	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
+	
+	/** Tells whether the user decided to start the auction or not. */
+	private boolean startCommandReceived = false;
+	
+	/** The default value for the bid waiting duration. */
+	public static final long DEFAULT_BID_WAITING_DURATION = 5000l; // 5 sec
+	
 	/** Allows logging. */
 	private static final Logger LOGGER =
 			Logger.getLogger(SellerAgent.class.getName());
@@ -61,7 +70,7 @@ public class SellerAgent extends Agent
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
-		// AuctionSellerBehaviour is to be added when the first one terminates.		
+		// AuctionSellerBehaviour is to be added when the creation terminates.		
 	}
     
 	/**
@@ -250,5 +259,40 @@ public class SellerAgent extends Agent
 	public void decreasePrice()
 	{
 		this.currentPrice -= this.priceStep;
+	}
+
+	/**
+	 * 
+	 * @return the amount of time to wait for bids after an announce.
+	 */
+	public long getBidWaitingDuration()
+	{
+		return bidWaitingDuration;
+	}
+
+	/**
+	 * 
+	 * @param bidWaitingDuration the amount of time to wait for bids after an announce.
+	 */
+	public void setBidWaitingDuration(long bidWaitingDuration)
+	{
+		this.bidWaitingDuration = Math.abs(bidWaitingDuration);
+	}
+	
+	/**
+	 * Notifies that the user decided to start the auction.
+	 */
+	public void notifyStartAuctionCommand()
+	{
+		this.startCommandReceived = true;
+	}
+	
+	/**
+	 * 
+	 * @return true if a start auction command has been received from the user, false otherwise.
+	 */
+	public boolean isStartCommandReceived()
+	{
+		return this.startCommandReceived;
 	}
 }

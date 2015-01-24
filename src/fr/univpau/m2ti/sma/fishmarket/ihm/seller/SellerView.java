@@ -1,8 +1,15 @@
 package fr.univpau.m2ti.sma.fishmarket.ihm.seller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 
@@ -13,6 +20,7 @@ import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
  *
  */
 public class SellerView extends JFrame
+						implements ActionListener
 {
 	/** The agent for which this view is created. */
 	private SellerAgent myAgent;
@@ -39,19 +47,24 @@ public class SellerView extends JFrame
 	private JSpinner waitBiddurationSpinner;
 	
 	/** Holds the text field which inform about the number of subscribers to the auction. */
-	private JTextField subscriberCountTextField;
+	private JSpinner subscriberCountSpinner;
 	
 	/** Holds the text field which inform about the current price of the auction. */
-	private JTextField currentPriceTextField;
+	private JTextField annoucedPriceTextField;
 	
 	/** Holds the text field which inform about the number of bidders for the current price. */
 	private JTextField bidderCountTextField;
 	
 	/** Holds the text field which inform about the past announced prices. */
-	private JTextField priceHistoryTextField;
+	private JTextField announcedPriceHistoryTextField;
 	
 	/** Holds the text field which inform about the number of bidders for the past announced prices. */
 	private JTextField bidderCountHistoryTextField;
+	
+	/** Holds the text field which inform about the number of bidders for the past announced prices. */
+	private JButton startButton;
+	
+	private static final String START_BUTTON_ACTION_COMMAND = "STRAT_BUTTON_ACTION_COMMAND";
 	
 	/**
 	 * 
@@ -66,6 +79,26 @@ public class SellerView extends JFrame
 	public SellerView(SellerAgent myAgent)
 	{
 		this.myAgent = myAgent;
+		
+		this.instantiateWidgets();
+		
+		this.addListeners();
+		
+		this.assemble();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event)
+	{
+		if(event.getActionCommand().equals(START_BUTTON_ACTION_COMMAND))
+		{
+			this.minPriceSpinner.setEnabled(false);
+			this.maxPriceSpinner.setEnabled(false);
+			
+			this.startButton.setEnabled(false);
+		}
+		
+		this.myAgent.notifyStartAuctionCommand();
 	}
 	
 	/**
@@ -128,8 +161,26 @@ public class SellerView extends JFrame
 	 */
 	public void setSubscriberCount(int subscriberCount)
 	{
-		this.subscriberCountTextField.setText(
-				String.valueOf(subscriberCount));
+		this.subscriberCountSpinner.setValue(
+				subscriberCount);
+	}
+	
+	/**
+	 * Update the UI after a new bid.
+	 * 
+	 * @param bidderCount  the value which is to be display on the field for the number of bids for the last announced price.
+	 */
+	public void notifyNewSubscriber()
+	{
+		int subscriberCount =
+				(int) this.subscriberCountSpinner.getValue();
+		
+		if(subscriberCount == 0)
+		{
+			this.startButton.setEnabled(true);
+		}
+		
+		this.subscriberCountSpinner.setValue(++subscriberCount);
 	}
 	
 	/**
@@ -139,11 +190,11 @@ public class SellerView extends JFrame
 	 */
 	public void notifyNewAnnounce(float price)
 	{
-		this.priceHistoryTextField.setText(
-				this.currentPriceTextField.getText() + "\n" +
-						this.priceHistoryTextField.getText());
+		this.announcedPriceHistoryTextField.setText(
+				this.annoucedPriceTextField.getText() + "\n" +
+						this.announcedPriceHistoryTextField.getText());
 		
-		this.currentPriceTextField.setText(String.valueOf(price));
+		this.annoucedPriceTextField.setText(String.valueOf(price));
 		
 		this.bidderCountHistoryTextField.setText(
 				this.bidderCountTextField.getText() + "\n" +
@@ -156,10 +207,8 @@ public class SellerView extends JFrame
 	
 	/**
 	 * Update the UI after a new bid.
-	 * 
-	 * @param bidderCount  the value which is to be display on the field for the number of bids for the last announced price.
 	 */
-	public void notifyNewBidder(int bidderCount)
+	public void notifyNewBidder()
 	{
 		this.bidderCountTextField.setText(
 				String.valueOf(++this.bidderCount));
@@ -217,5 +266,161 @@ public class SellerView extends JFrame
 	public long getWaitBidDuration()
 	{
 		return (Long) this.waitBiddurationSpinner.getValue();
+	}
+	
+	/**
+	 * Instantiates the dynamic widgets of the view.
+	 */
+	private void instantiateWidgets()
+	{
+		this.minPriceSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(double)this.myAgent.getMaxPrice(),
+						0d,
+						(double)this.myAgent.getMaxPrice()*10,
+						(double)this.myAgent.getMaxPrice()/10
+						)
+				);
+		
+		this.maxPriceSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(double)this.myAgent.getMinPrice(),
+						0d,
+						(double)this.myAgent.getMinPrice()*10,
+						(double)this.myAgent.getMinPrice()/10
+						)
+				);
+		
+		this.startingPriceSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(double)this.myAgent.getCurrentPrice(),
+						0d,
+						(double)this.myAgent.getCurrentPrice()*10,
+						(double)this.myAgent.getCurrentPrice()/10
+						)
+				);
+		
+		this.priceStepSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(double)this.myAgent.getPriceStep(),
+						0d,
+						(double)this.myAgent.getPriceStep()*10,
+						(double)this.myAgent.getPriceStep()/10
+						)
+				);
+		
+		this.minPriceStepSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(double)this.myAgent.getMinPriceStep(),
+						0d,
+						(double)this.myAgent.getMinPriceStep()*10,
+						(double)this.myAgent.getMinPriceStep()/10
+						)
+				);
+		
+		this.waitBiddurationSpinner = new JSpinner(
+				new SpinnerNumberModel(
+						(int)this.myAgent.getBidWaitingDuration(),
+						0,
+						(int)this.myAgent.getBidWaitingDuration()*10,
+						(int)this.myAgent.getBidWaitingDuration()/10
+						)
+				);
+		
+		this.subscriberCountSpinner = new JSpinner(
+				new SpinnerNumberModel(0, 0, 100, 1));
+		this.subscriberCountSpinner.setEnabled(false);
+		
+		
+		this.annoucedPriceTextField = new JTextField();
+		
+		this.bidderCountTextField = new JTextField();
+		
+		this.announcedPriceHistoryTextField = new JTextField();
+		
+		this.bidderCountHistoryTextField = new JTextField();
+		
+		this.startButton = new JButton("Start");
+		this.startButton.setEnabled(false);
+	}
+	
+	/**
+	 * Adds listeners to the dynamic widgets of the view.
+	 */
+	private void addListeners()
+	{
+		this.minPriceSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setMinPrice((float)spinner.getValue());
+					}
+				});
+		
+		this.maxPriceSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setMaxPrice((float)spinner.getValue());
+					}
+				});
+		
+		this.startingPriceSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setCurrentPrice((float)spinner.getValue());
+					}
+				});
+		
+		this.priceStepSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setPriceStep((float)spinner.getValue());
+					}
+				});
+		
+		this.minPriceStepSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setMinPriceStep((float)spinner.getValue());
+					}
+				});
+		
+		this.waitBiddurationSpinner.addChangeListener(
+				new ChangeListener(){
+					@Override
+					public void stateChanged(ChangeEvent e)
+					{
+						JSpinner spinner = (JSpinner) e.getSource();
+						
+						myAgent.setBidWaitingDuration((int)spinner.getValue());
+					}
+				});
+		
+		this.startButton.setActionCommand(START_BUTTON_ACTION_COMMAND);
+		this.startButton.addActionListener(this);
+	}
+	
+	private void assemble()
+	{
+		
 	}
 }
