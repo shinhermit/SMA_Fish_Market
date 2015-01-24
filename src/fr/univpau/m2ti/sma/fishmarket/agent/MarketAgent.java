@@ -342,6 +342,9 @@ public class MarketAgent extends Agent
 		this.subscribers.remove(auctionID);
 	}
 	
+	/**
+	 * Update the view associated with this agent.
+	 */
 	public void refreshView()
 	{
 		this.myView.refresh();
