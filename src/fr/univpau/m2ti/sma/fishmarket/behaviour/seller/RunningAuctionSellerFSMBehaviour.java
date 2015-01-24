@@ -18,24 +18,17 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	/** The id of the conversation of this auction. */
 	private final String conversationId;
 	
-	/** The number of block cycles h=which have been made in order to wait for incoming bids. */
-	private int waitCycleCount = 0;
-	
 	/** The state in which the seller makes an announcement of the current price. */
 	private static final String STATE_ANNONCE_PRICE =
 			"STATE_ANNONCE_PRICE";
 	
 	/** The state in which the seller waits for the first bid. */
-	private static final String STATE_WAIT_FIRST_BID =
-			"STATE_WAIT_FIRST_BID";
+	private static final String STATE_WAIT_BID =
+			"STATE_WAIT_BID";
 	
 	/** The state in which the seller waits for a second bid. */
-	private static final String STATE_WAIT_SECOND_BID =
-			"STATE_WAIT_SECOND_BID";
-	
-	/** The state in which the seller waits for more bids. */
-	private static final String STATE_WAIT_MORE_BID =
-			"STATE_WAIT_MORE_BID";
+	private static final String STATE_HANDLE_MULTIPLE_BID =
+			"STATE_HANDLE_MULTIPLE_BID";
 	
 	/** The state in which the seller send an attribution notification to the selected bidder. */
 	private static final String STATE_SEND_TO_ATTRIBUTE =
@@ -61,10 +54,7 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	public static final int TRANSITION_TO_TERMINATE_CANCEL;
 	
 	/** The code to activate the transition which allows to continue to wait for a first incoming bid. */
-	public static final int TRANSITION_TO_WAIT_FIRST_BID;
-	
-	/** The code to activate the transition which leads to the state to wait for a second bid after the first has been received. */
-	public static final int TRANSITION_TO_WAIT_SECOND_BID;
+	public static final int TRANSITION_TO_HANDLE_MULTIPLE_BID;
 	
 	/** The code to activate the transition which leads to the state which allows to attribute the fish supply. */
 	public static final int TRANSITION_TO_ATTRIBUTE;
@@ -75,9 +65,6 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	/** The code to activate the transition which leads to the state which allows to attribute the fish supply. */
 	public static final int TRANSITION_TO_TERMINATE_SUCCESS;
 	
-	/** The code to activate the transition which leads to the state to wait for more bids. */
-	public static final int TRANSITION_TO_WAIT_MORE_BID;
-	
 	/** The code to activate the transition which leads back to the first state. */
 	public static final int TRANSITION_TO_ANNOUNCE;
 	
@@ -86,9 +73,7 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 		int start = -1;
 		
 		TRANSITION_TO_TERMINATE_CANCEL = ++start;
-		TRANSITION_TO_WAIT_FIRST_BID = ++start;
-		TRANSITION_TO_WAIT_SECOND_BID = ++start;
-		TRANSITION_TO_WAIT_MORE_BID = ++start;
+		TRANSITION_TO_HANDLE_MULTIPLE_BID = ++start;
 		TRANSITION_TO_ATTRIBUTE = ++start;
 		TRANSITION_TO_ANNOUNCE = ++start;
 		TRANSITION_TO_WAIT_TO_PAY = ++start;
@@ -113,16 +98,12 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_ANNONCE_PRICE);
 		
 		this.registerState(
-				new WaitFirstBidBehaviour(mySellerAgent, this),
-				STATE_WAIT_FIRST_BID);
+				new WaitBidBehaviour(mySellerAgent, this),
+				STATE_WAIT_BID);
 		
 		this.registerState(
-				new WaitSecondBidBehaviour(mySellerAgent, this),
-				STATE_WAIT_SECOND_BID);
-		
-		this.registerState(
-				new WaitMoreBidBehaviour(mySellerAgent, this),
-				STATE_WAIT_MORE_BID);
+				new HandleMultipleBidBehaviour(mySellerAgent, this),
+				STATE_HANDLE_MULTIPLE_BID);
 		
 		this.registerState(
 				new AttributeFishSupplyBehaviour(mySellerAgent, this),
@@ -149,34 +130,25 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_TERMINATE_SUCCESS);
 		
 		// Add transitions
-		this.registerDefaultTransition(
-				STATE_ANNONCE_PRICE, STATE_WAIT_FIRST_BID);
+		this.registerDefaultTransition(STATE_ANNONCE_PRICE,
+				STATE_WAIT_BID);
 		
-		this.registerTransition(STATE_WAIT_FIRST_BID,
-				STATE_WAIT_FIRST_BID, TRANSITION_TO_WAIT_FIRST_BID);
-		
-		this.registerTransition(STATE_WAIT_FIRST_BID,
-				STATE_WAIT_SECOND_BID, TRANSITION_TO_WAIT_SECOND_BID);
-		
-		this.registerTransition(STATE_WAIT_FIRST_BID,
+		this.registerTransition(STATE_WAIT_BID,
 				STATE_ANNONCE_PRICE, TRANSITION_TO_ANNOUNCE);
 		
-		this.registerTransition(STATE_WAIT_FIRST_BID,
+		this.registerTransition(STATE_WAIT_BID,
 				STATE_TERMINATE_CANCEL, TRANSITION_TO_TERMINATE_CANCEL);
 		
-		this.registerTransition(STATE_WAIT_SECOND_BID,
-				STATE_WAIT_SECOND_BID, TRANSITION_TO_WAIT_SECOND_BID);
-		
-		this.registerTransition(STATE_WAIT_SECOND_BID,
+		this.registerTransition(STATE_WAIT_BID,
 				STATE_SEND_TO_ATTRIBUTE, TRANSITION_TO_ATTRIBUTE);
 		
-		this.registerTransition(STATE_WAIT_SECOND_BID,
-				STATE_WAIT_MORE_BID, TRANSITION_TO_WAIT_MORE_BID);
+		this.registerTransition(STATE_WAIT_BID,
+				STATE_HANDLE_MULTIPLE_BID, TRANSITION_TO_HANDLE_MULTIPLE_BID);
 		
-		this.registerTransition(STATE_WAIT_MORE_BID,
+		this.registerTransition(STATE_HANDLE_MULTIPLE_BID,
 				STATE_SEND_TO_ATTRIBUTE, TRANSITION_TO_ATTRIBUTE);
 		
-		this.registerTransition(STATE_WAIT_MORE_BID,
+		this.registerTransition(STATE_HANDLE_MULTIPLE_BID,
 				STATE_ANNONCE_PRICE, TRANSITION_TO_ANNOUNCE);
 		
 		this.registerDefaultTransition(
@@ -212,40 +184,5 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 						RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC),
 				MessageTemplate.MatchConversationId(
 						this.conversationId));
-	}
-
-	/**
-	 * 
-	 * @return the number of block cycles h=which have been made in order to wait for incoming bids.
-	 */
-	public int getWaitCycleCount()
-	{
-		return waitCycleCount;
-	}
-
-	/**
-	 * 
-	 * @param waitCycleCount the number of block cycles h=which have been made in order to wait for incoming bids.
-	 */
-	public void setWaitCycleCount(int waitCycleCount)
-	{
-		this.waitCycleCount = waitCycleCount;
-	}
-	
-	/**
-	 * Resets the number of block cycles h=which have been made in order to wait for incoming bids.
-	 */
-	public void resetWaitCycleCount()
-	{
-		this.waitCycleCount = 0;
-	}
-	
-	/**
-	 * Notifies that a new sleep cycle in order to wait for bidders before starting to announce.
-	 * @return the updated number of wait cycles.
-	 */
-	public int notifyNewWaitCycle()
-	{
-		return ++ this.waitCycleCount;
 	}
 }

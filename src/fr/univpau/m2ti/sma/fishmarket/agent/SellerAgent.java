@@ -10,8 +10,10 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.ihm.seller.SellerView;
+import fr.univpau.m2ti.sma.fishmarket.ihm.SellerView;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 
 @SuppressWarnings("serial")
 /**
@@ -43,6 +45,9 @@ public class SellerAgent extends Agent
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
 	
+	/** The default value for the bid waiting duration. */
+	public static final long DEFAULT_BID_WAITING_DURATION = 60*1000l; // 1 min
+	
 	/** The amount of time to wait for bids after an announce. */
 	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
 	
@@ -54,9 +59,6 @@ public class SellerAgent extends Agent
 	
 	/** The view for this seller agent. */
 	private SellerView myView;
-	
-	/** The default value for the bid waiting duration. */
-	public static final long DEFAULT_BID_WAITING_DURATION = 5000l; // 5 sec
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -80,7 +82,7 @@ public class SellerAgent extends Agent
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
-		// AuctionSellerBehaviour is to be added when the creation terminates.
+		// RunningAuctionSellerFSMBehaviour is to be added when the creation terminates.
 		
 		this.myView = new SellerView(this);
 		this.myView.setVisible(true);
@@ -298,6 +300,12 @@ public class SellerAgent extends Agent
 	public void notifyStartCommand()
 	{
 		this.startCommandReceived = true;
+		
+		jade.lang.acl.ACLMessage mess = new jade.lang.acl.ACLMessage(FishMarket.Performatives.TO_SUBSCRIBE);
+		
+		mess.addReceiver(this.getAID());
+		mess.addReceiver(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
+		super.send(mess);
 	}
 	
 	/**

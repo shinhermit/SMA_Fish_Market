@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.ihm.seller;
+package fr.univpau.m2ti.sma.fishmarket.ihm;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -253,7 +253,7 @@ public class SellerView extends JFrame
 	 */
 	public float getMinPrice()
 	{
-		return (Float) this.minPriceSpinner.getValue();
+		return ((Double) this.minPriceSpinner.getValue()).floatValue();
 	}
 	
 	/**
@@ -262,7 +262,7 @@ public class SellerView extends JFrame
 	 */
 	public float getMaxPrice()
 	{
-		return (Float) this.maxPriceSpinner.getValue();
+		return ((Double)this.maxPriceSpinner.getValue()).floatValue();
 	}
 	
 	/**
@@ -271,7 +271,7 @@ public class SellerView extends JFrame
 	 */
 	public float getStartingPrice()
 	{
-		return (Float) this.startingPriceSpinner.getValue();
+		return ((Double) this.startingPriceSpinner.getValue()).floatValue();
 	}
 	
 	/**
@@ -280,7 +280,7 @@ public class SellerView extends JFrame
 	 */
 	public float getPriceStep()
 	{
-		return (Float) this.priceStepSpinner.getValue();
+		return ((Double) this.priceStepSpinner.getValue()).floatValue();
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public class SellerView extends JFrame
 	 */
 	public float getMinPriceStep()
 	{
-		return (Float) this.minPriceStepSpinner.getValue();
+		return ((Double) this.minPriceStepSpinner.getValue()).floatValue();
 	}
 	
 	/**
@@ -298,7 +298,7 @@ public class SellerView extends JFrame
 	 */
 	public long getWaitBidDuration()
 	{
-		return (Long) this.waitingBidDurationSpinner.getValue();
+		return ((Integer) this.waitingBidDurationSpinner.getValue()).intValue();
 	}
 	
 	/**

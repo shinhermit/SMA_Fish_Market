@@ -4,12 +4,11 @@ import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
-import jade.core.behaviours.WakerBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitMoreBidBehaviour extends WakerBehaviour
+public class HandleMultipleBidBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private RunningAuctionSellerFSMBehaviour myFSM;
@@ -17,42 +16,29 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	/** The selected transition to the next state. */
 	private int transition;
 	
-	/** The time to wait for more bid. */
-	public static final long WAIT_MORE_BID_DURATION = 1000l; // 5 sec
-	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
 	 * 
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public WaitMoreBidBehaviour(
+	public HandleMultipleBidBehaviour(
 			SellerAgent mySellerAgent,
 			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent, WAIT_MORE_BID_DURATION);
+		super(mySellerAgent);
 		
 		this.myFSM = myFSM;
 	}
 	
 	@Override
-	public void onWake()
+	public void action()
 	{
 		// DEBUG
 		System.out.println("Seller: wait more bid timeout !");
 		
-		ACLMessage mess = null;
-		
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
-		
-		// Empty message queue
-		do
-		{
-			mess = myAgent.receive(
-					this.getMessageFilter());
-		}
-		while(mess != null);
 		
 		// Select transition
 		float nextPrice = mySellerAgent.getCurrentPrice() + mySellerAgent.getPriceStep();
@@ -121,27 +107,6 @@ public class WaitMoreBidBehaviour extends WakerBehaviour
 	@Override
 	public int onEnd()
 	{
-		// For any future return to this state
-		this.reset(WAIT_MORE_BID_DURATION);
-		
 		return this.transition;
-	}
-	
-	/**
-	 * 
-	 * @return the message filter to use in this behaviour.
-	 */
-	private MessageTemplate getMessageFilter()
-	{
-		SellerAgent mySellerAgent =
-				(SellerAgent) super.myAgent;
-		
-		return MessageTemplate.and(
-				this.myFSM.getMessageFilter(),
-				MessageTemplate.and(
-						MessageTemplate.MatchContent(
-								String.valueOf(mySellerAgent.getCurrentPrice())),
-						MessageTemplate.MatchPerformative(
-								FishMarket.Performatives.TO_BID)));
 	}
 }

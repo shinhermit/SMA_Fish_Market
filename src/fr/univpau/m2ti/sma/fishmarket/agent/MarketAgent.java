@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
-import fr.univpau.m2ti.sma.fishmarket.ihm.seller.MarketView;
+import fr.univpau.m2ti.sma.fishmarket.ihm.MarketView;
 import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")

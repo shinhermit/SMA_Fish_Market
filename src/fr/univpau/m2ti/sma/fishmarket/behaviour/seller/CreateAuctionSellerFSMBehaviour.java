@@ -37,8 +37,8 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 			"STATE_WAIT_RESPONSE";
 	
 	/** The state in which the seller waits that at least one bidder subscribes to his auction. */
-	private static final String STATE_WAIT_BIDDERS =
-			"STATE_WAIT_BIDDERS";
+	private static final String STATE_WAIT_SUBSCRIBERS =
+			"STATE_WAIT_SUBSCRIBERS";
 	
 	/** The state in which the seller end this behaviour and creates the behaviour to participate to his auction. */
 	private static final String STATE_TERMINATE_SUCCESS =
@@ -62,7 +62,7 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 	public static final int TRANSITION_TO_TERMINATE_CANCEL;
 	
 	/** The code which activates the transition to wait for bidders subscriptions. */
-	public static final int TRANSITION_TO_WAIT_BIDDERS;
+	public static final int TRANSITION_TO_WAIT_SUBSCRIBERS;
 	
 	/** The code which activates the transition to try another registration request. */
 	public static final int TRANSITION_TO_REQUEST_CREATION;
@@ -77,7 +77,7 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 		TRANSITION_TO_WAIT_RESPONSE = ++start;
 		TRANSITION_TO_TERMINATE_FAILURE = ++start;
 		TRANSITION_TO_TERMINATE_CANCEL = ++start;
-		TRANSITION_TO_WAIT_BIDDERS = ++start;
+		TRANSITION_TO_WAIT_SUBSCRIBERS = ++start;
 		TRANSITION_TO_REQUEST_CREATION = ++start;
 		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
 	}
@@ -103,8 +103,8 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_WAIT_RESPONSE);
 		
 		this.registerState(
-				new WaitBiddersBehaviour(mySellerAgent, this),
-				STATE_WAIT_BIDDERS);
+				new WaitSubscribersBehaviour(mySellerAgent, this),
+				STATE_WAIT_SUBSCRIBERS);
 		
 		this.registerLastState(
 				new TerminateSuccessBehaviour(mySellerAgent, this),
@@ -136,19 +136,19 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 				TRANSITION_TO_REQUEST_CREATION);
 		
 		this.registerTransition(
-				STATE_WAIT_RESPONSE, STATE_WAIT_BIDDERS,
-				TRANSITION_TO_WAIT_BIDDERS);
+				STATE_WAIT_RESPONSE, STATE_WAIT_SUBSCRIBERS,
+				TRANSITION_TO_WAIT_SUBSCRIBERS);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDERS, STATE_WAIT_BIDDERS,
-				TRANSITION_TO_WAIT_BIDDERS);
+				STATE_WAIT_SUBSCRIBERS, STATE_WAIT_SUBSCRIBERS,
+				TRANSITION_TO_WAIT_SUBSCRIBERS);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDERS, STATE_TERMINATE_CANCEL,
+				STATE_WAIT_SUBSCRIBERS, STATE_TERMINATE_CANCEL,
 				TRANSITION_TO_TERMINATE_CANCEL);
 		
 		this.registerTransition(
-				STATE_WAIT_BIDDERS, STATE_TERMINATE_SUCCESS,
+				STATE_WAIT_SUBSCRIBERS, STATE_TERMINATE_SUCCESS,
 				TRANSITION_TO_TERMINATE_SUCCESS);
 	}
 

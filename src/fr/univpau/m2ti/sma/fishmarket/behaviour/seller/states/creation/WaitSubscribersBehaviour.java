@@ -8,7 +8,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitBiddersBehaviour extends OneShotBehaviour
+public class WaitSubscribersBehaviour extends OneShotBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private CreateAuctionSellerFSMBehaviour myFSM;
@@ -29,7 +29,7 @@ public class WaitBiddersBehaviour extends OneShotBehaviour
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public WaitBiddersBehaviour(
+	public WaitSubscribersBehaviour(
 			SellerAgent mySellerAgent,
 			CreateAuctionSellerFSMBehaviour myFSM)
 	{
@@ -41,21 +41,18 @@ public class WaitBiddersBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		// DEBUG
-		System.out.println("Seller: waiting bidder sleep delay over !");
-		
 		SellerAgent mySellerAgent = (SellerAgent) super.myAgent;
 		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
-				WaitBiddersBehaviour.MESSAGE_FILTER);
+				WaitSubscribersBehaviour.MESSAGE_FILTER);
 		
 		if(mess != null)
 		{
 			mySellerAgent.notifyNewSubscriber();
 			
 			// DEBUG
-			System.out.println("Seller: notifying new bid !");
+			System.out.println("Seller: notifying new subscriber !");
 		}
 		
 		if(mySellerAgent.isStartCommandReceived())
@@ -78,10 +75,10 @@ public class WaitBiddersBehaviour extends OneShotBehaviour
 		else
 		{
 			// DEBUG
-			System.out.println("Seller: setting transition to wait bidders !");
+			System.out.println("Seller: setting transition to wait subscribers !");
 			
 			this.transition =
-					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_BIDDERS;
+					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SUBSCRIBERS;
 			
 			this.myFSM.block();
 		}
