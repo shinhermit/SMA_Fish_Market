@@ -12,7 +12,7 @@ import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 
 /**
- * The view for the market agent.
+ * The view for the market agents.
  * 
  * @author Josuah Aron
  *
