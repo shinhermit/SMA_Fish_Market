@@ -1,13 +1,21 @@
 package fr.univpau.m2ti.sma.fishmarket.ihm.seller;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -26,7 +34,7 @@ public class SellerView extends JFrame
 	private SellerAgent myAgent;
 	
 	/** The number of bidders on the current announced price. */
-	private int bidderCount = 0;
+	private int bidCount = 0;
 	
 	/** Holds the spinner which defines the minimal value for the price. */
 	private JSpinner minPriceSpinner;
@@ -44,26 +52,35 @@ public class SellerView extends JFrame
 	private JSpinner minPriceStepSpinner;
 	
 	/** Holds the spinner which defines the duration of the waiting for bidders. */
-	private JSpinner waitBiddurationSpinner;
+	private JSpinner waitingBidDurationSpinner;
 	
 	/** Holds the text field which inform about the number of subscribers to the auction. */
 	private JSpinner subscriberCountSpinner;
 	
 	/** Holds the text field which inform about the current price of the auction. */
-	private JTextField annoucedPriceTextField;
+	private JLabel announcedPriceLabel;
 	
 	/** Holds the text field which inform about the number of bidders for the current price. */
-	private JTextField bidderCountTextField;
+	private JLabel bidCountLabel;
 	
 	/** Holds the text field which inform about the past announced prices. */
-	private JTextField announcedPriceHistoryTextField;
+	private JLabel announcedPriceHistoryLabel;
 	
 	/** Holds the text field which inform about the number of bidders for the past announced prices. */
-	private JTextField bidderCountHistoryTextField;
+	private JLabel bidderCountHistoryLabel;
+	
+	private JTextField fishSupplyNameTextField;
 	
 	/** Holds the text field which inform about the number of bidders for the past announced prices. */
 	private JButton startButton;
 	
+	/** The default width of the window. */
+	public static final int DEFAULT_WIDTH = 600;
+	
+	/** The default height of the window. */
+	public static final int DEFAULT_HEIGHT = 300;
+
+	/** Action command for the start button click listener (action listener). */
 	private static final String START_BUTTON_ACTION_COMMAND = "STRAT_BUTTON_ACTION_COMMAND";
 	
 	/**
@@ -85,6 +102,11 @@ public class SellerView extends JFrame
 		this.addListeners();
 		
 		this.assemble();
+		
+		this.setTitle("Seller agent: "+this.myAgent.getAID().getLocalName());
+	    this.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	    this.setLocationRelativeTo(null);
+	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	@Override
@@ -96,9 +118,12 @@ public class SellerView extends JFrame
 			this.maxPriceSpinner.setEnabled(false);
 			
 			this.startButton.setEnabled(false);
+			
+			this.myAgent.setFishSupplyName(
+					this.fishSupplyNameTextField.getText());
+			
+			this.myAgent.notifyStartAuctionCommand();
 		}
-		
-		this.myAgent.notifyStartAuctionCommand();
 	}
 	
 	/**
@@ -152,7 +177,7 @@ public class SellerView extends JFrame
 	 */
 	public void setWaitBidDuration(long millis)
 	{
-		this.waitBiddurationSpinner.setValue(millis);
+		this.waitingBidDurationSpinner.setValue(millis);
 	}
 	
 	/**
@@ -168,7 +193,7 @@ public class SellerView extends JFrame
 	/**
 	 * Update the UI after a new bid.
 	 * 
-	 * @param bidderCount  the value which is to be display on the field for the number of bids for the last announced price.
+	 * @param bidCount  the value which is to be display on the field for the number of bids for the last announced price.
 	 */
 	public void notifyNewSubscriber()
 	{
@@ -190,28 +215,28 @@ public class SellerView extends JFrame
 	 */
 	public void notifyNewAnnounce(float price)
 	{
-		this.announcedPriceHistoryTextField.setText(
-				this.annoucedPriceTextField.getText() + "\n" +
-						this.announcedPriceHistoryTextField.getText());
+		this.announcedPriceHistoryLabel.setText(
+				this.announcedPriceLabel.getText() + "\n" +
+						this.announcedPriceHistoryLabel.getText());
 		
-		this.annoucedPriceTextField.setText(String.valueOf(price));
+		this.announcedPriceLabel.setText(String.valueOf(price));
 		
-		this.bidderCountHistoryTextField.setText(
-				this.bidderCountTextField.getText() + "\n" +
-						this.bidderCountHistoryTextField.getText());
+		this.bidderCountHistoryLabel.setText(
+				this.bidCountLabel.getText() + "\n" +
+						this.bidderCountHistoryLabel.getText());
 		
-		this.bidderCount = 0;
+		this.bidCount = 0;
 		
-		this.bidderCountTextField.setText("0");
+		this.bidCountLabel.setText("0");
 	}
 	
 	/**
 	 * Update the UI after a new bid.
 	 */
-	public void notifyNewBidder()
+	public void notifyNewBid()
 	{
-		this.bidderCountTextField.setText(
-				String.valueOf(++this.bidderCount));
+		this.bidCountLabel.setText(
+				String.valueOf(++this.bidCount));
 	}
 	
 	/**
@@ -265,7 +290,7 @@ public class SellerView extends JFrame
 	 */
 	public long getWaitBidDuration()
 	{
-		return (Long) this.waitBiddurationSpinner.getValue();
+		return (Long) this.waitingBidDurationSpinner.getValue();
 	}
 	
 	/**
@@ -318,7 +343,7 @@ public class SellerView extends JFrame
 						)
 				);
 		
-		this.waitBiddurationSpinner = new JSpinner(
+		this.waitingBidDurationSpinner = new JSpinner(
 				new SpinnerNumberModel(
 						(int)this.myAgent.getBidWaitingDuration(),
 						0,
@@ -331,14 +356,15 @@ public class SellerView extends JFrame
 				new SpinnerNumberModel(0, 0, 100, 1));
 		this.subscriberCountSpinner.setEnabled(false);
 		
+		this.fishSupplyNameTextField = new JTextField("Fish supply");
 		
-		this.annoucedPriceTextField = new JTextField();
+		this.announcedPriceLabel = new JLabel();
 		
-		this.bidderCountTextField = new JTextField();
+		this.bidCountLabel = new JLabel();
 		
-		this.announcedPriceHistoryTextField = new JTextField();
+		this.announcedPriceHistoryLabel = new JLabel();
 		
-		this.bidderCountHistoryTextField = new JTextField();
+		this.bidderCountHistoryLabel = new JLabel();
 		
 		this.startButton = new JButton("Start");
 		this.startButton.setEnabled(false);
@@ -404,7 +430,7 @@ public class SellerView extends JFrame
 					}
 				});
 		
-		this.waitBiddurationSpinner.addChangeListener(
+		this.waitingBidDurationSpinner.addChangeListener(
 				new ChangeListener(){
 					@Override
 					public void stateChanged(ChangeEvent e)
@@ -419,8 +445,156 @@ public class SellerView extends JFrame
 		this.startButton.addActionListener(this);
 	}
 	
+	/**
+	 * Assembles the widgets of this view and realises the layout.
+	 */
 	private void assemble()
 	{
+		// Left pane
+		JPanel leftPane = this.createLeftPane();
 		
+		// Right Pane
+		JPanel rightPane = this.createRightPane();
+		
+		// This frame
+		Container windowPane = this.getContentPane();
+		
+		windowPane.setLayout(new BorderLayout(10,0));
+		
+		windowPane.add(leftPane, BorderLayout.WEST);
+		windowPane.add(rightPane, BorderLayout.CENTER);
+	}
+	
+	/**
+	 * View assembly helper.
+	 * 
+	 * @return the left panel of the view.
+	 */
+	private JPanel createLeftPane()
+	{
+		JPanel leftPane = new JPanel();
+		
+		leftPane.setLayout(
+				new BoxLayout(leftPane, BoxLayout.Y_AXIS));
+		
+		// Fish supply pane
+		JPanel fishSupplyPanel = new JPanel();
+		
+		fishSupplyPanel.setBorder(
+				this.createTitleBorder("Fish supply"));
+		
+		fishSupplyPanel.setLayout(new GridLayout(0, 2));
+		
+		fishSupplyPanel.add(new JLabel("Name"));
+		fishSupplyPanel.add(this.fishSupplyNameTextField);
+		
+		// Price configuration
+		JPanel priceConfigPanel = new JPanel();
+		
+		priceConfigPanel.setBorder(
+				this.createTitleBorder("Price"));
+		
+		priceConfigPanel.setLayout(new GridLayout(0, 2));
+		
+		priceConfigPanel.add(new JLabel("Min"));
+		priceConfigPanel.add(this.minPriceSpinner);
+		
+		priceConfigPanel.add(new JLabel("Max"));
+		priceConfigPanel.add(this.maxPriceSpinner);
+		
+		priceConfigPanel.add(new JLabel("Step"));
+		priceConfigPanel.add(this.priceStepSpinner);
+		
+		priceConfigPanel.add(new JLabel("Min step"));
+		priceConfigPanel.add(this.minPriceStepSpinner);
+		
+		// Price configuration
+		JPanel bidWaitingConfigPanel = new JPanel();
+		
+		bidWaitingConfigPanel.setBorder(
+				this.createTitleBorder("Bid waiting"));
+		
+		bidWaitingConfigPanel.setLayout(new GridLayout(0, 2));
+		
+		bidWaitingConfigPanel.add(new JLabel("Timeout"));
+		bidWaitingConfigPanel.add(this.waitingBidDurationSpinner);
+		
+		// Subscription feedback
+		JPanel subscriptionsFeedbackPanel = new JPanel();
+		
+		subscriptionsFeedbackPanel.setBorder(
+				this.createTitleBorder("Subscribers"));
+		
+		subscriptionsFeedbackPanel.setLayout(new GridLayout(0, 2));
+		
+		subscriptionsFeedbackPanel.add(new JLabel("Registered"));
+		subscriptionsFeedbackPanel.add(this.subscriberCountSpinner);
+		
+		// Assemble
+		leftPane.add(fishSupplyPanel);
+		leftPane.add(priceConfigPanel);
+		leftPane.add(bidWaitingConfigPanel);
+		leftPane.add(subscriptionsFeedbackPanel);
+		
+		leftPane.add(this.startButton);
+		
+		return leftPane;
+	}
+	
+	/**
+	 * View assembly helper.
+	 * 
+	 * @return the right panel of the view.
+	 */
+	private JPanel createRightPane()
+	{
+		JPanel rightPane = new JPanel();
+		
+		rightPane.setLayout(new GridLayout(1,2));
+		
+		rightPane.setBorder(
+				this.createTitleBorder("Auction progress"));
+		
+		// Announced price panel
+		JPanel announcedPricePanel = new JPanel();
+		
+		announcedPricePanel.setBorder(
+				this.createTitleBorder("Price"));
+		
+		announcedPricePanel.setLayout(
+				new BoxLayout(announcedPricePanel, BoxLayout.Y_AXIS));
+		
+		announcedPricePanel.add(this.announcedPriceLabel);
+		announcedPricePanel.add(this.announcedPriceHistoryLabel);
+		
+		// Bid count panel
+		JPanel bidCountPanel = new JPanel();
+		
+		bidCountPanel.setBorder(
+				this.createTitleBorder("Bids"));
+		
+		bidCountPanel.setLayout(
+				new BoxLayout(bidCountPanel, BoxLayout.Y_AXIS));
+		
+		bidCountPanel.add(this.bidCountLabel);
+		bidCountPanel.add(this.bidderCountHistoryLabel);
+		
+		// Assemble
+		rightPane.add(announcedPricePanel);
+		rightPane.add(bidCountPanel);
+		
+		return rightPane;
+	}
+	
+	/**
+	 * Allows all panels to have the same style for titles.
+	 * 
+	 * @param title the title of a JPanel.
+	 * 
+	 * @return a title border object.
+	 */
+	private TitledBorder createTitleBorder(String title)
+	{
+		return BorderFactory.createTitledBorder(title);
 	}
 }

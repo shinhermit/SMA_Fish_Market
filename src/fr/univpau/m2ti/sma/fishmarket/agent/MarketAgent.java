@@ -45,6 +45,7 @@ public class MarketAgent extends Agent
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
 	
+	/** The view for this market agent. */
 	private MarketView myView;
 	
 	/** Allows logging. */
@@ -84,7 +85,7 @@ public class MarketAgent extends Agent
         this.myView.setVisible(true);
         
         // DEBUG
-		this.createMarketUsers(6, 20);
+//		this.createMarketUsers(6, 20);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)

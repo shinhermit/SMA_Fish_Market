@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.ihm.seller.SellerView;
 
 @SuppressWarnings("serial")
 /**
@@ -23,6 +24,9 @@ public class SellerAgent extends Agent
 {
 	/** The AID of the market agent. */
 	private AID marketAgentID = null;
+	
+	/** A user friendly name for the auction. */
+	private String fishSupplyName = "";
 	
 	/** The minimal value for the price. */
 	private float minPrice = 200f;
@@ -44,6 +48,9 @@ public class SellerAgent extends Agent
 	
 	/** Tells whether the user decided to start the auction or not. */
 	private boolean startCommandReceived = false;
+	
+	/** The view for this seller agent. */
+	private SellerView myView;
 	
 	/** The default value for the bid waiting duration. */
 	public static final long DEFAULT_BID_WAITING_DURATION = 5000l; // 5 sec
@@ -70,7 +77,10 @@ public class SellerAgent extends Agent
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
-		// AuctionSellerBehaviour is to be added when the creation terminates.		
+		// AuctionSellerBehaviour is to be added when the creation terminates.
+		
+		this.myView = new SellerView(this);
+		this.myView.setVisible(true);
 	}
     
 	/**
@@ -294,5 +304,23 @@ public class SellerAgent extends Agent
 	public boolean isStartCommandReceived()
 	{
 		return this.startCommandReceived;
+	}
+
+	/**
+	 * 
+	 * @return a user friendly name for the auction.
+	 */
+	public String getFishSupplyName()
+	{
+		return fishSupplyName;
+	}
+
+	/**
+	 * 
+	 * @param fishSupplyName a user friendly name for the auction.
+	 */
+	public void setFishSupplyName(String fishSupplyName)
+	{
+		this.fishSupplyName = fishSupplyName;
 	}
 }
