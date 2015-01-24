@@ -49,6 +49,9 @@ public class SellerAgent extends Agent
 	/** Tells whether the user decided to start the auction or not. */
 	private boolean startCommandReceived = false;
 	
+	/** Tells whether the user decided to start the auction or not. */
+	private boolean cancelCommandReceived = false;
+	
 	/** The view for this seller agent. */
 	private SellerView myView;
 	
@@ -292,7 +295,7 @@ public class SellerAgent extends Agent
 	/**
 	 * Notifies that the user decided to start the auction.
 	 */
-	public void notifyStartAuctionCommand()
+	public void notifyStartCommand()
 	{
 		this.startCommandReceived = true;
 	}
@@ -304,6 +307,23 @@ public class SellerAgent extends Agent
 	public boolean isStartCommandReceived()
 	{
 		return this.startCommandReceived;
+	}
+	
+	/**
+	 * Notifies that the user decided to cancel the auction.
+	 */
+	public void notifyCancelCommandReceived()
+	{
+		this.cancelCommandReceived = true;
+	}
+	
+	/**
+	 * 
+	 * @return true if a cancel auction command has been received from the user, false otherwise.
+	 */
+	public boolean isCancelCommandReceived()
+	{
+		return this.cancelCommandReceived;
 	}
 
 	/**
@@ -322,5 +342,13 @@ public class SellerAgent extends Agent
 	public void setFishSupplyName(String fishSupplyName)
 	{
 		this.fishSupplyName = fishSupplyName;
+	}
+	
+	/**
+	 * Notifies that a new bidder agent subscribed to the auction created by this agent.
+	 */
+	public void notifyNewSubscriber()
+	{
+		this.myView.notifyNewSubscriber();
 	}
 }

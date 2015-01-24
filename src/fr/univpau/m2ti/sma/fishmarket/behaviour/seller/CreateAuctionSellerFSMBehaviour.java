@@ -24,9 +24,6 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 	/** The number of request already sent. */
 	private int requestCount = 0;
 	
-	/** The number of cycles made to wait for bidders before starting announcing. */
-	private int waitCycleCount = 0;
-	
 	/** Base filter for filtering messages. */
 	public static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.MatchTopic(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
@@ -199,33 +196,5 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 	public int notifyNewRequest()
 	{
 		return ++this.requestCount;
-	}
-
-	/**
-	 * 
-	 * @return the number of time the agent <i>slept</i> in order to wait for bidders before starting to announce.
-	 */
-	public int getWaitCycleCount()
-	{
-		return waitCycleCount;
-	}
-
-	/**
-	 * 
-	 * @param waitCycleCount the number of time the agent <i>slept</i> in order to wait for bidders before starting to announce.
-	 */
-	public void setWaitCycleCount(int waitCycleCount)
-	{
-		this.waitCycleCount = waitCycleCount;
-	}
-	
-	/**
-	 * Notifies that a new <i>sleep</i> cycle in order to wait for bidders before starting to announce.
-	 * 
-	 * @return the updated number of wait cycles.
-	 */
-	public int notifyNewWaitCycle()
-	{
-		return ++this.waitCycleCount;
 	}
 }

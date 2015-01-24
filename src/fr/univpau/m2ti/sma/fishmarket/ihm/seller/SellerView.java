@@ -118,7 +118,7 @@ public class SellerView extends JFrame
 			this.myAgent.setFishSupplyName(
 					this.fishSupplyNameTextField.getText());
 			
-			this.myAgent.notifyStartAuctionCommand();
+			this.myAgent.notifyStartCommand();
 		}
 	}
 	
