@@ -80,5 +80,8 @@ public class RelayToAnnounceBehaviour extends OneShotBehaviour
 		
 		// delete request
 		this.myFSM.setRequest(null);
+		
+		// Update GUI
+		myMarketAgent.refreshView();
 	}
 }

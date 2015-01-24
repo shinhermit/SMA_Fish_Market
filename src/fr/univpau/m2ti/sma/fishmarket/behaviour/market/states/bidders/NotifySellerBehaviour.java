@@ -62,5 +62,8 @@ public class NotifySellerBehaviour extends OneShotBehaviour
 				myMarketAgent.getSeller(auctionID));
 		
 		myMarketAgent.send(notify);
+		
+		// Update GUI
+		myMarketAgent.refreshView();
 	}
 }

@@ -314,19 +314,19 @@ public class SellerView extends JFrame
 	{
 		this.minPriceSpinner = new JSpinner(
 				new SpinnerNumberModel(
-						(double)this.myAgent.getMaxPrice(),
+						(double)this.myAgent.getMinPrice(),
 						0d,
-						(double)this.myAgent.getMaxPrice()*10,
-						(double)this.myAgent.getMaxPrice()/10
+						(double)this.myAgent.getMinPrice()*10,
+						(double)this.myAgent.getMinPrice()/10
 						)
 				);
 		
 		this.maxPriceSpinner = new JSpinner(
 				new SpinnerNumberModel(
-						(double)this.myAgent.getMinPrice(),
+						(double)this.myAgent.getMaxPrice(),
 						0d,
-						(double)this.myAgent.getMinPrice()*10,
-						(double)this.myAgent.getMinPrice()/10
+						(double)this.myAgent.getMaxPrice()*10,
+						(double)this.myAgent.getMaxPrice()/10
 						)
 				);
 		
@@ -392,7 +392,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setMinPrice((float)spinner.getValue());
+						myAgent.setMinPrice(((Double)spinner.getValue()).floatValue());
 					}
 				});
 		
@@ -403,7 +403,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setMaxPrice((float)spinner.getValue());
+						myAgent.setMaxPrice(((Double)spinner.getValue()).floatValue());
 					}
 				});
 		
@@ -414,7 +414,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setCurrentPrice((float)spinner.getValue());
+						myAgent.setCurrentPrice(((Double)spinner.getValue()).floatValue());
 					}
 				});
 		
@@ -425,7 +425,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setPriceStep((float)spinner.getValue());
+						myAgent.setPriceStep(((Double)spinner.getValue()).floatValue());
 					}
 				});
 		
@@ -436,7 +436,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setMinPriceStep((float)spinner.getValue());
+						myAgent.setMinPriceStep(((Double)spinner.getValue()).floatValue());
 					}
 				});
 		
@@ -447,7 +447,7 @@ public class SellerView extends JFrame
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
 						
-						myAgent.setBidWaitingDuration((int)spinner.getValue());
+						myAgent.setBidWaitingDuration(((Integer)spinner.getValue()).longValue());
 					}
 				});
 		
@@ -701,8 +701,8 @@ public class SellerView extends JFrame
 		 */
 		public void addValue(float price, int bidCount)
 		{
-			prices.add(price);
-			bids.add(bidCount);
+			prices.add(0,price);
+			bids.add(0, bidCount);
 		}
 		
 		/**
