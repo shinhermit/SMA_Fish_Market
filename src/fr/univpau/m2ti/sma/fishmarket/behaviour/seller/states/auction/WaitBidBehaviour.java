@@ -38,6 +38,9 @@ public class WaitBidBehaviour extends WakerBehaviour
 		// DEBUG
 		System.out.println("Seller: checking messages for first bid.");
 		
+		SellerAgent mySellerAgent =
+				(SellerAgent)super.myAgent;
+		
 		// Receive messages
 		ACLMessage mess;
 		
@@ -45,12 +48,14 @@ public class WaitBidBehaviour extends WakerBehaviour
 		
 		do
 		{
-			mess = myAgent.receive(
+			mess = mySellerAgent.receive(
 					this.getMessageFilter());
 			
 			if(mess != null)
 			{
 				++ bidCount;
+				
+				mySellerAgent.notifyNewBid();
 			}
 		}
 		while(mess != null);
@@ -58,9 +63,6 @@ public class WaitBidBehaviour extends WakerBehaviour
 		/** New announce or cancel */
 		if(bidCount == 0)
 		{
-			SellerAgent mySellerAgent =
-					(SellerAgent)super.myAgent;
-			
 			// Either: make new announce with lower price OR cancel
 			float newStep = mySellerAgent.getPriceStep() / 2f;
 			float newPrice = mySellerAgent.getCurrentPrice() - newStep;
@@ -94,8 +96,6 @@ public class WaitBidBehaviour extends WakerBehaviour
 				// DEBUG
 				System.out.println("Seller: setting transition to attribute.");
 				
-				SellerAgent mySellerAgent =
-						(SellerAgent)super.myAgent;
 				
 				// DEBUG
 				System.out.println("Seller: sending rep bid ok.");

@@ -226,11 +226,15 @@ public class SellerView extends JFrame
 			
 			currentAnnounceModel.setValueAt(newPrice, 0, SellerTableModel.PRICE_COLUMN);
 			currentAnnounceModel.setValueAt(0, 0, SellerTableModel.BID_COUNT_COLUMN);
+			
+			historyModel.fireTableDataChanged();
 		}
 		else
 		{
 			currentAnnounceModel.addValue(newPrice);
 		}
+		
+		currentAnnounceModel.fireTableDataChanged();
 	}
 	
 	/**
@@ -245,6 +249,8 @@ public class SellerView extends JFrame
 		
 		currentAnnounceModel.setValueAt(
 				++currentBidCount, 0, SellerTableModel.BID_COUNT_COLUMN);
+		
+		currentAnnounceModel.fireTableDataChanged();
 	}
 	
 	/**

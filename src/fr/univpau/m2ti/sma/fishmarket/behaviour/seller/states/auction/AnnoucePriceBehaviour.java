@@ -59,7 +59,10 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 		// Send
 		mySellerAgent.send(mess);
 		
-		// DEBUG (break point)
-		System.out.println();
+		// Update GUI
+		mySellerAgent.notifyNewAnnounce();
+		
+		// DEBUG
+		System.out.println("Seller: notifying GUI !");
 	}
 }

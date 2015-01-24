@@ -69,4 +69,16 @@ public class FishMarket
 		public static final String TOPIC_RUNNING_AUCTION = 
 				FishMarket.Topics.class.getName()+":TOPIC_RUNNING_AUCTION";
 	}
+	
+	/**
+	 * Represent the command of the user, via the GUI.
+	 * 
+	 * @author Josuah Aron
+	 *
+	 */
+	public static class Commands
+	{
+		/** Start button pushed (start command). */
+		public static final String COMMAND_START = "COMMAND_START";
+	}
 }

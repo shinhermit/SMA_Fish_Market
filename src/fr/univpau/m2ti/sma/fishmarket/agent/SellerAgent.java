@@ -6,6 +6,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -301,9 +302,12 @@ public class SellerAgent extends Agent
 	{
 		this.startCommandReceived = true;
 		
-		jade.lang.acl.ACLMessage mess = new jade.lang.acl.ACLMessage(FishMarket.Performatives.TO_SUBSCRIBE);
+		// Possibly unblock the agent.
+		ACLMessage mess = new ACLMessage(ACLMessage.INFORM);
 		
-		mess.addReceiver(this.getAID());
+		mess.setContent(FishMarket.Commands.COMMAND_START);
+		
+		mess.addReceiver(super.getAID());
 		mess.addReceiver(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		super.send(mess);
 	}
@@ -320,7 +324,7 @@ public class SellerAgent extends Agent
 	/**
 	 * Notifies that the user decided to cancel the auction.
 	 */
-	public void notifyCancelCommandReceived()
+	public void notifyCancelCommand()
 	{
 		this.cancelCommandReceived = true;
 	}
@@ -333,7 +337,15 @@ public class SellerAgent extends Agent
 	{
 		return this.cancelCommandReceived;
 	}
-
+	
+	/**
+	 * Notifies the user that a new announce has been make.
+	 */
+	public void notifyNewAnnounce()
+	{
+		this.myView.notifyNewAnnounce(this.currentPrice);
+	}
+	
 	/**
 	 * 
 	 * @return a user friendly name for the auction.
@@ -358,5 +370,13 @@ public class SellerAgent extends Agent
 	public void notifyNewSubscriber()
 	{
 		this.myView.notifyNewSubscriber();
+	}
+	
+	/**
+	 * Notifies that a new bid for the last announced price.
+	 */
+	public void notifyNewBid()
+	{
+		this.myView.notifyNewBid();
 	}
 }

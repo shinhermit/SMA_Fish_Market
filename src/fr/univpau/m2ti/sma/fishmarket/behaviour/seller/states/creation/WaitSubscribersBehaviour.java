@@ -20,8 +20,14 @@ public class WaitSubscribersBehaviour extends OneShotBehaviour
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
 					CreateAuctionSellerFSMBehaviour.MESSAGE_FILTER,
-					MessageTemplate.MatchPerformative(
-							FishMarket.Performatives.TO_SUBSCRIBE));
+					MessageTemplate.or(
+							MessageTemplate.and(
+									MessageTemplate.MatchContent(
+											String.valueOf(FishMarket.Commands.COMMAND_START)),
+									MessageTemplate.MatchPerformative(
+											ACLMessage.INFORM)),
+							MessageTemplate.MatchPerformative(
+									FishMarket.Performatives.TO_SUBSCRIBE)));
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -49,7 +55,10 @@ public class WaitSubscribersBehaviour extends OneShotBehaviour
 		
 		if(mess != null)
 		{
-			mySellerAgent.notifyNewSubscriber();
+			if(mess.getPerformative() == FishMarket.Performatives.TO_SUBSCRIBE)
+			{
+				mySellerAgent.notifyNewSubscriber();
+			}
 			
 			// DEBUG
 			System.out.println("Seller: notifying new subscriber !");
