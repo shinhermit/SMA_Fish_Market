@@ -22,6 +22,12 @@ public class Auction implements Serializable
 	/** The status of the auction. One of the static fields prefixed with <i>STATUS_</i>.*/
 	private int status;
 	
+	/** A human friendly name. */
+	private String auctionName = "";
+	
+	/** The name of the winner of the auction. */
+	private String winnerName = "";
+	
 	/** Status code which indicates that an auction has been created, but the seller has made no announcement yet. */
 	public static final int STATUS_CREATED;
 	
@@ -187,5 +193,41 @@ public class Auction implements Serializable
 	public void setCurrentPrice(float currentPrice)
 	{
 		this.currentPrice = currentPrice;
+	}
+
+	/**
+	 * 
+	 * @return a human friendly name for the auction.
+	 */
+	public String getAuctionName()
+	{
+		return auctionName;
+	}
+
+	/**
+	 * 
+	 * @param auctionName  a human friendly name for the auction.
+	 */
+	public void setAuctionName(String auctionName)
+	{
+		this.auctionName = auctionName;
+	}
+
+	/**
+	 * 
+	 * @return the name of the winner of the auction, for an auction which successfully ended with an attribution.
+	 */
+	public String getWinnerName()
+	{
+		return winnerName;
+	}
+
+	/**
+	 * 
+	 * @param winnerName the name of the winner of the auction, for an auction which successfully ended with an attribution.
+	 */
+	public void setWinnerName(String winnerName)
+	{
+		this.winnerName = winnerName;
 	}
 }

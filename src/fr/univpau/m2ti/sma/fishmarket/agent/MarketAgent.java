@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.ihm.seller.MarketView;
 import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")
@@ -43,6 +44,8 @@ public class MarketAgent extends Agent
 	
 	/** Tells whether this agent has ended it's task or not. */
 	private boolean isDone = false;
+	
+	private MarketView myView;
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -73,11 +76,15 @@ public class MarketAgent extends Agent
         // Add behaviours
         this.addBehaviour(new BidderSubscriptionMarketFSMBehaviour(this));
         this.addBehaviour(new CreateAuctionMarketFSMBehaviour(this));
-        // Auction management behaviour are add by SellerManagementBehaviour
-        // sub-behaviour (confirm auction registration behaviour)
-
+        /** Auction management behaviours are add by SellerManagementBehaviour
+              sub-behaviour (confirm auction registration behaviour) **/
+        
+        // Agent view
+        this.myView = new MarketView(this);
+        this.myView.setVisible(true);
+        
         // DEBUG
-		this.createMarketUsers(1, 2);
+		this.createMarketUsers(6, 20);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)
@@ -180,6 +187,8 @@ public class MarketAgent extends Agent
 			this.auctions.put(auctionID, auction);
 			this.sellers.put(auctionID, seller);
 			this.subscribers.put(auctionID, new HashSet<AID>());
+			
+			this.myView.refresh();
 		}
 		else
 		{
