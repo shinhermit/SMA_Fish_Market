@@ -5,6 +5,8 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -12,12 +14,15 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
 
@@ -32,9 +37,6 @@ public class SellerView extends JFrame
 {
 	/** The agent for which this view is created. */
 	private SellerAgent myAgent;
-	
-	/** The number of bidders on the current announced price. */
-	private int bidCount = 0;
 	
 	/** Holds the spinner which defines the minimal value for the price. */
 	private JSpinner minPriceSpinner;
@@ -57,17 +59,11 @@ public class SellerView extends JFrame
 	/** Holds the text field which inform about the number of subscribers to the auction. */
 	private JSpinner subscriberCountSpinner;
 	
-	/** Holds the text field which inform about the current price of the auction. */
-	private JLabel announcedPriceLabel;
+	/** Holds the table which inform about the last announced price of the auction and the number of bid for this announce. */
+	private JTable currentAnnounceTable;
 	
-	/** Holds the text field which inform about the number of bidders for the current price. */
-	private JLabel bidCountLabel;
-	
-	/** Holds the text field which inform about the past announced prices. */
-	private JLabel announcedPriceHistoryLabel;
-	
-	/** Holds the text field which inform about the number of bidders for the past announced prices. */
-	private JLabel bidderCountHistoryLabel;
+	/** Holds the table which inform about the past announced prices of the auction and the number of bids for these announces. */
+	private JTable announceHistoryTable;
 	
 	private JTextField fishSupplyNameTextField;
 	
@@ -213,21 +209,28 @@ public class SellerView extends JFrame
 	 * 
 	 * @param price  the value which is to be display on the field for the last announce price. 
 	 */
-	public void notifyNewAnnounce(float price)
+	public void notifyNewAnnounce(float newPrice)
 	{
-		this.announcedPriceHistoryLabel.setText(
-				this.announcedPriceLabel.getText() + "\n" +
-						this.announcedPriceHistoryLabel.getText());
+		SellerTableModel historyModel =
+				(SellerTableModel) this.announceHistoryTable.getModel();
 		
-		this.announcedPriceLabel.setText(String.valueOf(price));
+		SellerTableModel currentAnnounceModel =
+				(SellerTableModel) this.currentAnnounceTable.getModel();
 		
-		this.bidderCountHistoryLabel.setText(
-				this.bidCountLabel.getText() + "\n" +
-						this.bidderCountHistoryLabel.getText());
-		
-		this.bidCount = 0;
-		
-		this.bidCountLabel.setText("0");
+		if(currentAnnounceModel.getRowCount() == 1)
+		{
+			Float currentPrice = (Float) currentAnnounceModel.getValueAt(0, 0);
+			Integer currentBidCount = (Integer) currentAnnounceModel.getValueAt(0, 1);
+			
+			historyModel.addValue(currentPrice, currentBidCount);
+			
+			currentAnnounceModel.setValueAt(newPrice, 0, SellerTableModel.PRICE_COLUMN);
+			currentAnnounceModel.setValueAt(0, 0, SellerTableModel.BID_COUNT_COLUMN);
+		}
+		else
+		{
+			currentAnnounceModel.addValue(newPrice);
+		}
 	}
 	
 	/**
@@ -235,8 +238,13 @@ public class SellerView extends JFrame
 	 */
 	public void notifyNewBid()
 	{
-		this.bidCountLabel.setText(
-				String.valueOf(++this.bidCount));
+		SellerTableModel currentAnnounceModel =
+				(SellerTableModel) this.currentAnnounceTable.getModel();
+		
+		Integer currentBidCount = (Integer) currentAnnounceModel.getValueAt(0, SellerTableModel.BID_COUNT_COLUMN);
+		
+		currentAnnounceModel.setValueAt(
+				++currentBidCount, 0, SellerTableModel.BID_COUNT_COLUMN);
 	}
 	
 	/**
@@ -358,13 +366,9 @@ public class SellerView extends JFrame
 		
 		this.fishSupplyNameTextField = new JTextField("Fish supply");
 		
-		this.announcedPriceLabel = new JLabel();
+		this.currentAnnounceTable = new JTable(new SellerTableModel());
 		
-		this.bidCountLabel = new JLabel();
-		
-		this.announcedPriceHistoryLabel = new JLabel();
-		
-		this.bidderCountHistoryLabel = new JLabel();
+		this.announceHistoryTable = new JTable(new SellerTableModel());
 		
 		this.startButton = new JButton("Start");
 		this.startButton.setEnabled(false);
@@ -550,38 +554,44 @@ public class SellerView extends JFrame
 	{
 		JPanel rightPane = new JPanel();
 		
-		rightPane.setLayout(new GridLayout(1,2));
+		rightPane.setLayout(
+				new BoxLayout(rightPane, BoxLayout.Y_AXIS));
 		
 		rightPane.setBorder(
 				this.createTitleBorder("Auction progress"));
 		
-		// Announced price panel
-		JPanel announcedPricePanel = new JPanel();
+		// Current announce price panel
+		JPanel currentAnnouncePanel = new JPanel();
 		
-		announcedPricePanel.setBorder(
-				this.createTitleBorder("Price"));
+		currentAnnounceTable.setSize(currentAnnouncePanel.getWidth(), 100);
 		
-		announcedPricePanel.setLayout(
-				new BoxLayout(announcedPricePanel, BoxLayout.Y_AXIS));
+		currentAnnouncePanel.setBorder(
+				this.createTitleBorder("Current announce"));
 		
-		announcedPricePanel.add(this.announcedPriceLabel);
-		announcedPricePanel.add(this.announcedPriceHistoryLabel);
+		currentAnnouncePanel.setLayout(
+				new BoxLayout(currentAnnouncePanel, BoxLayout.Y_AXIS));
 		
-		// Bid count panel
-		JPanel bidCountPanel = new JPanel();
+		currentAnnouncePanel.add(this.currentAnnounceTable.getTableHeader());
+		currentAnnouncePanel.add(this.currentAnnounceTable);
 		
-		bidCountPanel.setBorder(
-				this.createTitleBorder("Bids"));
+		// Current announce price panel
+		JPanel announceHistoryPanel = new JPanel();
 		
-		bidCountPanel.setLayout(
-				new BoxLayout(bidCountPanel, BoxLayout.Y_AXIS));
+		announceHistoryPanel.setBorder(
+				this.createTitleBorder("History"));
 		
-		bidCountPanel.add(this.bidCountLabel);
-		bidCountPanel.add(this.bidderCountHistoryLabel);
+		JScrollPane scrollPane = new JScrollPane(this.announceHistoryTable);
+		
+//		this.announceHistoryTable.setFillsViewportHeight(true);
+		
+		announceHistoryPanel.setLayout(
+				new BoxLayout(announceHistoryPanel, BoxLayout.Y_AXIS));
+		
+		announceHistoryPanel.add(scrollPane);
 		
 		// Assemble
-		rightPane.add(announcedPricePanel);
-		rightPane.add(bidCountPanel);
+		rightPane.add(currentAnnouncePanel);
+		rightPane.add(announceHistoryPanel);
 		
 		return rightPane;
 	}
@@ -596,5 +606,108 @@ public class SellerView extends JFrame
 	private TitledBorder createTitleBorder(String title)
 	{
 		return BorderFactory.createTitledBorder(title);
+	}
+	
+	/**
+	 * Presenter for the auction progress table view (JTable).
+	 * 
+	 * @author Josuah Aron
+	 *
+	 */
+	private static class SellerTableModel  extends AbstractTableModel
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8031870852112649553L;
+
+		/** The announced prices. */
+		private List<Float> prices =
+				new ArrayList<Float>();
+		
+		/** The number of bids for the announced prices. */
+		private List<Integer> bids =
+				new ArrayList<Integer>();
+		
+		/** The names of the columns of the table. */
+		private static final String [] COLUMN_NAMES= new String [] {
+				"Price",
+				"Bids"
+		};
+		
+		/** The index of the column for the prices. */
+		public static final int PRICE_COLUMN = 0;
+		
+		/** The index of the column for the number of bids. */
+		public static final int BID_COUNT_COLUMN = 1;
+		
+		@Override
+		public int getColumnCount()
+		{
+			return COLUMN_NAMES.length;
+		}
+
+		@Override
+		public int getRowCount()
+		{
+			return prices.size();
+		}
+		
+		@Override
+		public String getColumnName(int column)
+		{
+			return SellerTableModel.COLUMN_NAMES[column];
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex)
+		{
+			if(columnIndex == PRICE_COLUMN)
+			{
+				return prices.get(rowIndex);
+			}
+			else
+			{
+				return bids.get(rowIndex);
+			}
+		}
+		
+		@Override
+		public void setValueAt(Object aValue,
+	              int rowIndex,
+	              int columnIndex)
+		{
+			if(columnIndex == PRICE_COLUMN)
+			{
+				prices.set(rowIndex, (Float)aValue);
+			}
+			else
+			{
+				bids.set(rowIndex, (Integer)aValue);
+			}
+		}
+		
+		/**
+		 * Inserts a row.
+		 * 
+		 * @param price the announce price.
+		 * @param bidCount the initial number of bids for this announce. 
+		 */
+		public void addValue(float price, int bidCount)
+		{
+			prices.add(price);
+			bids.add(bidCount);
+		}
+		
+		/**
+		 * Inserts a row.
+		 * 
+		 * @param price the announce price.
+		 * @param bidCount the initial number of bids for this announce. 
+		 */
+		public void addValue(float price)
+		{
+			this.addValue(price, 0);
+		}
 	}
 }
