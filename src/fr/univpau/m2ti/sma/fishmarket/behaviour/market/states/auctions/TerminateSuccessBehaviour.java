@@ -39,7 +39,12 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		MarketAgent myMarketAgent =
 				(MarketAgent) super.myAgent;
 		
-		myMarketAgent.deleteAuction(this.myFSM.getAuctionId());
+//		myMarketAgent.deleteAuction(this.myFSM.getAuctionId());
+		
+		// Update GUI
+		myMarketAgent.refreshView();
+		
+		myMarketAgent.removeBehaviour(this);
 		
 		// Say bye !
 	}

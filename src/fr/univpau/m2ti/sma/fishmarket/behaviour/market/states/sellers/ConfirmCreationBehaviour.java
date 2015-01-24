@@ -65,6 +65,9 @@ public class ConfirmCreationBehaviour extends OneShotBehaviour
 		myMarketAgent.send(reply);
 		
 		// Delete request
-		this.myFSM.setRequest(null);		
+		this.myFSM.setRequest(null);
+		
+		// Update GUI
+		myMarketAgent.refreshView();
 	}
 }

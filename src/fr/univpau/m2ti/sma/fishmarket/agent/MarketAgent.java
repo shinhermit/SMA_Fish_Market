@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
-import fr.univpau.m2ti.sma.fishmarket.ihm.seller.MarketView;
+import fr.univpau.m2ti.sma.fishmarket.ihm.MarketView;
 import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")
@@ -85,7 +85,7 @@ public class MarketAgent extends Agent
         this.myView.setVisible(true);
         
         // DEBUG
-//		this.createMarketUsers(6, 20);
+		this.createMarketUsers(0, 0);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)

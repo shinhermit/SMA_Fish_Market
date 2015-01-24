@@ -6,12 +6,15 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.ihm.seller.SellerView;
+import fr.univpau.m2ti.sma.fishmarket.ihm.SellerView;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 
 @SuppressWarnings("serial")
 /**
@@ -43,17 +46,20 @@ public class SellerAgent extends Agent
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
 	
+	/** The default value for the bid waiting duration. */
+	public static final long DEFAULT_BID_WAITING_DURATION = 60*1000l; // 1 min
+	
 	/** The amount of time to wait for bids after an announce. */
 	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
 	
 	/** Tells whether the user decided to start the auction or not. */
 	private boolean startCommandReceived = false;
 	
+	/** Tells whether the user decided to start the auction or not. */
+	private boolean cancelCommandReceived = false;
+	
 	/** The view for this seller agent. */
 	private SellerView myView;
-	
-	/** The default value for the bid waiting duration. */
-	public static final long DEFAULT_BID_WAITING_DURATION = 5000l; // 5 sec
 	
 	/** Allows logging. */
 	private static final Logger LOGGER =
@@ -77,7 +83,7 @@ public class SellerAgent extends Agent
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
-		// AuctionSellerBehaviour is to be added when the creation terminates.
+		// RunningAuctionSellerFSMBehaviour is to be added when the creation terminates.
 		
 		this.myView = new SellerView(this);
 		this.myView.setVisible(true);
@@ -292,9 +298,18 @@ public class SellerAgent extends Agent
 	/**
 	 * Notifies that the user decided to start the auction.
 	 */
-	public void notifyStartAuctionCommand()
+	public void notifyStartCommand()
 	{
 		this.startCommandReceived = true;
+		
+		// Possibly unblock the agent.
+		ACLMessage mess = new ACLMessage(ACLMessage.INFORM);
+		
+		mess.setContent(FishMarket.Commands.COMMAND_START);
+		
+		mess.addReceiver(super.getAID());
+		mess.addReceiver(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
+		super.send(mess);
 	}
 	
 	/**
@@ -305,7 +320,32 @@ public class SellerAgent extends Agent
 	{
 		return this.startCommandReceived;
 	}
-
+	
+	/**
+	 * Notifies that the user decided to cancel the auction.
+	 */
+	public void notifyCancelCommand()
+	{
+		this.cancelCommandReceived = true;
+	}
+	
+	/**
+	 * 
+	 * @return true if a cancel auction command has been received from the user, false otherwise.
+	 */
+	public boolean isCancelCommandReceived()
+	{
+		return this.cancelCommandReceived;
+	}
+	
+	/**
+	 * Notifies the user that a new announce has been make.
+	 */
+	public void notifyNewAnnounce()
+	{
+		this.myView.notifyNewAnnounce(this.currentPrice);
+	}
+	
 	/**
 	 * 
 	 * @return a user friendly name for the auction.
@@ -322,5 +362,21 @@ public class SellerAgent extends Agent
 	public void setFishSupplyName(String fishSupplyName)
 	{
 		this.fishSupplyName = fishSupplyName;
+	}
+	
+	/**
+	 * Notifies that a new bidder agent subscribed to the auction created by this agent.
+	 */
+	public void notifyNewSubscriber()
+	{
+		this.myView.notifyNewSubscriber();
+	}
+	
+	/**
+	 * Notifies that a new bid for the last announced price.
+	 */
+	public void notifyNewBid()
+	{
+		this.myView.notifyNewBid();
 	}
 }

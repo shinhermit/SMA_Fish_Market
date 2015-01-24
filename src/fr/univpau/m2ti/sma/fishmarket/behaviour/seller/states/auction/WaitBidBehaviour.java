@@ -1,6 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.seller.states.auction;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.RunningAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.WakerBehaviour;
@@ -8,7 +9,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
-public class WaitFirstBidBehaviour extends WakerBehaviour
+public class WaitBidBehaviour extends WakerBehaviour
 {
 	/** The FSM behaviour to which this behaviour is to be added. */
 	private RunningAuctionSellerFSMBehaviour myFSM;
@@ -16,23 +17,17 @@ public class WaitFirstBidBehaviour extends WakerBehaviour
 	/** The selected transition to the next state. */
 	private int transition;
 	
-	/** The time to wait for the first bid. */
-	private static final long WAIT_FIRST_BID_CYCLE_DURATION = 1000l; // 1 sec
-	
-	/** The time to wait for the first bid. */
-	private static final int WAIT_FIRST_MAX_CYCLE_COUNT = 10*60; // to reach 10 min
-	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
 	 * 
 	 * @param mySellerAgent the seller agent to which the FSM is to be added.
 	 * @param myFSM the FSM behaviour to which this behaviour is to be added.
 	 */
-	public WaitFirstBidBehaviour(
+	public WaitBidBehaviour(
 			SellerAgent mySellerAgent,
 			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent, WAIT_FIRST_BID_CYCLE_DURATION);
+		super(mySellerAgent, mySellerAgent.getBidWaitingDuration());
 		
 		this.myFSM = myFSM;
 	}
@@ -40,42 +35,34 @@ public class WaitFirstBidBehaviour extends WakerBehaviour
 	@Override
 	public void onWake()
 	{
-		this.myFSM.notifyNewWaitCycle();
-		
 		// DEBUG
 		System.out.println("Seller: checking messages for first bid.");
 		
-		// Receive messages
-		ACLMessage mess = myAgent.receive(
-				this.getMessageFilter());
+		SellerAgent mySellerAgent =
+				(SellerAgent)super.myAgent;
 		
-		if(mess != null)
+		// Receive messages
+		ACLMessage mess;
+		
+		int bidCount = 0;
+		
+		do
 		{
-			this.myFSM.resetWaitCycleCount();
+			mess = mySellerAgent.receive(
+					this.getMessageFilter());
 			
-			// DEBUG
-			System.out.println("Seller: setting transition to wait second bid.");
-			
-			this.transition =
-					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SECOND_BID;
+			if(mess != null)
+			{
+				++ bidCount;
+				
+				mySellerAgent.notifyNewBid();
+			}
 		}
-		else if(this.myFSM.getWaitCycleCount() <
-					WAIT_FIRST_MAX_CYCLE_COUNT)
+		while(mess != null);
+		
+		/** New announce or cancel */
+		if(bidCount == 0)
 		{
-			// DEBUG
-			System.out.println("Seller: setting transition to wait first bid.");
-			
-			// Continue to wait
-			this.transition =
-					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_FIRST_BID;
-		}
-		else
-		{
-			this.myFSM.resetWaitCycleCount();
-			
-			SellerAgent mySellerAgent =
-					(SellerAgent)super.myAgent;
-			
 			// Either: make new announce with lower price OR cancel
 			float newStep = mySellerAgent.getPriceStep() / 2f;
 			float newPrice = mySellerAgent.getCurrentPrice() - newStep;
@@ -101,13 +88,65 @@ public class WaitFirstBidBehaviour extends WakerBehaviour
 						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
 			}
 		}
+		else
+		{
+			/** Attribute */
+			if(bidCount == 1)
+			{
+				// DEBUG
+				System.out.println("Seller: setting transition to attribute.");
+				
+				
+				// DEBUG
+				System.out.println("Seller: sending rep bid ok.");
+				
+				// send rep_bid(OK)
+				ACLMessage reply = new ACLMessage(
+						FishMarket.Performatives.REP_BID);
+				
+				// Receiver
+				reply.addReceiver(
+						mySellerAgent.getMarketAgent());
+				
+				// Set topic
+				reply.addReceiver(
+						RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
+				
+				// Set conversation id
+				reply.setConversationId(
+						this.myFSM.getConversationId());
+				
+				// Add price and send
+				reply.setContent(String.valueOf(true));
+				
+				// Send
+				mySellerAgent.send(reply);
+				
+				this.transition =
+						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ATTRIBUTE;
+			}
+			
+			/** Multiple bid decision */
+			else
+			{
+				// DEBUG
+				System.out.println("Seller: setting transition to send rep bid nok.");
+				
+				// Continue to wait
+				this.transition =
+						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_HANDLE_MULTIPLE_BID;
+			}
+		}
 	}
 	
 	@Override
 	public int onEnd()
 	{
+		SellerAgent mySellerAgent =
+				(SellerAgent) super.myAgent;
+		
 		// For any future return to this state
-		this.reset(WAIT_FIRST_BID_CYCLE_DURATION);
+		this.reset(mySellerAgent.getBidWaitingDuration());
 		
 		return this.transition;
 	}

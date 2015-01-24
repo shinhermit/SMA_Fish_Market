@@ -63,10 +63,10 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 			{
 				this.transition =
 						CreateAuctionSellerFSMBehaviour
-						.TRANSITION_TO_WAIT_BIDDERS;
+						.TRANSITION_TO_WAIT_SUBSCRIBERS;
 				
 				// DEBUG
-				System.out.println("Seller: setting transition to wait bidders !");
+				System.out.println("Seller: setting transition to wait subscribers !");
 			}
 			else
 			{
