@@ -192,20 +192,19 @@ public class SellerView extends JFrame
 	
 	/**
 	 * Update the UI after a new bid.
-	 * 
-	 * @param bidCount  the value which is to be display on the field for the number of bids for the last announced price.
+	 *
 	 */
 	public void notifyNewSubscriber()
 	{
-		int subscriberCount =
-				(int) this.subscriberCountSpinner.getValue();
-		
-		if(subscriberCount == 0)
-		{
-			this.startButton.setEnabled(true);
-		}
-		
-		this.subscriberCountSpinner.setValue(++subscriberCount);
+//		int subscriberCount =
+//				(int) this.subscriberCountSpinner.getValue();
+//
+//		if(subscriberCount == 0)
+//		{
+//			this.startButton.setEnabled(true);
+//		}
+//
+//		this.subscriberCountSpinner.setValue(++subscriberCount);
 	}
 	
 	/**
@@ -381,68 +380,68 @@ public class SellerView extends JFrame
 					public void stateChanged(ChangeEvent e)
 					{
 						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setMinPrice((float)spinner.getValue());
+
+					//	myAgent.setMinPrice((float)spinner.getValue());
 					}
 				});
-		
-		this.maxPriceSpinner.addChangeListener(
-				new ChangeListener(){
-					@Override
-					public void stateChanged(ChangeEvent e)
-					{
-						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setMaxPrice((float)spinner.getValue());
-					}
-				});
-		
-		this.startingPriceSpinner.addChangeListener(
-				new ChangeListener(){
-					@Override
-					public void stateChanged(ChangeEvent e)
-					{
-						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setCurrentPrice((float)spinner.getValue());
-					}
-				});
-		
-		this.priceStepSpinner.addChangeListener(
-				new ChangeListener(){
-					@Override
-					public void stateChanged(ChangeEvent e)
-					{
-						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setPriceStep((float)spinner.getValue());
-					}
-				});
-		
-		this.minPriceStepSpinner.addChangeListener(
-				new ChangeListener(){
-					@Override
-					public void stateChanged(ChangeEvent e)
-					{
-						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setMinPriceStep((float)spinner.getValue());
-					}
-				});
-		
-		this.waitingBidDurationSpinner.addChangeListener(
-				new ChangeListener(){
-					@Override
-					public void stateChanged(ChangeEvent e)
-					{
-						JSpinner spinner = (JSpinner) e.getSource();
-						
-						myAgent.setBidWaitingDuration((int)spinner.getValue());
-					}
-				});
-		
-		this.startButton.setActionCommand(START_BUTTON_ACTION_COMMAND);
-		this.startButton.addActionListener(this);
+//
+//		this.maxPriceSpinner.addChangeListener(
+//				new ChangeListener(){
+//					@Override
+//					public void stateChanged(ChangeEvent e)
+//					{
+//						JSpinner spinner = (JSpinner) e.getSource();
+//
+//						myAgent.setMaxPrice((float)spinner.getValue());
+//					}
+//				});
+//
+//		this.startingPriceSpinner.addChangeListener(
+//				new ChangeListener(){
+//					@Override
+//					public void stateChanged(ChangeEvent e)
+//					{
+//						JSpinner spinner = (JSpinner) e.getSource();
+//
+//						myAgent.setCurrentPrice((float)spinner.getValue());
+//					}
+//				});
+//
+//		this.priceStepSpinner.addChangeListener(
+//				new ChangeListener(){
+//					@Override
+//					public void stateChanged(ChangeEvent e)
+//					{
+//						JSpinner spinner = (JSpinner) e.getSource();
+//
+//						myAgent.setPriceStep((float)spinner.getValue());
+//					}
+//				});
+//
+//		this.minPriceStepSpinner.addChangeListener(
+//				new ChangeListener(){
+//					@Override
+//					public void stateChanged(ChangeEvent e)
+//					{
+//						JSpinner spinner = (JSpinner) e.getSource();
+//
+//						myAgent.setMinPriceStep((float)spinner.getValue());
+//					}
+//				});
+//
+//		this.waitingBidDurationSpinner.addChangeListener(
+//				new ChangeListener(){
+//					@Override
+//					public void stateChanged(ChangeEvent e)
+//					{
+//						JSpinner spinner = (JSpinner) e.getSource();
+//
+//						myAgent.setBidWaitingDuration((int)spinner.getValue());
+//					}
+//				});
+//
+//		this.startButton.setActionCommand(START_BUTTON_ACTION_COMMAND);
+//		this.startButton.addActionListener(this);
 	}
 	
 	/**
