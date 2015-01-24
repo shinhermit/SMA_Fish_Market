@@ -341,6 +341,11 @@ public class MarketAgent extends Agent
 		this.sellers.remove(auctionID);
 		this.subscribers.remove(auctionID);
 	}
+	
+	public void refreshView()
+	{
+		this.myView.refresh();
+	}
     
     /**
      * Add a description of this agent's services to the DF.

@@ -39,6 +39,11 @@ public class MarketView extends JFrame
 	 */
 	private static final long serialVersionUID = 1837117931407701695L;
 	
+	/**
+	 * A view for market agents.
+	 * 
+	 * @param myAgent the market agent for which the view is defined.
+	 */
 	public MarketView(MarketAgent myAgent)
 	{
 		this.myAgent = myAgent;
@@ -61,6 +66,9 @@ public class MarketView extends JFrame
 		this.getContentPane().add(scrollPane);
 	}
 	
+	/**
+	 * Updates the display.
+	 */
 	public void refresh()
 	{
 		this.tableViewModel.fireTableDataChanged();
