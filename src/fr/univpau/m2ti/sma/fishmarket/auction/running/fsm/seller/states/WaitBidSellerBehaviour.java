@@ -69,8 +69,6 @@ public class WaitBidSellerBehaviour extends WakerBehaviour
 		
 		if(timeout)// || bidCount == mySellerAgent.getSubscriberCount())
 		{
-			this.myFSM.resetWaitCycleCount();
-			
 			/** Either: make new announce with lower price OR cancel */
 			if(bidCount == 0)
 			{
