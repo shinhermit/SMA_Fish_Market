@@ -24,6 +24,14 @@ public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
 
     private BidderBehaviour myFSM;
 
+    private boolean firstAnnounce = true;
+
+    private static String AUCTION_START =
+            "Auction start";
+
+    private static String ENTERED_AUCTION =
+            "Entered auction";
+
     /** Allows filtering incoming messages. */
     private static final MessageTemplate MESSAGE_FILTER =
             MessageTemplate.and(
@@ -52,6 +60,10 @@ public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
     {
         super(a);
         this.myFSM = fsm;
+
+        //Display enter message
+        ((BidderAgent)a).displayBidInformation(ENTERED_AUCTION);
+
     }
 
     @Override
@@ -71,6 +83,11 @@ public class InitialOrAfterFailedBidBehaviour extends OneShotBehaviour
             if (mess.getPerformative() == FishMarket.Performatives.TO_ANNOUNCE)
             {
                 this.transition = BidderBehaviour.TRANSITION_RECEIVED_FIRST_ANNOUNCE;
+                if (this.firstAnnounce)
+                {
+                    this.firstAnnounce = false;
+                    bidderAgent.displayBidInformation(AUCTION_START);
+                }
             }
             else if (mess.getPerformative() == FishMarket.Performatives.TO_CANCEL)
             {

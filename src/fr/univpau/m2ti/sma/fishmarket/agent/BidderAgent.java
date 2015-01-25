@@ -38,6 +38,8 @@ public class BidderAgent extends Agent
 
 	private float maxPrice;
 
+
+
 	private static final String NO_MARKET_AVAILABLE =
 			"Market agent couldn't be located.";
 
@@ -89,6 +91,18 @@ public class BidderAgent extends Agent
 		this.addBehaviour(this.subscribeToAuctionFSM);
 
 	}
+
+
+	public void displayAlert(String message)
+	{
+		this.bidderView.alert(message);
+	}
+
+	public void displayAuctionInformation(String message)
+	{
+		this.bidderView.addBidInformation(message);
+	}
+
 
 
 	/**
@@ -151,6 +165,9 @@ public class BidderAgent extends Agent
 				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
 		);
 		userBidMessage.addReceiver(this.getAID());
+
+		this.bidderView.disableBidButton();
+
 		this.send(userBidMessage);
 	}
 

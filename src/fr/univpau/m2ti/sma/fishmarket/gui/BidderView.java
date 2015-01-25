@@ -4,6 +4,8 @@ import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -24,14 +26,8 @@ public class BidderView
     private JCheckBox autoBidCheckBox;
     private JTextField maximumPriceTextField;
 
-    private static String AUCTION_START_TEXT =
-            "Début de l'enchère";
-
-    private static String AUCTION_BID_SENT =
-            "Bid envoyé";
-
     private static String AUTO_BID_MAX_PRICE_NOT_SET =
-            "Veuillez définir un prix maximum";
+            "Please set a maximum price";
 
     private JFrame currentFrame;
 
@@ -69,7 +65,16 @@ public class BidderView
         this.currentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.currentFrame.pack();
         this.attachListeners();
+
+        this.initialState();
     }
+
+    public void initialState()
+    {
+        this.subscribeButton.setEnabled(false);
+        this.disableBidButton();
+    }
+
 
 
     public void display()
@@ -96,6 +101,19 @@ public class BidderView
                 }
         );
 
+        this.auctionList.addListSelectionListener(
+                new ListSelectionListener()
+                {
+                    @Override
+                    public void valueChanged(
+                            ListSelectionEvent listSelectionEvent
+                    )
+                    {
+                        //enable Subscribe button
+                        subscribeButton.setEnabled(true);
+                    }
+                }
+        );
         this.subscribeButton.addActionListener(
                 new ActionListener()
                 {
@@ -118,7 +136,6 @@ public class BidderView
                     public void actionPerformed(ActionEvent actionEvent)
                     {
                         bidderAgent.sendBid();
-                        bidListModel.addElement(BidderView.AUCTION_BID_SENT);
                     }
                 }
         );
@@ -192,11 +209,24 @@ public class BidderView
         this.bidListModel.clear();
     }
 
+    /**
+     * Entered auction.
+     *
+     * @param auction
+     */
     public void initBidList(Auction auction)
     {
         this.clearBidList();
         this.bidListLabel.setText(auction.getAuctionName());
-        this.bidListModel.addElement(BidderView.AUCTION_START_TEXT);
+
+        //Remove auction from list of subscribable auctions
+        this.auctionListModel.removeElement(auction);
+        this.auctionList.repaint();
+
+        //Remove focus from list element
+        this.auctionList.clearSelection();
+        //Grey out subscribe button
+        this.subscribeButton.setEnabled(false);
     }
 
     public void addBidInformation(String information)

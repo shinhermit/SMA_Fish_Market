@@ -22,6 +22,9 @@ public class AboutToBidBehaviour extends OneShotBehaviour
 
     private BidderBehaviour myFSM;
 
+    private static String AUCTION_BID_SENT = "Bid sent.";
+
+
     private int transition;
 
     /** Message filtering */
@@ -99,6 +102,9 @@ public class AboutToBidBehaviour extends OneShotBehaviour
                 bid.setConversationId(this.myFSM.getRequest().getConversationId());
                 bid.setSender(bidderAgent.getAID());
                 bidderAgent.send(bid);
+
+                //Display message to user
+                bidderAgent.displayBidInformation(AUCTION_BID_SENT);
 
                 this.transition =
                         BidderBehaviour.TRANSITION_WAIT_BID_RESULT;
