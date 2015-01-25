@@ -29,15 +29,13 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		// Create auction FSM
+		// Add running auction FSM
 		super.myAgent.addBehaviour(
 				new RunningAuctionSellerFSMBehaviour(
 						(SellerAgent)super.myAgent,
 						this.myFSM.getResponse().getConversationId()));
 		
-		this.myFSM.setRequestCount(0);
-		
-		// DEBUG
-		System.out.println("Seller: Terminate success !");
+		// Remove auction creation FSM
+		super.myAgent.removeBehaviour(this.myFSM);
 	}
 }

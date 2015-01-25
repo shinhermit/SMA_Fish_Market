@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
-import fr.univpau.m2ti.sma.fishmarket.ihm.MarketView;
+import fr.univpau.m2ti.sma.fishmarket.gui.MarketView;
 import jade.wrapper.StaleProxyException;
 
 @SuppressWarnings("serial")
@@ -303,6 +303,52 @@ public class MarketAgent extends Agent
 		if(auction != null)
 		{
 			auction.setStatus(status);
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
+	}
+
+	/**
+	 * Updates the auction status and the view when an auction ends with an attribution.
+	 * 
+	 * @param auctionID the auction which is over.
+	 * @param winnerName the name of the winner
+	 */
+	public void notifyAuctionOver(String auctionID, String winnerName)
+	{
+		Auction auction = this.findAuction(auctionID);
+		
+		if(auction != null)
+		{
+			auction.setStatus(Auction.STATUS_OVER);
+			auction.setWinnerName(winnerName);
+			
+//			this.myView.refresh();
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
+	}
+
+	/**
+	 * Updates the auction status and the view when an auction has been cancelled.
+	 * 
+	 * @param auctionID the auction which has been cancelled.
+	 */
+	public void notifyAuctionCancelled(String auctionID)
+	{
+		Auction auction = this.findAuction(auctionID);
+		
+		if(auction != null)
+		{
+			auction.setStatus(Auction.STATUS_CANCELLED);
+			
+//			this.myView.refresh();
 		}
 		else
 		{

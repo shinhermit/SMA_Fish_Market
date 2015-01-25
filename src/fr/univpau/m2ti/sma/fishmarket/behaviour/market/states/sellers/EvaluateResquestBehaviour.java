@@ -1,5 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.sellers;
 
+import java.util.Scanner;
+
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
@@ -51,23 +53,44 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 				RunningAuctionMarketFSMBehaviour.createAuctionId(
 						request.getSender());
 		
-		Auction auction = new Auction(auctionId);
-		
 		// DEBUG
 		System.out.println("Market: evaluating creation request of auction with id "+auctionId);
 		System.out.println("Topic is: "+CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
-		if(! myMarketAgent.isRegisteredAuction(auctionId) )
+		boolean accepted = true;
+		
+		Auction auction = myMarketAgent.findAuction(auctionId);
+		
+		if(auction == null)
+		{
+			auction = new Auction(auctionId);
+		}
+		else if(auction.getStatus() != Auction.STATUS_CANCELLED
+				&& auction.getStatus() != Auction.STATUS_OVER)
+		{
+			accepted = false;
+		}
+		
+		if(accepted)
 		{
 			// DEBUG
 			System.out.println("Market: auction is not yet registered");
+			
+			Scanner input = new Scanner(request.getContent());
+			input.useDelimiter(":");
+			
+			String fishSupplyName = input.hasNext() ? input.next() : "";
+			float price = input.hasNextFloat() ? input.nextFloat() : 0f;
+			
+			input.close();
 			
 			// Register auction
 			auction.setStatus(
 					Auction.STATUS_RUNNING);
 			
-			auction.setCurrentPrice(Float.parseFloat(
-					(String)request.getContent()));
+			auction.setAuctionName(fishSupplyName);
+			
+			auction.setCurrentPrice(price);
 			
 			myMarketAgent.registerAuction(
 					auction, request.getSender());

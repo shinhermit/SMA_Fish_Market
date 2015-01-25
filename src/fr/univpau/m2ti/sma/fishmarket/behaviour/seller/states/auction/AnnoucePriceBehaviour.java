@@ -34,6 +34,10 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		
+		mySellerAgent.notifyAuctionStarted();
+		
+		this.myFSM.resetBidCount();
+		
 		// DEBUG
 		System.out.println("Seller: sending to_announce("+mySellerAgent.getCurrentPrice()+") !");
 		

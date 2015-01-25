@@ -18,6 +18,12 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	/** The id of the conversation of this auction. */
 	private final String conversationId;
 	
+	/** The number of bids received for the last announced price. */
+	private int bidCount = 0;
+	
+	/** The number of wait cycle which has been done. */
+	private int waitCycleCount = 0;
+	
 	/** The state in which the seller makes an announcement of the current price. */
 	private static final String STATE_ANNONCE_PRICE =
 			"STATE_ANNONCE_PRICE";
@@ -50,6 +56,9 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	private static final String STATE_TERMINATE_CANCEL =
 			"STATE_TERMINATE_CANCEL";
 	
+	/** The code to activate the transition which leads to wait for bid. */
+	public static final int TRANSITION_TO_WAIT_TO_BID;
+	
 	/** The code to activate the transition which leads to the state to terminate when the auction is cancelled. */
 	public static final int TRANSITION_TO_TERMINATE_CANCEL;
 	
@@ -78,6 +87,7 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 		TRANSITION_TO_ANNOUNCE = ++start;
 		TRANSITION_TO_WAIT_TO_PAY = ++start;
 		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
+		TRANSITION_TO_WAIT_TO_BID = ++start;
 	}
 	
 	/**
@@ -134,6 +144,9 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_WAIT_BID);
 		
 		this.registerTransition(STATE_WAIT_BID,
+				STATE_WAIT_BID, TRANSITION_TO_WAIT_TO_BID);
+		
+		this.registerTransition(STATE_WAIT_BID,
 				STATE_ANNONCE_PRICE, TRANSITION_TO_ANNOUNCE);
 		
 		this.registerTransition(STATE_WAIT_BID,
@@ -171,6 +184,58 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 	public String getConversationId()
 	{
 		return conversationId;
+	}
+	
+	/**
+	 * Notifies that a new bid has been received for the last announced price.
+	 */
+	public void notifyNewBid()
+	{
+		++ this.bidCount;
+		
+		((SellerAgent)this.myAgent).notifyNewBid();
+	}
+	
+	/**
+	 * 
+	 * @return the number of bid received for the last announced price.
+	 */
+	public int getBidCount()
+	{
+		return this.bidCount;
+	}
+	
+	/**
+	 * Sets the number of bid received to 0.
+	 */
+	public void resetBidCount()
+	{
+		this.bidCount = 0;
+	}
+	
+	/**
+	 * Notifies that a new bid wait cycle is over.
+	 */
+	public void notifyWaitCycle()
+	{
+		++ this.waitCycleCount;
+	}
+	
+	/**
+	 * 
+	 * @return the number of bid wait cycles which have been done.
+	 */
+	public int getWaitCycleCount()
+	{
+		return this.waitCycleCount;
+	}
+	
+	/**
+	 * Sets the number of bid wait cycle to 0.
+	 */
+	public void resetWaitCycleCount()
+	{
+		this.waitCycleCount = 0;
 	}
 	
 	/**

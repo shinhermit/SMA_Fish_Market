@@ -16,18 +16,15 @@ public class WaitSubscribersBehaviour extends OneShotBehaviour
 	/** The transition which will be selected. */
 	private int transition;
 	
+	/** the duration of one blocking cycle in order to wait for suscribers. */
+	private static final long WAITING_SUBSCRIBER_CYCLE_DURATION = 500; // 0.5 sec
+	
 	/** Allows filtering incoming messages. */
 	private static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.and(
 					CreateAuctionSellerFSMBehaviour.MESSAGE_FILTER,
-					MessageTemplate.or(
-							MessageTemplate.and(
-									MessageTemplate.MatchContent(
-											String.valueOf(FishMarket.Commands.COMMAND_START)),
-									MessageTemplate.MatchPerformative(
-											ACLMessage.INFORM)),
-							MessageTemplate.MatchPerformative(
-									FishMarket.Performatives.TO_SUBSCRIBE)));
+					MessageTemplate.MatchPerformative(
+							FishMarket.Performatives.TO_SUBSCRIBE));
 	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
@@ -84,12 +81,12 @@ public class WaitSubscribersBehaviour extends OneShotBehaviour
 		else
 		{
 			// DEBUG
-			System.out.println("Seller: setting transition to wait subscribers !");
+//			System.out.println("Seller: setting transition to wait subscribers !");
 			
 			this.transition =
 					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_SUBSCRIBERS;
 			
-			this.myFSM.block();
+			this.myFSM.block(WAITING_SUBSCRIBER_CYCLE_DURATION);
 		}
 	}
 

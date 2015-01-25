@@ -17,6 +17,9 @@ public class WaitBidBehaviour extends WakerBehaviour
 	/** The selected transition to the next state. */
 	private int transition;
 	
+	/** The duration of one cycle to wait for bids. */
+	private static final long WAIT_BID_CYCLE_DURATION = 500l; // 0.5 sec
+	
 	/**
 	 * Creates a behaviour which represents a state of the FSM behaviour of a seller agent.
 	 * 
@@ -27,7 +30,7 @@ public class WaitBidBehaviour extends WakerBehaviour
 			SellerAgent mySellerAgent,
 			RunningAuctionSellerFSMBehaviour myFSM)
 	{
-		super(mySellerAgent, mySellerAgent.getBidWaitingDuration());
+		super(mySellerAgent, WAIT_BID_CYCLE_DURATION);
 		
 		this.myFSM = myFSM;
 	}
@@ -35,16 +38,13 @@ public class WaitBidBehaviour extends WakerBehaviour
 	@Override
 	public void onWake()
 	{
-		// DEBUG
-		System.out.println("Seller: checking messages for first bid.");
+		this.myFSM.notifyWaitCycle();
 		
 		SellerAgent mySellerAgent =
 				(SellerAgent)super.myAgent;
 		
 		// Receive messages
 		ACLMessage mess;
-		
-		int bidCount = 0;
 		
 		do
 		{
@@ -53,45 +53,54 @@ public class WaitBidBehaviour extends WakerBehaviour
 			
 			if(mess != null)
 			{
-				++ bidCount;
-				
-				mySellerAgent.notifyNewBid();
+				this.myFSM.notifyNewBid();
 			}
 		}
 		while(mess != null);
 		
-		/** New announce or cancel */
-		if(bidCount == 0)
+		// Decide transition
+		int bidCount = this.myFSM.getBidCount();
+		
+		long maxCycleCount =
+				mySellerAgent.getBidWaitingDuration() /
+				WaitBidBehaviour.WAIT_BID_CYCLE_DURATION;
+		
+		boolean timeout = this.myFSM.getWaitCycleCount() > maxCycleCount;
+		
+		if(timeout || bidCount == mySellerAgent.getSubscriberCount())
 		{
-			// Either: make new announce with lower price OR cancel
-			float newStep = mySellerAgent.getPriceStep() / 2f;
-			float newPrice = mySellerAgent.getCurrentPrice() - newStep;
+			this.myFSM.resetWaitCycleCount();
 			
-			if(newPrice >= mySellerAgent.getMinPrice()
-					&& newStep >= mySellerAgent.getMinPriceStep())
+			/** Either: make new announce with lower price OR cancel */
+			if(bidCount == 0)
 			{
-				mySellerAgent.decreasePriceStep();
-				mySellerAgent.decreasePrice();
+				float newStep = mySellerAgent.getPriceStep() / 2f;
+				float newPrice = mySellerAgent.getCurrentPrice() - newStep;
 				
-				// DEBUG
-				System.out.println("Seller: setting transition to announce.");
-				
-				this.transition =
-						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
+				if(newPrice >= mySellerAgent.getMinPrice()
+						&& newStep >= mySellerAgent.getMinPriceStep())
+				{
+					mySellerAgent.decreasePriceStep();
+					mySellerAgent.decreasePrice();
+					
+					// DEBUG
+					System.out.println("Seller: setting transition to announce.");
+					
+					this.transition =
+							RunningAuctionSellerFSMBehaviour.TRANSITION_TO_ANNOUNCE;
+				}
+				else
+				{
+					// DEBUG
+					System.out.println("Seller: setting transition to terminate cancel.");
+					
+					this.transition =
+							RunningAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
+				}
 			}
-			else
-			{
-				// DEBUG
-				System.out.println("Seller: setting transition to terminate cancel.");
-				
-				this.transition =
-						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_TERMINATE_CANCEL;
-			}
-		}
-		else
-		{
+			
 			/** Attribute */
-			if(bidCount == 1)
+			else if(bidCount == 1)
 			{
 				// DEBUG
 				System.out.println("Seller: setting transition to attribute.");
@@ -132,21 +141,24 @@ public class WaitBidBehaviour extends WakerBehaviour
 				// DEBUG
 				System.out.println("Seller: setting transition to send rep bid nok.");
 				
-				// Continue to wait
+				// Handle multiple bids
 				this.transition =
 						RunningAuctionSellerFSMBehaviour.TRANSITION_TO_HANDLE_MULTIPLE_BID;
 			}
+		}
+		else
+		{
+			// Continue to wait
+			this.transition =
+					RunningAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_TO_BID;
 		}
 	}
 	
 	@Override
 	public int onEnd()
 	{
-		SellerAgent mySellerAgent =
-				(SellerAgent) super.myAgent;
-		
 		// For any future return to this state
-		this.reset(mySellerAgent.getBidWaitingDuration());
+		this.reset(WAIT_BID_CYCLE_DURATION);
 		
 		return this.transition;
 	}

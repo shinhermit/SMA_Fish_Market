@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.ihm;
+package fr.univpau.m2ti.sma.fishmarket.gui;
 
 import java.util.Iterator;
 import java.util.Set;

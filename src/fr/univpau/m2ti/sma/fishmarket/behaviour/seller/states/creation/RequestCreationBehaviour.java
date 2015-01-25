@@ -56,8 +56,9 @@ public class RequestCreationBehaviour extends OneShotBehaviour
 					CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 			
 			// Add starting price
-			mess.setContent(String.valueOf(
-					mySellerAgent.getCurrentPrice()));
+			mess.setContent(
+					mySellerAgent.getFishSupplyName() + ":" +
+					String.valueOf(mySellerAgent.getCurrentPrice()));
 			
 			// Send
 			mySellerAgent.send(mess);

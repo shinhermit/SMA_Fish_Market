@@ -6,15 +6,12 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.ihm.SellerView;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.gui.SellerView;
 
 @SuppressWarnings("serial")
 /**
@@ -29,13 +26,13 @@ public class SellerAgent extends Agent
 	private AID marketAgentID = null;
 	
 	/** A user friendly name for the auction. */
-	private String fishSupplyName = "";
+	private String fishSupplyName;
 	
 	/** The minimal value for the price. */
-	private float minPrice = 200f;
+	private float minPrice;
 	
 	/** The maximal value for the price. */
-	private float maxPrice = 1000f;
+	private float maxPrice;
 	
 	/** The current price of the fish supply. */
 	private float currentPrice;
@@ -46,17 +43,23 @@ public class SellerAgent extends Agent
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
 	
+	/** The number of subscriber for the auction of this seller. */
+	private int subscriberCount;
+	
 	/** The default value for the bid waiting duration. */
-	public static final long DEFAULT_BID_WAITING_DURATION = 60*1000l; // 1 min
+	public static final long DEFAULT_BID_WAITING_DURATION = 10*1000l; // 10 sec
 	
 	/** The amount of time to wait for bids after an announce. */
-	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
+	private long bidWaitingDuration;
 	
 	/** Tells whether the user decided to start the auction or not. */
-	private boolean startCommandReceived = false;
+	private boolean createCommandReceived;
 	
 	/** Tells whether the user decided to start the auction or not. */
-	private boolean cancelCommandReceived = false;
+	private boolean startCommandReceived;
+	
+	/** Tells whether the user decided to start the auction or not. */
+	private boolean cancelCommandReceived;
 	
 	/** The view for this seller agent. */
 	private SellerView myView;
@@ -70,16 +73,37 @@ public class SellerAgent extends Agent
 	 */
 	public SellerAgent()
 	{
+		
+	}
+	
+	/**
+	 * Sets the agent to its initial state.
+	 */
+	public void reset()
+	{
+		this.bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
+		this.cancelCommandReceived = false;
+		this.createCommandReceived = false;
+		this.startCommandReceived = false;
+		this.subscriberCount = 0;
+		this.fishSupplyName = "";
+		
+		this.maxPrice = 1000f;
+		this.minPrice = 200f;
 		this.currentPrice = minPrice;
 		this.priceStep = (maxPrice - minPrice) / 2f;
 		this.minPriceStep = this.priceStep / 10f;
+		
+		if(this.myView != null)
+		{
+			this.myView.reset();
+		}
 	}
 	
 	@Override
 	protected void setup()
 	{
-		this.marketAgentID =
-				this.lookupMarketAgent();
+		this.reset();
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
@@ -90,41 +114,43 @@ public class SellerAgent extends Agent
 	}
     
 	/**
-	 * Retrieves the AID of the market agent.
-	 * @return the AID of the market agent.
+	 * Retrieves the AID of the market agent, by asking the DF agent.
+	 * 
+	 * @return true if the AID has been found, false otherwise.
 	 */
-    protected AID lookupMarketAgent()
+    public boolean lookupMarketAgent()
     {
-    	AID marketAgent = null;
-    	
-        DFAgentDescription marketTemplate = new DFAgentDescription();
-        ServiceDescription marketSd = new ServiceDescription();
+    	if(this.marketAgentID == null)
+    	{
+	    	DFAgentDescription marketTemplate = new DFAgentDescription();
+	        ServiceDescription marketSd = new ServiceDescription();
+	        
+	        // Template for searching the market agent
+	        marketSd.setType(MarketAgent.SERVICE_DESCIPTION);
+	        marketTemplate.addServices(marketSd);
+	        
+	        try
+	        {
+	            DFAgentDescription[] marketResult = DFService.search(this, marketTemplate);
+	            
+	            if(marketResult.length == 1)
+	            {
+	            	this.marketAgentID = marketResult[0].getName();
+	            }
+	            else
+	            {
+	            	SellerAgent.LOGGER.log(
+	            			Level.SEVERE, null,
+	            			"Logic error: multiple market agents found !");
+	            }
+	        }
+	        catch (FIPAException fe)
+	        {
+	            SellerAgent.LOGGER.log(Level.INFO, null, fe);
+	        }
+    	}
         
-        // Template for searching the market agent
-        marketSd.setType(MarketAgent.SERVICE_DESCIPTION);
-        marketTemplate.addServices(marketSd);
-        
-        try
-        {
-            DFAgentDescription[] marketResult = DFService.search(this, marketTemplate);
-            
-            if(marketResult.length == 1)
-            {
-            	marketAgent = marketResult[0].getName();
-            }
-            else
-            {
-            	SellerAgent.LOGGER.log(
-            			Level.SEVERE, null,
-            			"Logic error: multiple market agents found !");
-            }
-        }
-        catch (FIPAException fe)
-        {
-            SellerAgent.LOGGER.log(Level.SEVERE, null, fe);
-        }
-        
-        return marketAgent;
+        return this.marketAgentID != null;
     }
 
     /**
@@ -298,18 +324,60 @@ public class SellerAgent extends Agent
 	/**
 	 * Notifies that the user decided to start the auction.
 	 */
+	public void notifyCreateCommand()
+	{
+		this.createCommandReceived = true;
+	}
+	
+	/**
+	 * Notifies that the user decided to start the auction.
+	 */
+	public void notifyMarketNotFound()
+	{
+		this.createCommandReceived = false;
+		
+		this.myView.displayMessage("Market agent not found :_(");
+	}
+	
+	/**
+	 * Notifies the view that the auction has been created.
+	 */
+	public void notifyAuctionCreated()
+	{
+		this.myView.notifyAuctionCreated(true);
+	}
+	
+	/**
+	 * 
+	 * @return true if a start auction command has been received from the user, false otherwise.
+	 */
+	public boolean isCreateCommandReceived()
+	{
+		return this.createCommandReceived;
+	}
+	
+	/**
+	 * Notifies the view of the message.
+	 */
+	public void notifyMessage(String mess)
+	{
+		this.myView.displayMessage(mess);
+	}
+	
+	/**
+	 * Notifies that the user decided to start the auction.
+	 */
 	public void notifyStartCommand()
 	{
 		this.startCommandReceived = true;
-		
-		// Possibly unblock the agent.
-		ACLMessage mess = new ACLMessage(ACLMessage.INFORM);
-		
-		mess.setContent(FishMarket.Commands.COMMAND_START);
-		
-		mess.addReceiver(super.getAID());
-		mess.addReceiver(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
-		super.send(mess);
+	}
+	
+	/**
+	 * Notifies the view that the auction has been started.
+	 */
+	public void notifyAuctionStarted()
+	{
+		this.myView.notifyAuctionStarted();
 	}
 	
 	/**
@@ -330,6 +398,14 @@ public class SellerAgent extends Agent
 	}
 	
 	/**
+	 * Notifies the view that the auction has been cancelled.
+	 */
+	public void notifyAuctionCancelled()
+	{
+		this.myView.notifyAuctionCancelled();
+	}
+	
+	/**
 	 * 
 	 * @return true if a cancel auction command has been received from the user, false otherwise.
 	 */
@@ -344,6 +420,15 @@ public class SellerAgent extends Agent
 	public void notifyNewAnnounce()
 	{
 		this.myView.notifyNewAnnounce(this.currentPrice);
+	}
+	
+	/**
+	 * Notifies the view that the auction successfully ended.
+	 */
+	public void notifyAuctionOver()
+	{
+		this.myView.notifyAuctionOver(
+				this.getCurrentPrice());
 	}
 	
 	/**
@@ -369,7 +454,18 @@ public class SellerAgent extends Agent
 	 */
 	public void notifyNewSubscriber()
 	{
+		++ this.subscriberCount;
+		
 		this.myView.notifyNewSubscriber();
+	}
+	
+	/**
+	 * 
+	 * @return the number of subscribers for the auction of this seller.
+	 */
+	public int getSubscriberCount()
+	{
+		return this.subscriberCount;
 	}
 	
 	/**

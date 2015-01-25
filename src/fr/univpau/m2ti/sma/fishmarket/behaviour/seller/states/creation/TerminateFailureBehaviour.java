@@ -28,9 +28,10 @@ public class TerminateFailureBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		this.myFSM.setRequestCount(0);
 		
-		// DEBUG
-		System.out.println("Seller: Terminate failure !");
+		((SellerAgent)this.myAgent).notifyMessage(
+				"Auction creation failed :_(");
+		
+		this.myFSM.reset();
 	}
 }
