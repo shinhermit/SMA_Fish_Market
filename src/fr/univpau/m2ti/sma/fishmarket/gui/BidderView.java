@@ -143,7 +143,7 @@ public class BidderView
         this.bidButton = new JButton("Bid");
 
         this.auctionPane.add(this.bidButton);
-        
+
         JPanel autoBidPane = new JPanel();
         autoBidPane.setLayout(
                 new BoxLayout(autoBidPane, BoxLayout.LINE_AXIS)

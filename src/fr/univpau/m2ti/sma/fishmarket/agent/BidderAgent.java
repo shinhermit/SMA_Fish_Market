@@ -1,12 +1,12 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionBidderFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionBidderFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.gui.BidderView;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
@@ -79,7 +79,8 @@ public class BidderAgent extends Agent
 			this.removeBehaviour(this.runningAuctionFSM);
 		}
 
-		this.runningAuctionFSM = new BidderBehaviour(this);
+		this.runningAuctionFSM = new RunningAuctionBidderFSMBehaviour(this);
+
 		this.addBehaviour(this.runningAuctionFSM);
 	}
 
@@ -91,7 +92,7 @@ public class BidderAgent extends Agent
 		}
 
 
-		this.subscribeToAuctionFSM = new SubscribeToAuctionBehaviour(this);
+		this.subscribeToAuctionFSM = new SubscribeToAuctionBidderFSMBehaviour(this);
 		// Register behaviour
 		this.addBehaviour(this.subscribeToAuctionFSM);
 
@@ -153,7 +154,7 @@ public class BidderAgent extends Agent
 
 		//notify behaviour by sending a message
 		ACLMessage unblockMessage = new ACLMessage(FishMarket.Performatives.TO_ANNOUNCE);
-		unblockMessage.addReceiver(BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC);
+		unblockMessage.addReceiver(SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		unblockMessage.addReceiver(this.getAID());
 		this.send(unblockMessage);
 	}

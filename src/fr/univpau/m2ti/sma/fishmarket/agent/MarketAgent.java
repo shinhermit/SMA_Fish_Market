@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.market.CreateAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.CreateAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.gui.MarketView;
 import jade.wrapper.StaleProxyException;
@@ -75,7 +75,7 @@ public class MarketAgent extends Agent
         }
         
         // Add behaviours
-        this.addBehaviour(new BidderSubscriptionMarketFSMBehaviour(this));
+        this.addBehaviour(new SubscribeToAuctionMarketFSMBehaviour(this));
         this.addBehaviour(new CreateAuctionMarketFSMBehaviour(this));
         /** Auction management behaviours are add by SellerManagementBehaviour
               sub-behaviour (confirm auction registration behaviour) **/
@@ -85,7 +85,7 @@ public class MarketAgent extends Agent
         this.myView.setVisible(true);
         
         // DEBUG
-		this.createMarketUsers(0, 0);
+		this.createMarketUsers(1, 4);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)
