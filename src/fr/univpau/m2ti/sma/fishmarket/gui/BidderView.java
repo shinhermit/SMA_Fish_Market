@@ -236,7 +236,8 @@ public class BidderView
                     @Override
                     public void actionPerformed(ActionEvent actionEvent)
                     {
-                        bidderAgent.sendBid();
+                        bidderAgent.takeUserBidIntoAccount();
+                        bidButton.setEnabled(false);
                     }
                 }
         );

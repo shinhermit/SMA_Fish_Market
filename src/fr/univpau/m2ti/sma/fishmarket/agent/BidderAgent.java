@@ -45,6 +45,11 @@ public class BidderAgent extends Agent
 
 	private float biddingPrice;
 
+	private boolean waitingForUserBid = false;
+	public boolean castBid = false;
+
+
+
 	@Override
 	protected void setup()
 	{
@@ -167,18 +172,37 @@ public class BidderAgent extends Agent
 	/**
 	 * Called by BidderView when the bid button is clicked.
 	 */
-	public void sendBid()
+	public void takeUserBidIntoAccount()
 	{
-		//notify behaviour by sending a message
-		ACLMessage userBidMessage = new ACLMessage(FishMarket.Performatives.TO_BID);
-		userBidMessage.addReceiver(
-				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
-		);
-		userBidMessage.addReceiver(this.getAID());
+//		//notify behaviour by sending a message
+//		ACLMessage userBidMessage = new ACLMessage(FishMarket.Performatives.TO_BID);
+//		userBidMessage.addReceiver(
+//				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
+//		);
+//		userBidMessage.addReceiver(this.getAID());
+//
+//		this.send(userBidMessage);
+		this.castBid = true;
+	}
 
-		this.bidderView.disableBidButton();
+	public boolean isWaitingForUserBid()
+	{
+		return waitingForUserBid;
+	}
 
-		this.send(userBidMessage);
+	public void setWaitingForUserBid(boolean waitingForUserBid)
+	{
+		this.waitingForUserBid = waitingForUserBid;
+	}
+
+	public boolean castBid()
+	{
+		return castBid;
+	}
+
+	public void setCastBid(boolean castBid)
+	{
+		this.castBid = castBid;
 	}
 
 	/**
@@ -191,6 +215,9 @@ public class BidderAgent extends Agent
 		this.bidderView.addBidInformation(information);
 	}
 
+	/**
+	 * Displays an alert signaling that market is not available.
+	 */
 	public void alertNoMarket()
 	{
 		this.bidderView.alert(BidderAgent.NO_MARKET_AVAILABLE);
@@ -206,6 +233,11 @@ public class BidderAgent extends Agent
 		this.maxPrice = maxPrice;
 	}
 
+	/**
+	 * Returns the price which came with the last to_announce.
+	 *
+	 * @return
+	 */
 	public float getBiddingPrice()
 	{
 		return this.biddingPrice;

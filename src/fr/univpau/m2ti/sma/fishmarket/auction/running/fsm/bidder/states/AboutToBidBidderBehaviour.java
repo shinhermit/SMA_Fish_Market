@@ -25,6 +25,8 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
     private static String AUCTION_BID_SENT = "Bid sent.";
 
 
+    private ACLMessage lastMessage = null;
+
     private int transition;
 
     /** Message filtering */
@@ -39,17 +41,13 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                                     MessageTemplate.MatchPerformative(
                                             FishMarket.Performatives.TO_CANCEL
                                     ),
-                                    MessageTemplate.or(
-                                            MessageTemplate.MatchPerformative(
-                                                    FishMarket.Performatives.TO_BID
-                                            ),
-                                            MessageTemplate.MatchPerformative(
-                                                    FishMarket.Performatives.AUCTION_OVER
-                                            )
+                                    MessageTemplate.MatchPerformative(
+                                            FishMarket.Performatives.AUCTION_OVER
                                     )
                             )
                     )
             );
+
 
     public AboutToBidBidderBehaviour(Agent a, RunningAuctionBidderFSMBehaviour fsm)
     {
@@ -70,16 +68,27 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
         if (mess != null)
         {
+            this.lastMessage = mess;
             price = Float.parseFloat(mess.getContent());
+            //Display price to user and store it
             bidderAgent.handleAnnounce(price);
             //remove last announce
-            //this.myFSM.setRequest(null);
+            this.myFSM.setRequest(null);
+
+            //needs user interaction
+            bidderAgent.setCastBid(false);
+            bidderAgent.setWaitingForUserBid(true);
+
+            this.transition =
+                    RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
         }
 
         ACLMessage newMessage = myAgent.receive(MESSAGE_FILTER);
 
+        //Did we receive a new message ?
         if (newMessage != null)
         {
+            //new price, cancel, or auction end
             if (newMessage.getPerformative()
                     == FishMarket.Performatives.TO_ANNOUNCE)
             {
@@ -87,27 +96,9 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
-            }
-            else if (newMessage.getPerformative()
-                    == FishMarket.Performatives.TO_BID)
-            {
-                // User wants to bid
-                ACLMessage bid = new ACLMessage(
-                        FishMarket.Performatives.TO_BID
-                );
-                bid.setContent(String.valueOf(bidderAgent.getBiddingPrice()));
-                bid.clearAllReceiver();
-                bid.addReceiver(bidderAgent.getMarketAgentAID());
-                bid.addReceiver(RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
-                bid.setConversationId(this.myFSM.getRequest().getConversationId());
-                bid.setSender(bidderAgent.getAID());
-                bidderAgent.send(bid);
 
-                //Display message to user
-                bidderAgent.displayBidInformation(AUCTION_BID_SENT);
-
-                this.transition =
-                        RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_BID_RESULT;
+                bidderAgent.setWaitingForUserBid(true);
+                bidderAgent.setCastBid(false);
             }
             else if (newMessage.getPerformative()
                     == FishMarket.Performatives.TO_CANCEL)
@@ -116,6 +107,9 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 this.myFSM.setRequest(null);
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
+
+                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setCastBid(false);
             }
             else
             {
@@ -124,75 +118,45 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
+
+                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setCastBid(false);
             }
         }
-        else
+
+        //user interaction
+        if (bidderAgent.isWaitingForUserBid())
         {
-            this.myFSM.block();
-            this.transition =
-                    RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
+            if (bidderAgent.castBid())
+            {
+                //Send bid
+                ACLMessage bid = this.lastMessage.createReply();
+                bid.setPerformative(FishMarket.Performatives.TO_BID);
+                bid.setContent(String.valueOf(bidderAgent.getBiddingPrice()));
+                bid.clearAllReceiver();
+                bid.addReceiver(bidderAgent.getMarketAgentAID());
+                bid.addReceiver(RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
+                bid.setConversationId(this.lastMessage.getConversationId());
+                bid.setSender(bidderAgent.getAID());
+                bidderAgent.send(bid);
+
+                //user interacted
+                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setCastBid(false);
+
+                this.transition =
+                        RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_BID_RESULT;
+            }
+            else
+            {
+                //wait some more
+                System.out.println("Waiting for user bid");
+                this.myFSM.block(500);
+                this.transition =
+                        RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
+            }
         }
     }
-
-//    @Override
-//    public void action()
-//    {
-//        System.out.println("action => " + getBehaviourName());
-//
-//        // read price from last announce
-//        ACLMessage mess = this.myFSM.getRequest();
-//
-//        float price = Float.parseFloat(mess.getContent());
-//
-//        // Is price low enough ?
-//        if (this.myFSM.getPriceLimit() > price && !blocked)
-//        {
-//            //bidding is possible
-//            ACLMessage bid = mess.createReply();
-//            bid.setPerformative(FishMarket.Performatives.TO_BID);
-//            bid.setContent(String.valueOf(price));
-//            bid.clearAllReceiver();
-//            bid.addReceiver(((BidderAgent)super.myAgent).getMarketAgentAID());
-//            bid.addReceiver(RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
-//            bid.setConversationId(this.myFSM.getRequest().getConversationId());
-//            bid.setSender(super.myAgent.getAID());
-//            super.myAgent.send(bid);
-//
-//            // Store bidding price
-//            this.myFSM.setBiddingPrice(price);
-//
-//            this.transition = BidderBehaviour.TRANSITION_BID;
-//        }
-//        else
-//        {
-//            ACLMessage newMessage = myAgent.receive(MESSAGE_FILTER);
-//
-//            if (newMessage != null)
-//            {
-//                this.myFSM.setRequest(newMessage);
-//
-//                if (newMessage.getPerformative() == FishMarket.Performatives.TO_ANNOUNCE)
-//                {
-//                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
-//                }
-//                else if (newMessage.getPerformative() == FishMarket.Performatives.TO_CANCEL)
-//                {
-//                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
-//                }
-//                else
-//                {
-//                    //mess.getPerformative() == FishMarket.Performatives.AUCTION_OVER
-//                    this.transition = BidderBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
-//                }
-//            }
-//            else
-//            {
-//                //Price is too high, waiting for price decrease
-//                this.myFSM.block();
-//                blocked = true;
-//            }
-//        }
-//    }
 
     @Override
     public int onEnd()
