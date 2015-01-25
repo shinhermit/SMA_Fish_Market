@@ -21,7 +21,7 @@ import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToAt
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToBidMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToGiveMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToPayMarketBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;

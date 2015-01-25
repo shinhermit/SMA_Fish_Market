@@ -2,7 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.market.states;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.CreateAuctionMarketFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

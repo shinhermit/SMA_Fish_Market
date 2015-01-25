@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.message;
+package fr.univpau.m2ti.sma.fishmarket.protocol;
 
 import jade.lang.acl.ACLMessage;
 

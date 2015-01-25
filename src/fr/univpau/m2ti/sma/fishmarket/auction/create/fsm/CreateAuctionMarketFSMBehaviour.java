@@ -5,7 +5,7 @@ import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.market.states.ConfirmCr
 import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.market.states.EvaluateCreationResquestMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.market.states.TerminateCreationMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.market.states.WaitCreationRequestMarketBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;

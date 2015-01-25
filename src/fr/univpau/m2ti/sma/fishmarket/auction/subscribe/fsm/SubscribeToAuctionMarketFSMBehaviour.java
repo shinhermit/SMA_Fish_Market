@@ -6,7 +6,7 @@ import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.market.states.Notify
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.market.states.ProvideAuctionListMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.market.states.TerminateSubscriptionsMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.market.states.WaitBidderRequestMarketBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
+import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.messaging.TopicUtility;
