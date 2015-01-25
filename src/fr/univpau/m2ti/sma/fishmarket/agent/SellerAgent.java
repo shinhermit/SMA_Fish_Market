@@ -10,7 +10,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.create.fsm.CreateAuctionSellerFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.gui.SellerView;
 
 @SuppressWarnings("serial")

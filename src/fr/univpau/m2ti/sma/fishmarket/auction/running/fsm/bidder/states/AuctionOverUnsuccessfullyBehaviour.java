@@ -1,0 +1,38 @@
+package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states;
+
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.BidderBehaviour;
+import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
+
+import java.util.logging.Logger;
+
+/**
+ *
+ */
+public class AuctionOverUnsuccessfullyBehaviour extends OneShotBehaviour
+{
+    /** Logging. */
+    private static final Logger LOGGER =
+            Logger.getLogger(AuctionOverUnsuccessfullyBehaviour.class.getName());
+
+    private BidderBehaviour myFSM;
+
+    private static String AUCTION_FAILURE =
+            "Auction canceled.";
+
+    public AuctionOverUnsuccessfullyBehaviour(Agent a, BidderBehaviour fsm)
+    {
+        super(a);
+        this.myFSM = fsm;
+    }
+
+    @Override
+    public void action() {
+        System.out.println("action => " + getBehaviourName());
+
+        System.out.println("Auction cancelled.");
+
+        ((BidderAgent)myAgent).displayBidInformation(AUCTION_FAILURE);
+    }
+}
