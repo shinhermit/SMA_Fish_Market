@@ -128,22 +128,22 @@ public class SellerView extends JFrame
 	{
 		String command = event.getActionCommand();
 		
-		switch(command)
+		if(command.equals(CREATE_BUTTON_ACTION_COMMAND))
 		{
-		case CREATE_BUTTON_ACTION_COMMAND:
 			this.myAgent.setFishSupplyName(
 					this.fishSupplyNameTextField.getText());
 			
 			this.myAgent.notifyCreateCommand();
-			break;
-			
-		case START_BUTTON_ACTION_COMMAND:
+		}
+		
+		else if(command.equals(START_BUTTON_ACTION_COMMAND))
+		{
 			this.myAgent.notifyStartCommand();
-			break;
-			
-		case CANCEL_BUTTON_ACTION_COMMAND:
+		}
+		
+		else if(command.equals(CANCEL_BUTTON_ACTION_COMMAND))
+		{
 			this.myAgent.notifyCancelCommand();
-			break;
 		}
 	}
 	
@@ -252,7 +252,7 @@ public class SellerView extends JFrame
 	public void notifyNewSubscriber()
 	{
 		int subscriberCount =
-				(int) this.subscriberCountSpinner.getValue();
+				(Integer) this.subscriberCountSpinner.getValue();
 		
 		if(subscriberCount == 0)
 		{
