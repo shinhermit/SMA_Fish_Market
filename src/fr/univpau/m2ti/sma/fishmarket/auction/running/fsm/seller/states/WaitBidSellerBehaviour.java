@@ -67,7 +67,7 @@ public class WaitBidSellerBehaviour extends WakerBehaviour
 		
 		boolean timeout = this.myFSM.getWaitCycleCount() > maxCycleCount;
 		
-		if(timeout || bidCount == mySellerAgent.getSubscriberCount())
+		if(timeout)// || bidCount == mySellerAgent.getSubscriberCount())
 		{
 			this.myFSM.resetWaitCycleCount();
 			
