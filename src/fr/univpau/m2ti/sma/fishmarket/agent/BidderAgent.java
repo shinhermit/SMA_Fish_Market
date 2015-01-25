@@ -5,7 +5,7 @@ import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehavio
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
-import fr.univpau.m2ti.sma.fishmarket.ihm.BidderView;
+import fr.univpau.m2ti.sma.fishmarket.gui.BidderView;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;

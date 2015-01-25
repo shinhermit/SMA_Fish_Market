@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.ihm;
+package fr.univpau.m2ti.sma.fishmarket.gui;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.data.Auction;
