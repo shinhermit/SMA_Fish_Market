@@ -74,6 +74,11 @@ public class BidderAgent extends Agent
 	{
 		this.bidderView.initBidList(this.getSubscribedAuction());
 
+		if (this.runningAuctionFSM != null)
+		{
+			this.removeBehaviour(this.runningAuctionFSM);
+		}
+
 		this.runningAuctionFSM = new BidderBehaviour(this);
 		this.addBehaviour(this.runningAuctionFSM);
 	}
@@ -92,6 +97,10 @@ public class BidderAgent extends Agent
 
 	}
 
+	public void restoreInitialViewState()
+	{
+		this.bidderView.initialState();
+	}
 
 	public void displayAlert(String message)
 	{

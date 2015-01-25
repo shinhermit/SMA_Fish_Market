@@ -34,5 +34,6 @@ public class OtherBidderWonBehaviour extends OneShotBehaviour
         System.out.println("Other bidder won.");
 
         ((BidderAgent)myAgent).displayBidInformation(OTHER_BIDDER_WON);
+        ((BidderAgent)myAgent).restoreInitialViewState();
     }
 }

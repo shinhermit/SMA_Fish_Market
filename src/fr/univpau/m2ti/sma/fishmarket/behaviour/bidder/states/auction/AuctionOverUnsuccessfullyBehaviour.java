@@ -34,5 +34,6 @@ public class AuctionOverUnsuccessfullyBehaviour extends OneShotBehaviour
         System.out.println("Auction cancelled.");
 
         ((BidderAgent)myAgent).displayBidInformation(AUCTION_FAILURE);
+        ((BidderAgent)myAgent).restoreInitialViewState();
     }
 }
