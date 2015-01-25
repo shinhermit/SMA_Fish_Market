@@ -9,6 +9,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -28,6 +29,13 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
     private ACLMessage lastMessage = null;
 
     private int transition;
+
+    /**
+     * Max and min time before bid is sent when auto bid mode is on.
+     * (millisecs)
+     */
+    private static long AUTO_BID_RANDOM_MAX_TIME_LIMIT = 2000l;
+    private static long AUTO_BID_RANDOM_MIN_TIME_LIMIT = 500l;
 
     /** Message filtering */
     private static final MessageTemplate MESSAGE_FILTER =
@@ -77,7 +85,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
             //needs user interaction
             bidderAgent.setCastBid(false);
-            bidderAgent.setWaitingForUserBid(true);
+            bidderAgent.setWithinBiddingTimeFrame(true);
 
             this.transition =
                     RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
@@ -97,7 +105,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
 
-                bidderAgent.setWaitingForUserBid(true);
+                bidderAgent.setWithinBiddingTimeFrame(true);
                 bidderAgent.setCastBid(false);
             }
             else if (newMessage.getPerformative()
@@ -108,7 +116,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
 
-                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setWithinBiddingTimeFrame(false);
                 bidderAgent.setCastBid(false);
             }
             else
@@ -119,15 +127,34 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
 
-                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setWithinBiddingTimeFrame(false);
                 bidderAgent.setCastBid(false);
             }
         }
 
-        //user interaction
-        if (bidderAgent.isWaitingForUserBid())
+        //is bidding allowed ?
+        if (bidderAgent.isWithinBiddingTimeFrame())
         {
-            if (bidderAgent.castBid())
+            //is bidding handled automatically ?
+            if (bidderAgent.bidsAutomatically() && !bidderAgent.castBid())
+            {
+                //is price over our limit ?
+                if (bidderAgent.getBiddingPrice() <= bidderAgent.getMaxPrice())
+                {
+                    //no
+                    bidderAgent.setCastBid(true);
+                    //wàit random time so first auto bid agent doesn't always win
+                    Random rand = new Random();
+                    long range =
+                            (AUTO_BID_RANDOM_MAX_TIME_LIMIT - AUTO_BID_RANDOM_MIN_TIME_LIMIT);
+                    long waitTime = (long)
+                            (rand.nextDouble() * range) +
+                            AUTO_BID_RANDOM_MIN_TIME_LIMIT;
+
+                    block(waitTime);
+                }
+            }
+            else if (bidderAgent.castBid())
             {
                 //Send bid
                 ACLMessage bid = this.lastMessage.createReply();
@@ -141,8 +168,10 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                 bidderAgent.send(bid);
 
                 //user interacted
-                bidderAgent.setWaitingForUserBid(false);
+                bidderAgent.setWithinBiddingTimeFrame(false);
                 bidderAgent.setCastBid(false);
+
+                bidderAgent.displayBidInformation(AUCTION_BID_SENT);
 
                 this.transition =
                         RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_BID_RESULT;

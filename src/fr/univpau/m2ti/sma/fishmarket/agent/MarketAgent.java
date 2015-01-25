@@ -85,7 +85,7 @@ public class MarketAgent extends Agent
         this.myView.setVisible(true);
         
         // DEBUG
-		this.createMarketUsers(0, 4);
+		this.createMarketUsers(1, 2);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)
