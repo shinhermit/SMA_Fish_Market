@@ -294,6 +294,16 @@ public class MarketAgent extends Agent
 	}
 	
 	/**
+	 * Clears the subscriber list for the given auction.
+	 * 
+	 * @param auctionID the auction which should have no more subscribers.
+	 */
+	public void clearSubscribers(String auctionID)
+	{
+		this.subscribers.get(auctionID).clear();
+	}
+	
+	/**
 	 * Defines the status of an auction.
 	 * 
 	 * @param auctionID  the ID of the auction.
