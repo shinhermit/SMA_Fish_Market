@@ -2,9 +2,12 @@ package fr.univpau.m2ti.sma.fishmarket.ihm;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,17 +70,32 @@ public class SellerView extends JFrame
 	
 	private JTextField fishSupplyNameTextField;
 	
-	/** Holds the text field which inform about the number of bidders for the past announced prices. */
+	/** Holds the test view which allows to display several information about the auciton. */
+	private JLabel messageLabel;
+	
+	/** Holds the button which allows to create the auction for the seller. */
+	private JButton createButton;
+	
+	/** Holds the button which allows to start announcing. */
 	private JButton startButton;
+	
+	/** Holds the button which allows to cancel the auction before the first announcement (no subscriber). */
+	private JButton cancelButton;
 	
 	/** The default width of the window. */
 	public static final int DEFAULT_WIDTH = 600;
 	
 	/** The default height of the window. */
-	public static final int DEFAULT_HEIGHT = 300;
+	public static final int DEFAULT_HEIGHT = 350;
+
+	/** Action command for the create button click listener (action listener). */
+	private static final String CREATE_BUTTON_ACTION_COMMAND = "CREATE_BUTTON_ACTION_COMMAND";
+
+	/** Action command for the cancel button click listener (action listener). */
+	private static final String CANCEL_BUTTON_ACTION_COMMAND = "CANCEL_BUTTON_ACTION_COMMAND";
 
 	/** Action command for the start button click listener (action listener). */
-	private static final String START_BUTTON_ACTION_COMMAND = "STRAT_BUTTON_ACTION_COMMAND";
+	private static final String START_BUTTON_ACTION_COMMAND = "START_BUTTON_ACTION_COMMAND";
 	
 	/**
 	 * 
@@ -108,17 +126,24 @@ public class SellerView extends JFrame
 	@Override
 	public void actionPerformed(ActionEvent event)
 	{
-		if(event.getActionCommand().equals(START_BUTTON_ACTION_COMMAND))
+		String command = event.getActionCommand();
+		
+		switch(command)
 		{
-			this.minPriceSpinner.setEnabled(false);
-			this.maxPriceSpinner.setEnabled(false);
-			
-			this.startButton.setEnabled(false);
-			
+		case CREATE_BUTTON_ACTION_COMMAND:
 			this.myAgent.setFishSupplyName(
 					this.fishSupplyNameTextField.getText());
 			
+			this.myAgent.notifyCreateCommand();
+			break;
+			
+		case START_BUTTON_ACTION_COMMAND:
 			this.myAgent.notifyStartCommand();
+			break;
+			
+		case CANCEL_BUTTON_ACTION_COMMAND:
+			this.myAgent.notifyCancelCommand();
+			break;
 		}
 	}
 	
@@ -202,6 +227,8 @@ public class SellerView extends JFrame
 		}
 		
 		this.subscriberCountSpinner.setValue(++subscriberCount);
+		
+		this.messageLabel.setText("New subscriber !");
 	}
 	
 	/**
@@ -251,6 +278,18 @@ public class SellerView extends JFrame
 				++currentBidCount, 0, SellerTableModel.BID_COUNT_COLUMN);
 		
 		currentAnnounceModel.fireTableDataChanged();
+	}
+	
+	/**
+	 * Update the UI when the auction successfully ends.
+	 */
+	public void notifyAuctionOver(float price)
+	{
+		this.notifyAuctionCreated(false); // TODO : reschedule create auction behaviour.
+		
+		this.messageLabel.setText(
+				this.myAgent.getFishSupplyName() +
+				" sold at price " + price + " !");
 	}
 	
 	/**
@@ -305,6 +344,42 @@ public class SellerView extends JFrame
 	public long getWaitBidDuration()
 	{
 		return ((Integer) this.waitingBidDurationSpinner.getValue()).intValue();
+	}
+	
+	/**
+	 * Show the given message in the running information field.
+	 * 
+	 * @param mess the message which is to be displayed.
+	 */
+	public void displayMessage(String mess)
+	{
+		this.messageLabel.setText(mess);
+	}
+	
+	/**
+	 * Changes the state of the GUI when the auction has been created.
+	 * 
+	 * @param isCreated true sets the GUI to start the auction, otherwise for creating a new auction.
+	 */
+	public void notifyAuctionCreated(boolean isCreated)
+	{
+		this.fishSupplyNameTextField.setEnabled(!isCreated);
+		this.createButton.setEnabled(!isCreated);
+		
+		this.minPriceSpinner.setEnabled(isCreated);
+		this.maxPriceSpinner.setEnabled(isCreated);
+		this.startingPriceSpinner.setEnabled(isCreated);
+		this.priceStepSpinner.setEnabled(isCreated);
+		this.minPriceStepSpinner.setEnabled(isCreated);
+		this.waitingBidDurationSpinner.setEnabled(isCreated);
+		this.cancelButton.setEnabled(isCreated);
+		
+		this.startButton.setEnabled(false); // never before notifyNewSubscriber
+		
+		if(isCreated)
+		{
+			this.messageLabel.setText("Auction has been created ! Waiting subscribers !");
+		}
 	}
 	
 	/**
@@ -371,13 +446,50 @@ public class SellerView extends JFrame
 		this.subscriberCountSpinner.setEnabled(false);
 		
 		this.fishSupplyNameTextField = new JTextField("Fish supply");
+		this.fishSupplyNameTextField.requestFocus(true);
 		
 		this.currentAnnounceTable = new JTable(new SellerTableModel());
 		
 		this.announceHistoryTable = new JTable(new SellerTableModel());
 		
+		this.messageLabel = new JLabel("No auction created yet.");
+		this.messageLabel.setFont(
+				this.messageLabel.getFont().deriveFont(
+						this.messageLabel.getFont().getStyle() & ~Font.BOLD));
+		
+		this.createButton = new JButton("Create");
+		
+		this.cancelButton = new JButton("Cancel");
+		
 		this.startButton = new JButton("Start");
+		
+		this.notifyAuctionCreated(false);
+	}
+	
+	/**
+	 * Changes the state of the GUI when the auction has been started.
+	 * 
+	 */
+	public void notifyAuctionStarted()
+	{
+		this.minPriceSpinner.setEnabled(false);
+		this.maxPriceSpinner.setEnabled(false);
+		
+		this.cancelButton.setEnabled(false);
 		this.startButton.setEnabled(false);
+		
+		this.messageLabel.setText("Auction has started !");
+	}
+	
+	/**
+	 * Changes the state of the GUI when the auction has been started.
+	 * 
+	 */
+	public void notifyAuctionCancelled()
+	{
+		this.notifyAuctionCreated(false); // TODO : reschedule create auction behaviour.
+		
+		this.messageLabel.setText("Auction has been cancelled !");
 	}
 	
 	/**
@@ -451,8 +563,29 @@ public class SellerView extends JFrame
 					}
 				});
 		
+		this.fishSupplyNameTextField.addFocusListener(
+				new FocusListener() {
+		            @Override
+		            public void focusGained(FocusEvent e)
+		            {
+		            	fishSupplyNameTextField.select(0, fishSupplyNameTextField.getText().length());
+		            }
+
+		            @Override
+		            public void focusLost(FocusEvent e)
+		            {
+		            	fishSupplyNameTextField.select(0, 0);
+		            }
+		        });
+		
+		this.createButton.setActionCommand(CREATE_BUTTON_ACTION_COMMAND);
+		this.createButton.addActionListener(this);
+		
 		this.startButton.setActionCommand(START_BUTTON_ACTION_COMMAND);
 		this.startButton.addActionListener(this);
+		
+		this.cancelButton.setActionCommand(CANCEL_BUTTON_ACTION_COMMAND);
+		this.cancelButton.addActionListener(this);
 	}
 	
 	/**
@@ -498,6 +631,9 @@ public class SellerView extends JFrame
 		fishSupplyPanel.add(new JLabel("Name"));
 		fishSupplyPanel.add(this.fishSupplyNameTextField);
 		
+		fishSupplyPanel.add(new JLabel(""));
+		fishSupplyPanel.add(this.createButton);
+		
 		// Price configuration
 		JPanel priceConfigPanel = new JPanel();
 		
@@ -540,13 +676,22 @@ public class SellerView extends JFrame
 		subscriptionsFeedbackPanel.add(new JLabel("Registered"));
 		subscriptionsFeedbackPanel.add(this.subscriberCountSpinner);
 		
+		// Buttons pane
+		JPanel buttonsPanel = new JPanel();
+		
+		buttonsPanel.setBorder(
+				this.createTitleBorder("Auction"));
+		
+		buttonsPanel.setLayout(new GridLayout(0, 2));
+		buttonsPanel.add(this.cancelButton);
+		buttonsPanel.add(this.startButton);
+		
 		// Assemble
 		leftPane.add(fishSupplyPanel);
 		leftPane.add(priceConfigPanel);
 		leftPane.add(bidWaitingConfigPanel);
 		leftPane.add(subscriptionsFeedbackPanel);
-		
-		leftPane.add(this.startButton);
+		leftPane.add(buttonsPanel);
 		
 		return leftPane;
 	}
@@ -566,10 +711,19 @@ public class SellerView extends JFrame
 		rightPane.setBorder(
 				this.createTitleBorder("Auction progress"));
 		
+		// Messages label
+		JPanel messagePanel = new JPanel();
+		
+		messagePanel.setBorder(this.createTitleBorder("Info"));
+		
+		messagePanel.setLayout(new GridLayout(0, 1));
+		
+		messagePanel.add(this.messageLabel);
+		
 		// Current announce price panel
 		JPanel currentAnnouncePanel = new JPanel();
 		
-		currentAnnounceTable.setSize(currentAnnouncePanel.getWidth(), 100);
+		this.currentAnnounceTable.setSize(currentAnnouncePanel.getWidth(), 100);
 		
 		currentAnnouncePanel.setBorder(
 				this.createTitleBorder("Current announce"));
@@ -588,14 +742,13 @@ public class SellerView extends JFrame
 		
 		JScrollPane scrollPane = new JScrollPane(this.announceHistoryTable);
 		
-//		this.announceHistoryTable.setFillsViewportHeight(true);
-		
 		announceHistoryPanel.setLayout(
 				new BoxLayout(announceHistoryPanel, BoxLayout.Y_AXIS));
 		
 		announceHistoryPanel.add(scrollPane);
 		
 		// Assemble
+		rightPane.add(messagePanel);
 		rightPane.add(currentAnnouncePanel);
 		rightPane.add(announceHistoryPanel);
 		

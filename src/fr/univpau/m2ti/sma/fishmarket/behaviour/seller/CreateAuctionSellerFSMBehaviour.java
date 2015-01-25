@@ -28,6 +28,10 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 	public static final MessageTemplate MESSAGE_FILTER =
 			MessageTemplate.MatchTopic(CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 	
+	/** The state in which the seller waits that the user makes the create action. */
+	private static final String STATE_WAIT_CREATE_COMMAND =
+			"STATE_WAIT_CREATE_COMMAND";
+	
 	/** The initial state, in which the seller creates an auction and request it's registration to the market agent. */
 	private static final String STATE_REQUEST_CREATION =
 			"STATE_REQUEST_CREATION";
@@ -51,6 +55,9 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 	/** The state in which the seller cancels the auction because no bidder subscribed. */
 	private static final String STATE_TERMINATE_CANCEL =
 			"STATE_TERMINATE_CANCEL";
+	
+	/** The code which activates the transition to wait for the create command from the user. */
+	public static final int TRANSITION_TO_WAIT_CREATE_COMMAND;
 	
 	/** The code which activates the transition to wait for an answer from the market after a registration request. */
 	public static final int TRANSITION_TO_WAIT_RESPONSE;
@@ -80,6 +87,7 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 		TRANSITION_TO_WAIT_SUBSCRIBERS = ++start;
 		TRANSITION_TO_REQUEST_CREATION = ++start;
 		TRANSITION_TO_TERMINATE_SUCCESS = ++start;
+		TRANSITION_TO_WAIT_CREATE_COMMAND = ++start;
 	}
 	
 	/**
@@ -95,6 +103,10 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 		// Add states
 		// Final state must create AuctionSellerBehaviour
 		this.registerFirstState(
+				new WaitCreateCommandBehaviour(mySellerAgent, this),
+				STATE_WAIT_CREATE_COMMAND);
+		
+		this.registerState(
 				new RequestCreationBehaviour(mySellerAgent, this),
 				STATE_REQUEST_CREATION);
 		
@@ -119,6 +131,14 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_TERMINATE_CANCEL);
 		
 		// Add transitions
+		this.registerTransition(
+				STATE_WAIT_CREATE_COMMAND, STATE_WAIT_CREATE_COMMAND,
+				TRANSITION_TO_WAIT_CREATE_COMMAND);
+		
+		this.registerTransition(
+				STATE_WAIT_CREATE_COMMAND, STATE_REQUEST_CREATION,
+				TRANSITION_TO_REQUEST_CREATION);
+		
 		this.registerTransition(
 				STATE_REQUEST_CREATION, STATE_WAIT_RESPONSE,
 				TRANSITION_TO_WAIT_RESPONSE);

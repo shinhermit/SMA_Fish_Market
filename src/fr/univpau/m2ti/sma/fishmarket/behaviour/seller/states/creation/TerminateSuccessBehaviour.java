@@ -38,6 +38,6 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		this.myFSM.setRequestCount(0);
 		
 		// DEBUG
-		System.out.println("Seller: Terminate success !");
+		System.out.println("Seller: auction create terminate success !");
 	}
 }

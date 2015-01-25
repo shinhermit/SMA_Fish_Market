@@ -56,6 +56,8 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		// send
 		mySellerAgent.send(cancelMess);
 		
+		mySellerAgent.notifyAuctionCancelled();
+		
 		// DEBUG (break point)
 		System.out.println();
 	}

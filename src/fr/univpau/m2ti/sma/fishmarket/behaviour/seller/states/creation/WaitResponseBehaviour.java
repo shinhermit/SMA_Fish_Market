@@ -47,6 +47,8 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 		// DEBUG
 		System.out.println("Seller: checking messages !");
 		
+		SellerAgent mySellerAgent = (SellerAgent) super.myAgent;
+		
 		// Receive messages
 		ACLMessage mess = myAgent.receive(
 				WaitResponseBehaviour.MESSAGE_FILTER);
@@ -64,6 +66,8 @@ public class WaitResponseBehaviour extends OneShotBehaviour
 				this.transition =
 						CreateAuctionSellerFSMBehaviour
 						.TRANSITION_TO_WAIT_SUBSCRIBERS;
+				
+				mySellerAgent.notifyAuctionCreated();
 				
 				// DEBUG
 				System.out.println("Seller: setting transition to wait subscribers !");

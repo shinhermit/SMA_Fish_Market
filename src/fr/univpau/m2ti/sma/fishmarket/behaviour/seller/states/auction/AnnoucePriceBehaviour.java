@@ -34,6 +34,8 @@ public class AnnoucePriceBehaviour extends OneShotBehaviour
 		SellerAgent mySellerAgent =
 				(SellerAgent) super.myAgent;
 		
+		mySellerAgent.notifyAuctionStarted();
+		
 		// DEBUG
 		System.out.println("Seller: sending to_announce("+mySellerAgent.getCurrentPrice()+") !");
 		

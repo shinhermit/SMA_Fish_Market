@@ -50,6 +50,9 @@ public class SellerAgent extends Agent
 	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
 	
 	/** Tells whether the user decided to start the auction or not. */
+	private boolean createCommandReceived = false;
+	
+	/** Tells whether the user decided to start the auction or not. */
 	private boolean startCommandReceived = false;
 	
 	/** Tells whether the user decided to start the auction or not. */
@@ -295,9 +298,42 @@ public class SellerAgent extends Agent
 	/**
 	 * Notifies that the user decided to start the auction.
 	 */
+	public void notifyCreateCommand()
+	{
+		this.createCommandReceived = true;
+	}
+	
+	/**
+	 * Notifies the view that the auction has been created.
+	 */
+	public void notifyAuctionCreated()
+	{
+		this.myView.notifyAuctionCreated(true);
+	}
+	
+	/**
+	 * 
+	 * @return true if a start auction command has been received from the user, false otherwise.
+	 */
+	public boolean isCreateCommandReceived()
+	{
+		return this.createCommandReceived;
+	}
+	
+	/**
+	 * Notifies that the user decided to start the auction.
+	 */
 	public void notifyStartCommand()
 	{
 		this.startCommandReceived = true;
+	}
+	
+	/**
+	 * Notifies the view that the auction has been started.
+	 */
+	public void notifyAuctionStarted()
+	{
+		this.myView.notifyAuctionStarted();
 	}
 	
 	/**
@@ -318,6 +354,14 @@ public class SellerAgent extends Agent
 	}
 	
 	/**
+	 * Notifies the view that the auction has been cancelled.
+	 */
+	public void notifyAuctionCancelled()
+	{
+		this.myView.notifyAuctionCancelled();
+	}
+	
+	/**
 	 * 
 	 * @return true if a cancel auction command has been received from the user, false otherwise.
 	 */
@@ -332,6 +376,15 @@ public class SellerAgent extends Agent
 	public void notifyNewAnnounce()
 	{
 		this.myView.notifyNewAnnounce(this.currentPrice);
+	}
+	
+	/**
+	 * Notifies the view that the auction successfully ended.
+	 */
+	public void notifyAuctionOver()
+	{
+		this.myView.notifyAuctionOver(
+				this.getCurrentPrice());
 	}
 	
 	/**
