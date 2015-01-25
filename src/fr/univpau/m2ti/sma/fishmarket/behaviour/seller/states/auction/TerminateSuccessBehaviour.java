@@ -62,6 +62,7 @@ public class TerminateSuccessBehaviour extends OneShotBehaviour
 		mySellerAgent.removeBehaviour(this.myFSM);
 		
 		// Add create auction
+		mySellerAgent.reset();
 		mySellerAgent.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(mySellerAgent));
 	}

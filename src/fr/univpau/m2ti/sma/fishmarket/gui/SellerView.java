@@ -149,8 +149,10 @@ public class SellerView extends JFrame
 	
 	/**
 	 * Resets the view (according to the agent state).
+	 * 
+	 * @param displayMessage a message to display after the reset. null makes no change to the displayed message.
 	 */
-	public void reset()
+	public void reset(String displayMessage)
 	{
 		this.setMinPrice(this.myAgent.getMinPrice());
 		this.setMaxPrice(this.myAgent.getMaxPrice());
@@ -159,9 +161,23 @@ public class SellerView extends JFrame
 		this.setMinPriceStep(this.myAgent.getMinPriceStep());
 		this.setSubscriberCount(this.myAgent.getSubscriberCount());
 		
-		this.displayMessage("No auction created yet.");
 		((SellerTableModel)this.currentAnnounceTable.getModel()).reset();
 		((SellerTableModel)this.announceHistoryTable.getModel()).reset();
+		
+		if(displayMessage != null)
+		{
+			this.displayMessage(displayMessage);
+		}
+	}
+	
+	/**
+	 * Resets the view (according to the agent state).
+	 * 
+	 * <p>Same as <code>reset(null);</code></p>
+	 */
+	public void reset()
+	{
+		this.reset(null);
 	}
 	
 	/**

@@ -66,7 +66,7 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 			auction = new Auction(auctionId);
 		}
 		else if(auction.getStatus() != Auction.STATUS_CANCELLED
-				&& auction.getStatus() != Auction.STATUS_CANCELLED)
+				&& auction.getStatus() != Auction.STATUS_OVER)
 		{
 			accepted = false;
 		}
