@@ -4,23 +4,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayAuctionOverBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayRepBidNokBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayRepBidOkBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToAnnounceBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToAttributeBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToBidBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToCancelBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToGiveBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToPayBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.TerminateCancelBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.TerminateSuccessBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitAuctionOverBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToAnnounceBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToAttributeBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToBidBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToGiveBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToPayBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayAuctionOverMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayRepBidNokMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayRepBidOkMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToAnnounceMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToAttributeMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToBidMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToCancelMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToGiveMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.RelayToPayMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.TerminateCancelMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.TerminateSuccessMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitAuctionOverMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToAnnounceMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToAttributeMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToBidMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToGiveMarketBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.market.states.WaitToPayMarketBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.behaviours.FSMBehaviour;
@@ -218,55 +218,55 @@ public class RunningAuctionMarketFSMBehaviour extends FSMBehaviour
 		this.messageFilter = this.createMessageFilter();
 		
 		// Register states
-		this.registerFirstState(new WaitToAnnounceBehaviour(myMarketAgent, this),
+		this.registerFirstState(new WaitToAnnounceMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_ANNOUNCE);
 		
-		this.registerState(new WaitToBidBehaviour(myMarketAgent, this),
+		this.registerState(new WaitToBidMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_BID);
 		
-		this.registerState(new WaitToAttributeBehaviour(myMarketAgent, this),
+		this.registerState(new WaitToAttributeMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_ATTRIBUTE);
 		
-		this.registerState(new WaitToGiveBehaviour(myMarketAgent, this),
+		this.registerState(new WaitToGiveMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_GIVE);
 		
-		this.registerState(new WaitToPayBehaviour(myMarketAgent, this),
+		this.registerState(new WaitToPayMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_TO_PAY);
 		
-		this.registerState(new WaitAuctionOverBehaviour(myMarketAgent, this),
+		this.registerState(new WaitAuctionOverMarketBehaviour(myMarketAgent, this),
 				STATE_WAIT_AUCTION_OVER);
 		
-		this.registerState(new RelayToAnnounceBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToAnnounceMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_ANNOUNCE);
 		
-		this.registerState(new RelayToBidBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToBidMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_BID);
 		
-		this.registerState(new RelayToCancelBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToCancelMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_AUCTION_CANCELLED);
 		
-		this.registerState(new RelayRepBidOkBehaviour(myMarketAgent, this),
+		this.registerState(new RelayRepBidOkMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_REP_BID_OK);
 		
-		this.registerState(new RelayRepBidNokBehaviour(myMarketAgent, this),
+		this.registerState(new RelayRepBidNokMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_REP_BID_NOK);
 		
-		this.registerState(new RelayToAttributeBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToAttributeMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_ATTRIBUTE);
 		
-		this.registerState(new RelayToGiveBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToGiveMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_GIVE);
 		
-		this.registerState(new RelayToPayBehaviour(myMarketAgent, this),
+		this.registerState(new RelayToPayMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_TO_PAY);
 		
-		this.registerState(new RelayAuctionOverBehaviour(myMarketAgent, this),
+		this.registerState(new RelayAuctionOverMarketBehaviour(myMarketAgent, this),
 				STATE_RELAY_AUCTION_OVER);
 		
-		this.registerLastState(new TerminateSuccessBehaviour(myMarketAgent, this),
+		this.registerLastState(new TerminateSuccessMarketBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_SUCCESS);
 		
-		this.registerLastState(new TerminateCancelBehaviour(myMarketAgent, this),
+		this.registerLastState(new TerminateCancelMarketBehaviour(myMarketAgent, this),
 				STATE_TERMINATE_CANCEL);
 		
 		// Register transitions

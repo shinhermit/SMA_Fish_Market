@@ -1,6 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.agent;
 
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.BidderBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionBidderFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionBidderFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionMarketFSMBehaviour;
@@ -74,7 +74,7 @@ public class BidderAgent extends Agent
 	{
 		this.bidderView.initBidList(this.getSubscribedAuction());
 
-		this.runningAuctionFSM = new BidderBehaviour(this);
+		this.runningAuctionFSM = new RunningAuctionBidderFSMBehaviour(this);
 		this.addBehaviour(this.runningAuctionFSM);
 	}
 

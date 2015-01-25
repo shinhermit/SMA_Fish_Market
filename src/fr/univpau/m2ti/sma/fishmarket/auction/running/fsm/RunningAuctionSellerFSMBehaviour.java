@@ -1,14 +1,14 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.SellerAgent;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.AnnoucePriceBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.AttributeFishSupplyBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.GiveFishSupplyBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.HandleMultipleBidBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.TerminateCancelBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.TerminateSuccessBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.WaitBidBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.WaitPaymentBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.AnnoucePriceSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.AttributeFishSupplySellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.GiveFishSupplySellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.HandleMultipleBidSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.TerminateCancelSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.TerminateSuccessSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.WaitBidSellerBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.seller.states.WaitPaymentSellerBehaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.MessageTemplate;
 
@@ -110,39 +110,39 @@ public class RunningAuctionSellerFSMBehaviour extends FSMBehaviour
 		
 		// Add states
 		this.registerFirstState(
-				new AnnoucePriceBehaviour(mySellerAgent, this),
+				new AnnoucePriceSellerBehaviour(mySellerAgent, this),
 				STATE_ANNONCE_PRICE);
 		
 		this.registerState(
-				new WaitBidBehaviour(mySellerAgent, this),
+				new WaitBidSellerBehaviour(mySellerAgent, this),
 				STATE_WAIT_BID);
 		
 		this.registerState(
-				new HandleMultipleBidBehaviour(mySellerAgent, this),
+				new HandleMultipleBidSellerBehaviour(mySellerAgent, this),
 				STATE_HANDLE_MULTIPLE_BID);
 		
 		this.registerState(
-				new AttributeFishSupplyBehaviour(mySellerAgent, this),
+				new AttributeFishSupplySellerBehaviour(mySellerAgent, this),
 				STATE_SEND_TO_ATTRIBUTE);
 		
 		this.registerState(
-				new GiveFishSupplyBehaviour(mySellerAgent, this),
+				new GiveFishSupplySellerBehaviour(mySellerAgent, this),
 				STATE_SEND_TO_GIVE);
 		
 		this.registerState(
-				new WaitPaymentBehaviour(mySellerAgent, this),
+				new WaitPaymentSellerBehaviour(mySellerAgent, this),
 				STATE_WAIT_TO_PAY);
 		
 		this.registerState(
-				new WaitPaymentBehaviour(mySellerAgent, this),
+				new WaitPaymentSellerBehaviour(mySellerAgent, this),
 				STATE_WAIT_TO_PAY);
 		
 		this.registerLastState(
-				new TerminateCancelBehaviour(mySellerAgent, this),
+				new TerminateCancelSellerBehaviour(mySellerAgent, this),
 				STATE_TERMINATE_CANCEL);
 		
 		this.registerLastState(
-				new TerminateSuccessBehaviour(mySellerAgent, this),
+				new TerminateSuccessSellerBehaviour(mySellerAgent, this),
 				STATE_TERMINATE_SUCCESS);
 		
 		// Add transitions
