@@ -1,4 +1,4 @@
-package fr.univpau.m2ti.sma.fishmarket.ihm;
+package fr.univpau.m2ti.sma.fishmarket.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -111,7 +111,7 @@ public class SellerView extends JFrame
 	{
 		this.myAgent = myAgent;
 		
-		this.instantiateWidgets();
+		this.instantianteWidgets();
 		
 		this.addListeners();
 		
@@ -148,12 +148,29 @@ public class SellerView extends JFrame
 	}
 	
 	/**
+	 * Resets the view (according to the agent state).
+	 */
+	public void reset()
+	{
+		this.setMinPrice(this.myAgent.getMinPrice());
+		this.setMaxPrice(this.myAgent.getMaxPrice());
+		this.setStartingPrice(this.myAgent.getCurrentPrice());
+		this.setPriceStep(this.myAgent.getPriceStep());
+		this.setMinPriceStep(this.myAgent.getMinPriceStep());
+		this.setSubscriberCount(this.myAgent.getSubscriberCount());
+		
+		this.displayMessage("No auction created yet.");
+		((SellerTableModel)this.currentAnnounceTable.getModel()).reset();
+		((SellerTableModel)this.announceHistoryTable.getModel()).reset();
+	}
+	
+	/**
 	 * 
 	 * @param minPrice the value which is to be display on the field for the minimal value of the price for the auction.
 	 */
 	public void setMinPrice(float minPrice)
 	{
-		this.minPriceSpinner.setValue(minPrice);
+		this.minPriceSpinner.setValue((double)minPrice);
 	}
 	
 	/**
@@ -162,7 +179,7 @@ public class SellerView extends JFrame
 	 */
 	public void setMaxPrice(float maxPrice)
 	{
-		this.maxPriceSpinner.setValue(maxPrice);
+		this.maxPriceSpinner.setValue((double)maxPrice);
 	}
 	
 	/**
@@ -171,7 +188,7 @@ public class SellerView extends JFrame
 	 */
 	public void setStartingPrice(float price)
 	{
-		this.startingPriceSpinner.setValue(price);	
+		this.startingPriceSpinner.setValue((double)price);	
 	}
 	
 	/**
@@ -180,7 +197,7 @@ public class SellerView extends JFrame
 	 */
 	public void setPriceStep(float priceStep)
 	{
-		this.priceStepSpinner.setValue(priceStep);
+		this.priceStepSpinner.setValue((double)priceStep);
 	}
 	
 	/**
@@ -189,7 +206,7 @@ public class SellerView extends JFrame
 	 */
 	public void setMinPriceStep(float minPriceStep)
 	{
-		this.minPriceSpinner.setValue(minPriceStep);
+		this.minPriceSpinner.setValue((double)minPriceStep);
 	}
 	
 	/**
@@ -198,7 +215,7 @@ public class SellerView extends JFrame
 	 */
 	public void setWaitBidDuration(long millis)
 	{
-		this.waitingBidDurationSpinner.setValue(millis);
+		this.waitingBidDurationSpinner.setValue((int)millis);
 	}
 	
 	/**
@@ -385,7 +402,7 @@ public class SellerView extends JFrame
 	/**
 	 * Instantiates the dynamic widgets of the view.
 	 */
-	private void instantiateWidgets()
+	private void instantianteWidgets()
 	{
 		this.minPriceSpinner = new JSpinner(
 				new SpinnerNumberModel(
@@ -867,6 +884,15 @@ public class SellerView extends JFrame
 		public void addValue(float price)
 		{
 			this.addValue(price, 0);
+		}
+		
+		/**
+		 * Resets the model to the initial state.
+		 */
+		public void reset()
+		{
+			this.prices.clear();
+			this.bids.clear();
 		}
 	}
 }

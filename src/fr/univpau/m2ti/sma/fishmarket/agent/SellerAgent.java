@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.seller.CreateAuctionSellerFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.ihm.SellerView;
+import fr.univpau.m2ti.sma.fishmarket.gui.SellerView;
 
 @SuppressWarnings("serial")
 /**
@@ -73,7 +73,7 @@ public class SellerAgent extends Agent
 	 */
 	public SellerAgent()
 	{
-		this.reset();
+		
 	}
 	
 	/**
@@ -93,13 +93,17 @@ public class SellerAgent extends Agent
 		this.currentPrice = minPrice;
 		this.priceStep = (maxPrice - minPrice) / 2f;
 		this.minPriceStep = this.priceStep / 10f;
+		
+		if(this.myView != null)
+		{
+			this.myView.reset();
+		}
 	}
 	
 	@Override
 	protected void setup()
 	{
-		this.marketAgentID =
-				this.lookupMarketAgent();
+		this.reset();
 		
 		this.addBehaviour(
 				new CreateAuctionSellerFSMBehaviour(this));
@@ -110,41 +114,43 @@ public class SellerAgent extends Agent
 	}
     
 	/**
-	 * Retrieves the AID of the market agent.
-	 * @return the AID of the market agent.
+	 * Retrieves the AID of the market agent, by asking the DF agent.
+	 * 
+	 * @return true if the AID has been found, false otherwise.
 	 */
-    protected AID lookupMarketAgent()
+    public boolean lookupMarketAgent()
     {
-    	AID marketAgent = null;
-    	
-        DFAgentDescription marketTemplate = new DFAgentDescription();
-        ServiceDescription marketSd = new ServiceDescription();
+    	if(this.marketAgentID == null)
+    	{
+	    	DFAgentDescription marketTemplate = new DFAgentDescription();
+	        ServiceDescription marketSd = new ServiceDescription();
+	        
+	        // Template for searching the market agent
+	        marketSd.setType(MarketAgent.SERVICE_DESCIPTION);
+	        marketTemplate.addServices(marketSd);
+	        
+	        try
+	        {
+	            DFAgentDescription[] marketResult = DFService.search(this, marketTemplate);
+	            
+	            if(marketResult.length == 1)
+	            {
+	            	this.marketAgentID = marketResult[0].getName();
+	            }
+	            else
+	            {
+	            	SellerAgent.LOGGER.log(
+	            			Level.SEVERE, null,
+	            			"Logic error: multiple market agents found !");
+	            }
+	        }
+	        catch (FIPAException fe)
+	        {
+	            SellerAgent.LOGGER.log(Level.INFO, null, fe);
+	        }
+    	}
         
-        // Template for searching the market agent
-        marketSd.setType(MarketAgent.SERVICE_DESCIPTION);
-        marketTemplate.addServices(marketSd);
-        
-        try
-        {
-            DFAgentDescription[] marketResult = DFService.search(this, marketTemplate);
-            
-            if(marketResult.length == 1)
-            {
-            	marketAgent = marketResult[0].getName();
-            }
-            else
-            {
-            	SellerAgent.LOGGER.log(
-            			Level.SEVERE, null,
-            			"Logic error: multiple market agents found !");
-            }
-        }
-        catch (FIPAException fe)
-        {
-            SellerAgent.LOGGER.log(Level.SEVERE, null, fe);
-        }
-        
-        return marketAgent;
+        return this.marketAgentID != null;
     }
 
     /**
@@ -321,6 +327,16 @@ public class SellerAgent extends Agent
 	public void notifyCreateCommand()
 	{
 		this.createCommandReceived = true;
+	}
+	
+	/**
+	 * Notifies that the user decided to start the auction.
+	 */
+	public void notifyMarketNotFound()
+	{
+		this.createCommandReceived = false;
+		
+		this.myView.displayMessage("Market agent not found :_(");
 	}
 	
 	/**

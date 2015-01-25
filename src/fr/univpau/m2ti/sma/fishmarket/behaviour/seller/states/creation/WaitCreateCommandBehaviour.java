@@ -34,18 +34,27 @@ public class WaitCreateCommandBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
-		// DEBUG
-		System.out.println("Seller: in wait create!");
-		
 		SellerAgent mySellerAgent = (SellerAgent) super.myAgent;
 		
 		if(mySellerAgent.isCreateCommandReceived())
 		{
-			// DEBUG
-			System.out.println("Seller: setting transition to request creation !");
-			
-			this.transition =
-					CreateAuctionSellerFSMBehaviour.TRANSITION_TO_REQUEST_CREATION;
+			if(mySellerAgent.lookupMarketAgent())
+			{
+				// DEBUG
+				System.out.println("Seller: setting transition to request creation !");
+				
+				this.transition =
+						CreateAuctionSellerFSMBehaviour.TRANSITION_TO_REQUEST_CREATION;
+			}
+			else
+			{
+				mySellerAgent.notifyMarketNotFound();
+				
+				this.transition =
+						CreateAuctionSellerFSMBehaviour.TRANSITION_TO_WAIT_CREATE_COMMAND;
+				
+				this.myFSM.block(WAIT_CREATE_COMMAND_CYCLE_DURATION);
+			}
 		}
 		else
 		{
