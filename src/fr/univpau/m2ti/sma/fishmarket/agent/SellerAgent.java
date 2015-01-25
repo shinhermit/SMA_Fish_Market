@@ -43,6 +43,9 @@ public class SellerAgent extends Agent
 	/** How much the price can currently be decreased or increased. */
 	private float minPriceStep;
 	
+	/** The number of subscriber for the auction of this seller. */
+	private int subscriberCount = 0;
+	
 	/** The default value for the bid waiting duration. */
 	public static final long DEFAULT_BID_WAITING_DURATION = 10*1000l; // 10 sec
 	
@@ -410,7 +413,18 @@ public class SellerAgent extends Agent
 	 */
 	public void notifyNewSubscriber()
 	{
+		++ this.subscriberCount;
+		
 		this.myView.notifyNewSubscriber();
+	}
+	
+	/**
+	 * 
+	 * @return the number of subscribers for the auction of this seller.
+	 */
+	public int getSubscriberCount()
+	{
+		return this.subscriberCount;
 	}
 	
 	/**
