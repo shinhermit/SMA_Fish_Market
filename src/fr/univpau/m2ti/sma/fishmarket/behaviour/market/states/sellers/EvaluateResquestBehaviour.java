@@ -53,13 +53,25 @@ public class EvaluateResquestBehaviour extends OneShotBehaviour
 				RunningAuctionMarketFSMBehaviour.createAuctionId(
 						request.getSender());
 		
-		Auction auction = new Auction(auctionId);
-		
 		// DEBUG
 		System.out.println("Market: evaluating creation request of auction with id "+auctionId);
 		System.out.println("Topic is: "+CreateAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
-		if(! myMarketAgent.isRegisteredAuction(auctionId) )
+		boolean accepted = true;
+		
+		Auction auction = myMarketAgent.findAuction(auctionId);
+		
+		if(auction == null)
+		{
+			auction = new Auction(auctionId);
+		}
+		else if(auction.getStatus() != Auction.STATUS_CANCELLED
+				&& auction.getStatus() != Auction.STATUS_CANCELLED)
+		{
+			accepted = false;
+		}
+		
+		if(accepted)
 		{
 			// DEBUG
 			System.out.println("Market: auction is not yet registered");

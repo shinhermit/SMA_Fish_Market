@@ -310,7 +310,13 @@ public class MarketAgent extends Agent
 					"auction with ID " + auctionID + " not found.");
 		}
 	}
-	
+
+	/**
+	 * Updates the auction status and the view when an auction ends with an attribution.
+	 * 
+	 * @param auctionID the auction which is over.
+	 * @param winnerName the name of the winner
+	 */
 	public void notifyAuctionOver(String auctionID, String winnerName)
 	{
 		Auction auction = this.findAuction(auctionID);
@@ -320,7 +326,29 @@ public class MarketAgent extends Agent
 			auction.setStatus(Auction.STATUS_OVER);
 			auction.setWinnerName(winnerName);
 			
-			this.myView.refresh();
+//			this.myView.refresh();
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
+	}
+
+	/**
+	 * Updates the auction status and the view when an auction has been cancelled.
+	 * 
+	 * @param auctionID the auction which has been cancelled.
+	 */
+	public void notifyAuctionCancelled(String auctionID)
+	{
+		Auction auction = this.findAuction(auctionID);
+		
+		if(auction != null)
+		{
+			auction.setStatus(Auction.STATUS_CANCELLED);
+			
+//			this.myView.refresh();
 		}
 		else
 		{

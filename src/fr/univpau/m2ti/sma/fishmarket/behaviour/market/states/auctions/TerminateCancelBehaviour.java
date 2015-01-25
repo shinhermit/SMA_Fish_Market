@@ -44,6 +44,8 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		// Update GUI
 		myMarketAgent.refreshView();
 		
+		myMarketAgent.removeBehaviour(this.myFSM);
+		
 		// Say bye !
 	}
 }

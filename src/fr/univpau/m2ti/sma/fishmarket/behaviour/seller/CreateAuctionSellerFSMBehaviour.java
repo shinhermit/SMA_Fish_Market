@@ -171,6 +171,15 @@ public class CreateAuctionSellerFSMBehaviour extends FSMBehaviour
 				STATE_WAIT_SUBSCRIBERS, STATE_TERMINATE_SUCCESS,
 				TRANSITION_TO_TERMINATE_SUCCESS);
 	}
+	
+	@Override
+	public void reset()
+	{
+		this.response = null;
+		this.requestCount = 0;
+		
+		super.reset();
+	}
 
 	/**
 	 * 

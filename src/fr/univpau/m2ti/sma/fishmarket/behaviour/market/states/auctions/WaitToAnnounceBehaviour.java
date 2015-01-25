@@ -2,6 +2,7 @@ package fr.univpau.m2ti.sma.fishmarket.behaviour.market.states.auctions;
 
 import fr.univpau.m2ti.sma.fishmarket.agent.MarketAgent;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -78,6 +79,10 @@ public class WaitToAnnounceBehaviour extends OneShotBehaviour
 				
 				this.transition = RunningAuctionMarketFSMBehaviour.
 						TRANSITION_TO_CANCEL;
+				
+				((MarketAgent)super.myAgent).setAuctionStatus(
+						this.myFSM.getAuctionId(),
+						Auction.STATUS_CANCELLED);
 			}
 		}
 		else

@@ -26,13 +26,13 @@ public class SellerAgent extends Agent
 	private AID marketAgentID = null;
 	
 	/** A user friendly name for the auction. */
-	private String fishSupplyName = "";
+	private String fishSupplyName;
 	
 	/** The minimal value for the price. */
-	private float minPrice = 200f;
+	private float minPrice;
 	
 	/** The maximal value for the price. */
-	private float maxPrice = 1000f;
+	private float maxPrice;
 	
 	/** The current price of the fish supply. */
 	private float currentPrice;
@@ -44,22 +44,22 @@ public class SellerAgent extends Agent
 	private float minPriceStep;
 	
 	/** The number of subscriber for the auction of this seller. */
-	private int subscriberCount = 0;
+	private int subscriberCount;
 	
 	/** The default value for the bid waiting duration. */
 	public static final long DEFAULT_BID_WAITING_DURATION = 10*1000l; // 10 sec
 	
 	/** The amount of time to wait for bids after an announce. */
-	private long bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
+	private long bidWaitingDuration;
 	
 	/** Tells whether the user decided to start the auction or not. */
-	private boolean createCommandReceived = false;
+	private boolean createCommandReceived;
 	
 	/** Tells whether the user decided to start the auction or not. */
-	private boolean startCommandReceived = false;
+	private boolean startCommandReceived;
 	
 	/** Tells whether the user decided to start the auction or not. */
-	private boolean cancelCommandReceived = false;
+	private boolean cancelCommandReceived;
 	
 	/** The view for this seller agent. */
 	private SellerView myView;
@@ -73,6 +73,23 @@ public class SellerAgent extends Agent
 	 */
 	public SellerAgent()
 	{
+		this.reset();
+	}
+	
+	/**
+	 * Sets the agent to its initial state.
+	 */
+	public void reset()
+	{
+		this.bidWaitingDuration = DEFAULT_BID_WAITING_DURATION;
+		this.cancelCommandReceived = false;
+		this.createCommandReceived = false;
+		this.startCommandReceived = false;
+		this.subscriberCount = 0;
+		this.fishSupplyName = "";
+		
+		this.maxPrice = 1000f;
+		this.minPrice = 200f;
 		this.currentPrice = minPrice;
 		this.priceStep = (maxPrice - minPrice) / 2f;
 		this.minPriceStep = this.priceStep / 10f;
@@ -321,6 +338,14 @@ public class SellerAgent extends Agent
 	public boolean isCreateCommandReceived()
 	{
 		return this.createCommandReceived;
+	}
+	
+	/**
+	 * Notifies the view of the message.
+	 */
+	public void notifyMessage(String mess)
+	{
+		this.myView.displayMessage(mess);
 	}
 	
 	/**

@@ -53,11 +53,10 @@ public class TerminateCancelBehaviour extends OneShotBehaviour
 		// Add auction and send
 		mySellerAgent.send(cancelMess);
 		
-		this.myFSM.setRequestCount(0);
-		
 		mySellerAgent.notifyAuctionCancelled();
 		
-		// DEBUG
-		System.out.println("Seller: auction creation terminate cancel !");
+		mySellerAgent.removeBehaviour(this.myFSM);
+		mySellerAgent.reset();
+		mySellerAgent.addBehaviour(new CreateAuctionSellerFSMBehaviour(mySellerAgent));
 	}
 }

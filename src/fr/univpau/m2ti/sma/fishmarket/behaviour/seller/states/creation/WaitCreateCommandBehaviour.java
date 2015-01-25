@@ -34,6 +34,9 @@ public class WaitCreateCommandBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// DEBUG
+		System.out.println("Seller: in wait create!");
+		
 		SellerAgent mySellerAgent = (SellerAgent) super.myAgent;
 		
 		if(mySellerAgent.isCreateCommandReceived())
