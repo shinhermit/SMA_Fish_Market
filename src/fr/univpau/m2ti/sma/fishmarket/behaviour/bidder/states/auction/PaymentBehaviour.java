@@ -40,7 +40,7 @@ public class PaymentBehaviour extends OneShotBehaviour
         payment.addReceiver(((BidderAgent) super.myAgent).getMarketAgentAID());
         payment.addReceiver(RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
         payment.setPerformative(FishMarket.Performatives.TO_PAY);
-        payment.setContent(String.valueOf(this.myFSM.getBiddingPrice()));
+        payment.setContent(String.valueOf(((BidderAgent) super.myAgent).getBiddingPrice()));
 
         super.myAgent.send(payment);
     }

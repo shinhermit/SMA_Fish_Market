@@ -61,6 +61,8 @@ public class BidderBehaviour extends FSMBehaviour
 
 	public static final int TRANSITION_WAIT_FISH;
 
+	public static final int TRANSITION_WAIT_USER_CHOICE;
+
 	static
 	{
 		int start = 1;
@@ -77,20 +79,22 @@ public class BidderBehaviour extends FSMBehaviour
 		TRANSITION_WAIT_BID_RESULT = ++start;
 		TRANSITION_WAIT_ATTRIBUTION = ++start;
 		TRANSITION_WAIT_FISH = ++start;
+		TRANSITION_WAIT_USER_CHOICE = ++start;
 	}
 
 	/** Message holder */
 	private ACLMessage request;
 
-	private float maxPrice;
+//	private float maxPrice;
+//
+//	/** Price at last bid */
+//	private float biddingPrice;
 
-	/** Price at last bid */
-	private float biddingPrice;
-
-	public BidderBehaviour (Agent a, float maxPrice)
+//	public BidderBehaviour (Agent a, float maxPrice)
+	public BidderBehaviour (Agent a)
 	{
 		super(a);
-		this.maxPrice = maxPrice;
+//		this.maxPrice = maxPrice;
 
 		// Declare and register states
 		this.registerFirstState(
@@ -154,13 +158,19 @@ public class BidderBehaviour extends FSMBehaviour
 		this.registerTransition(
 				STATE_ABOUT_TO_BID,
 				STATE_WAIT_BID_RESULT,
-				BidderBehaviour.TRANSITION_BID
+				BidderBehaviour.TRANSITION_WAIT_BID_RESULT
 		);
 
 		this.registerTransition(
 				STATE_ABOUT_TO_BID,
 				STATE_ABOUT_TO_BID,
 				BidderBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE
+		);
+
+		this.registerTransition(
+				STATE_ABOUT_TO_BID,
+				STATE_ABOUT_TO_BID,
+				BidderBehaviour.TRANSITION_WAIT_USER_CHOICE
 		);
 
 		this.registerTransition(
@@ -265,21 +275,6 @@ public class BidderBehaviour extends FSMBehaviour
 	public void setRequest(ACLMessage request)
 	{
 		this.request = request;
-	}
-
-	public float getPriceLimit()
-	{
-		return this.maxPrice;
-	}
-
-	public void setBiddingPrice(float biddingPrice)
-	{
-		this.biddingPrice = biddingPrice;
-	}
-
-	public float getBiddingPrice()
-	{
-		return this.biddingPrice;
 	}
 
 	@Override

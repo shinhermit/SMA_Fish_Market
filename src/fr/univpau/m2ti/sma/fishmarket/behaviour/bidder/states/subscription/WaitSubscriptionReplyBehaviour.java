@@ -63,7 +63,7 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
 
         if(mess != null)
         {
-            this.myFSM.restart();
+
             if(mess.getPerformative() ==
                     FishMarket.Performatives.TO_ACCEPT)
             {
@@ -73,8 +73,6 @@ public class WaitSubscriptionReplyBehaviour extends OneShotBehaviour
                                 .TRANSITION_SUBSCRIPTION_ACCEPTED;
 
                 seller =  mess.getContent();
-
-                this.myFSM.subscribeToAuction(seller);
             }
             else
             {

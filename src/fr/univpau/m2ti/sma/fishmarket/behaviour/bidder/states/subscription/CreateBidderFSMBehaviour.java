@@ -34,13 +34,13 @@ public class CreateBidderFSMBehaviour extends OneShotBehaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
-//        bidderAgent.createBidderFSM(
-//            this.getNewPriceLimit(1000, 2000)
-//        );
-
-        bidderAgent.addBehaviour(
-                new BidderBehaviour(super.myAgent, this.getNewPriceLimit(1000, 2000))
+        bidderAgent.createBidderFSM(
+            this.getNewPriceLimit(1000, 3000)
         );
+
+//        bidderAgent.addBehaviour(
+//                new BidderBehaviour(super.myAgent, this.getNewPriceLimit(1000, 3000))
+//        );
     }
 
     private float getNewPriceLimit(float min, float max)

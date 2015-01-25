@@ -16,6 +16,8 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
 {
     private SubscribeToAuctionBehaviour myFsm;
 
+    private int transition;
+
     public SubscriptionProcessStartBehaviour(Agent a, SubscribeToAuctionBehaviour fsm)
     {
         super(a);
@@ -30,20 +32,31 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
                 (BidderAgent) super.myAgent;
 
         // Prepare and send message
-        // TODO : faire le lookup une fois pour toutes
         AID marketAID = bidderAgent.getMarketAgentAID();
 
-        ACLMessage requestAuctionListMessage =
-                new ACLMessage(FishMarket.Performatives.TO_REQUEST);
+        if (marketAID != null)
+        {
+            ACLMessage requestAuctionListMessage =
+                    new ACLMessage(FishMarket.Performatives.TO_REQUEST);
 
-        requestAuctionListMessage.addReceiver(marketAID);
+            requestAuctionListMessage.addReceiver(marketAID);
 
-        requestAuctionListMessage.addReceiver(
-        		BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC);
+            requestAuctionListMessage.addReceiver(
+                    BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC
+            );
 
+            bidderAgent.send(requestAuctionListMessage);
 
-        bidderAgent.send(requestAuctionListMessage);
+            this.transition =
+                    SubscribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST;;
+        }
+        else
+        {
+            ((BidderAgent)myAgent).alertNoMarket();
 
+            this.transition =
+                    SubscribeToAuctionBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS;
+        }
         // transition to next step
 
     }
@@ -51,7 +64,7 @@ public class SubscriptionProcessStartBehaviour extends OneShotBehaviour
     @Override
     public int onEnd() {
         // Implemented because of possible early return to end state.
-        System.out.println("SubscriptionProcessStartBehaviour : in onEnd");
-        return SubscribeToAuctionBehaviour.TRANSITION_REQUEST_AUCTION_LIST;
+
+        return this.transition;
     }
 }

@@ -64,6 +64,7 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 
 	public static final int TRANSITION_WAIT_SUBSCRIPTION_RESULT;
 
+	public static final int TRANSITION_WAIT_USER_CHOICE;
 	/**
 	 * An empty auction list has been received.
 	 */
@@ -90,6 +91,7 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START = ++start;
 		TRANSITION_WAIT_AUCTION_LIST = ++start;
 		TRANSITION_WAIT_SUBSCRIPTION_RESULT = ++start;
+		TRANSITION_WAIT_USER_CHOICE = ++start;
 
 		start = -1;
 		STATUS_EMPTY_AUCTION_LIST = ++start;
@@ -175,6 +177,12 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 		);
 
 		this.registerTransition(
+				STATE_PICK_AUCTION,
+				STATE_PICK_AUCTION,
+				SubscribeToAuctionBehaviour.TRANSITION_WAIT_USER_CHOICE
+		);
+
+		this.registerTransition(
 				STATE_WAIT_SUBSCRIPTION_REPLY,
 				STATE_WAIT_SUBSCRIPTION_REPLY,
 				SubscribeToAuctionBehaviour.TRANSITION_WAIT_SUBSCRIPTION_RESULT
@@ -199,11 +207,11 @@ public class SubscribeToAuctionBehaviour extends FSMBehaviour
 				SubscribeToAuctionBehaviour.TRANSITION_SUBSCRIPTION_REFUSED
 		);
 
-		this.registerTransition(
-				STATE_CREATE_BIDDER_FSM,
-				STATE_SUBSCRIPTION_PROCESS_START,
-				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
-		);
+//		this.registerTransition(
+//				STATE_CREATE_BIDDER_FSM,
+//				STATE_SUBSCRIPTION_PROCESS_START,
+//				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
+//		);
 
 		//TODO : where do we go after subscribing to an auction
 		this.registerDefaultTransition(

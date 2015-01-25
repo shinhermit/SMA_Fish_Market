@@ -2,14 +2,21 @@ package fr.univpau.m2ti.sma.fishmarket.agent;
 
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.BidderBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.SubscribeToAuctionBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.behaviour.bidder.states.subscription.SubscriptionProcessStartBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.BidderSubscriptionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.behaviour.market.RunningAuctionMarketFSMBehaviour;
+import fr.univpau.m2ti.sma.fishmarket.data.Auction;
+import fr.univpau.m2ti.sma.fishmarket.ihm.BidderView;
+import fr.univpau.m2ti.sma.fishmarket.message.FishMarket;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.FSMBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
 
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,6 +26,23 @@ public class BidderAgent extends Agent
 	protected Logger logger =
 			Logger.getLogger(BidderAgent.class.getName());
 
+
+	private boolean bidsAutomatically = false;
+
+	private Auction selectedAuction;
+
+	private FSMBehaviour subscribeToAuctionFSM = null;
+	private FSMBehaviour runningAuctionFSM = null;
+
+	private BidderView bidderView;
+
+	private float maxPrice;
+
+	private static final String NO_MARKET_AVAILABLE =
+			"Market agent couldn't be located.";
+
+	private float biddingPrice;
+
 	@Override
 	protected void setup()
 	{
@@ -26,7 +50,10 @@ public class BidderAgent extends Agent
 		super.setup();
 
 		//find new auction
-		this.createAuctionFinderFSM();
+		//this.createAuctionFinderFSM();
+		this.bidderView = new BidderView(this);
+		this.bidderView.prepare();
+		this.bidderView.display();
 	}
 
 	@Override
@@ -39,19 +66,143 @@ public class BidderAgent extends Agent
 	/**
 	 * Called at the end of the auction subscription process.
 	 *
-	 * @param seller
+	 * @param maxPrice
 	 */
 	public void createBidderFSM(float maxPrice)
 	{
-		// TODO: implement
-		this.addBehaviour(new BidderBehaviour(this, maxPrice));
+		this.bidderView.initBidList(this.getSubscribedAuction());
+
+		this.runningAuctionFSM = new BidderBehaviour(this);
+		this.addBehaviour(this.runningAuctionFSM);
 	}
 
 	public void createAuctionFinderFSM()
 	{
-		// Register behaviour
-		this.addBehaviour(new SubscribeToAuctionBehaviour(this));
+		if (this.subscribeToAuctionFSM != null)
+		{
+			this.removeBehaviour(this.subscribeToAuctionFSM);
+		}
 
+
+		this.subscribeToAuctionFSM = new SubscribeToAuctionBehaviour(this);
+		// Register behaviour
+		this.addBehaviour(this.subscribeToAuctionFSM);
+
+	}
+
+
+	/**
+	 * Called by BidderView when refresh button is used.
+	 */
+	public void refreshAuctionList()
+	{
+		this.createAuctionFinderFSM();
+	}
+
+	/**
+	 * Called by PickAuctionBehaviour.
+	 * @param auctionList
+	 */
+	public void displayAuctionList(HashSet<Auction> auctionList)
+	{
+		this.bidderView.displayAuctionList(auctionList);
+	}
+
+	public void setBidsAutomatically(boolean bidsAutomatically)
+	{
+		this.bidsAutomatically = bidsAutomatically;
+	}
+
+	public boolean bidsAutomatically()
+	{
+		return this.bidsAutomatically;
+	}
+
+	/**
+	 * Called by BidderView when an auction is selected and the suscribe
+	 * button is used.
+	 *
+	 * @param selectedAuction
+	 */
+	public void subscribeToAuction(Auction selectedAuction)
+	{
+		this.selectedAuction = selectedAuction;
+
+		//notify behaviour by sending a message
+		ACLMessage unblockMessage = new ACLMessage(FishMarket.Performatives.TO_ANNOUNCE);
+		unblockMessage.addReceiver(BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC);
+		unblockMessage.addReceiver(this.getAID());
+		this.send(unblockMessage);
+	}
+
+	public Auction getSubscribedAuction()
+	{
+		return this.selectedAuction;
+	}
+
+	/**
+	 * Called by BidderView when the bid button is clicked.
+	 */
+	public void sendBid()
+	{
+		//notify behaviour by sending a message
+		ACLMessage userBidMessage = new ACLMessage(FishMarket.Performatives.TO_BID);
+		userBidMessage.addReceiver(
+				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
+		);
+		userBidMessage.addReceiver(this.getAID());
+		this.send(userBidMessage);
+	}
+
+	/**
+	 * Called when a new bid is received.
+	 *
+	 * @param information
+	 */
+	public void displayBidInformation(String information)
+	{
+		this.bidderView.addBidInformation(information);
+	}
+
+	public void alertNoMarket()
+	{
+		this.bidderView.alert(BidderAgent.NO_MARKET_AVAILABLE);
+	}
+
+	public float getMaxPrice()
+	{
+		return maxPrice;
+	}
+
+	public void setMaxPrice(float maxPrice)
+	{
+		this.maxPrice = maxPrice;
+	}
+
+	public float getBiddingPrice()
+	{
+		return this.biddingPrice;
+	}
+
+	/**
+	 * Called by behaviours when a new announce is received.
+	 */
+	public void handleAnnounce(float price)
+	{
+		this.biddingPrice = price;
+
+		this.bidderView.addBidInformation("New price announce " + String.valueOf(price));
+
+		if (this.bidsAutomatically())
+		{
+			//disable bid button
+			this.bidderView.disableBidButton();
+		}
+		else
+		{
+			//enable bid button
+			this.bidderView.enableBidButton();
+		}
 	}
 
 	public AID getMarketAgentAID()
