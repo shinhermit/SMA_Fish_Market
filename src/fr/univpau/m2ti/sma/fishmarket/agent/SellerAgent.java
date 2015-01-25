@@ -112,6 +112,14 @@ public class SellerAgent extends Agent
 		this.myView = new SellerView(this);
 		this.myView.setVisible(true);
 	}
+	
+	@Override
+	protected void takeDown()
+	{
+		this.myView.dispose();
+        
+        super.takeDown();
+	}
     
 	/**
 	 * Retrieves the AID of the market agent, by asking the DF agent.

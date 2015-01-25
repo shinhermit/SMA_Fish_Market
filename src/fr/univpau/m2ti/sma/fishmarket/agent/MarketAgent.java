@@ -85,7 +85,7 @@ public class MarketAgent extends Agent
         this.myView.setVisible(true);
         
         // DEBUG
-		this.createMarketUsers(1, 4);
+		this.createMarketUsers(0, 4);
 	}
 
 	private void createMarketUsers(int numSellers, int numBidders)
@@ -135,6 +135,9 @@ public class MarketAgent extends Agent
         {
             MarketAgent.LOGGER.log(Level.SEVERE, null, fe);
         }
+        
+        this.myView.setVisible(false);
+        this.myView.dispose();
         
         super.takeDown();
 	}
