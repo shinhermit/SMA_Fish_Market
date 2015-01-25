@@ -311,6 +311,24 @@ public class MarketAgent extends Agent
 		}
 	}
 	
+	public void notifyAuctionOver(String auctionID, String winnerName)
+	{
+		Auction auction = this.findAuction(auctionID);
+		
+		if(auction != null)
+		{
+			auction.setStatus(Auction.STATUS_OVER);
+			auction.setWinnerName(winnerName);
+			
+			this.myView.refresh();
+		}
+		else
+		{
+			MarketAgent.LOGGER.log(Level.WARNING,
+					"auction with ID " + auctionID + " not found.");
+		}
+	}
+	
 	/**
 	 * Defines the status of an auction.
 	 * 
