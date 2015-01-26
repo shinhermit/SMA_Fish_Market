@@ -1,15 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm;
 
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.AboutToBidBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.AuctionOverSuccessfullyBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.AuctionOverUnsuccessfullyBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.InitialOrAfterFailedBidBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.OtherBidderWonBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.PaymentBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.WaitAttributionBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.WaitBidResultBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.WaitFishBidderBehaviour;
-import jade.core.AID;
+import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.*;
 import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -35,6 +26,9 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 			"STATE_AUCTION_OVER_UNSUCESSFULLY";
 	private static final String STATE_OTHER_BIDDER_WON =
 			"STATE_OTHER_BIDDER_WON";
+	private static final String STATE_AUCTION_WITHDRAWAL =
+				"STATE_AUCTION_WITHDRAWAL";
+
 
 	/** Return code which activates the transition to wait for an auction list. */
 	public static final int TRANSITION_RECEIVED_FIRST_ANNOUNCE;
@@ -61,6 +55,8 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 	/** Return code which activates the transition confirming that our subscription was accepted. */
 	public static final int TRANSITION_RECEIVED_AUCTION_OVER;
 
+	public static final int TRANSITION_WAIT_AUCTION_OVER;
+
 	public static final int TRANSITION_WAIT_FIRST_ANNOUNCE;
 
 	public static final int TRANSITION_WAIT_BID_RESULT;
@@ -83,6 +79,7 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 		TRANSITION_TO_PAYMENT = ++start;
 		TRANSITION_RECEIVED_AUCTION_CANCELLED = ++start;
 		TRANSITION_RECEIVED_AUCTION_OVER = ++start;
+		TRANSITION_WAIT_AUCTION_OVER = ++start;
 		TRANSITION_WAIT_FIRST_ANNOUNCE = ++start;
 		TRANSITION_WAIT_BID_RESULT = ++start;
 		TRANSITION_WAIT_ATTRIBUTION = ++start;
@@ -93,17 +90,9 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 	/** Message holder */
 	private ACLMessage request;
 
-//	private float maxPrice;
-//
-//	/** Price at last bid */
-//	private float biddingPrice;
-
-//	public BidderBehaviour (Agent a, float maxPrice)
 	public RunningAuctionBidderFSMBehaviour (Agent a)
 	{
 		super(a);
-//		this.maxPrice = maxPrice;
-
 		// Declare and register states
 		this.registerFirstState(
 				new InitialOrAfterFailedBidBidderBehaviour(a, this),
@@ -148,6 +137,11 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 		this.registerLastState(
 				new OtherBidderWonBidderBehaviour(a, this),
 				STATE_OTHER_BIDDER_WON
+		);
+
+		this.registerLastState(
+				new WithdrawFromAuctionBidderBehaviour(a, this),
+				STATE_AUCTION_WITHDRAWAL
 		);
 
 		// Transitions
@@ -223,9 +217,16 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 				RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_FISH
 		);
 
-		this.registerDefaultTransition(
+		this.registerTransition(
 				STATE_PAYMENT,
-				STATE_AUCTION_OVER_SUCCESSFULLY
+				STATE_PAYMENT,
+				RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_AUCTION_OVER
+		);
+
+		this.registerTransition(
+				STATE_PAYMENT,
+				STATE_AUCTION_OVER_SUCCESSFULLY,
+				RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_OVER
 		);
 
 		// Transitions to unsuccessful ends

@@ -21,7 +21,9 @@ public class OtherBidderWonBidderBehaviour extends OneShotBehaviour
     private static String OTHER_BIDDER_WON =
             "Another bidder won the auction.";
 
-    public OtherBidderWonBidderBehaviour(Agent a, RunningAuctionBidderFSMBehaviour fsm)
+    public OtherBidderWonBidderBehaviour(
+            Agent a, RunningAuctionBidderFSMBehaviour fsm
+    )
     {
         super(a);
         this.myFSM = fsm;
@@ -34,6 +36,6 @@ public class OtherBidderWonBidderBehaviour extends OneShotBehaviour
         System.out.println("Other bidder won.");
 
         ((BidderAgent)myAgent).displayBidInformation(OTHER_BIDDER_WON);
-        ((BidderAgent)myAgent).restoreInitialViewState();
+        ((BidderAgent)myAgent).auctionOver();
     }
 }

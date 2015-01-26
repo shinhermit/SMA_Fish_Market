@@ -24,7 +24,11 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
     private RunningAuctionBidderFSMBehaviour myFSM;
 
     private static String AUCTION_BID_SENT = "Bid sent.";
+    private static String AUCTION_PRICE_TOO_HIGH =
+            "Price is too high. Announce price is %f, our limit is %f.";
 
+
+    private boolean isWaitingNewAnnounce = false;
 
     private ACLMessage lastMessage = null;
 
@@ -83,8 +87,10 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
             //remove last announce
             this.myFSM.setRequest(null);
 
+            this.isWaitingNewAnnounce = false;
+
             //needs user interaction
-            bidderAgent.setCastBid(false);
+            bidderAgent.setAnswerBid(false);
             bidderAgent.setWithinBiddingTimeFrame(true);
 
             this.transition =
@@ -106,7 +112,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_SUBSEQUENT_ANNOUNCE;
 
                 bidderAgent.setWithinBiddingTimeFrame(true);
-                bidderAgent.setCastBid(false);
+                bidderAgent.setAnswerBid(false);
             }
             else if (newMessage.getPerformative()
                     == FishMarket.Performatives.TO_CANCEL)
@@ -117,7 +123,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_CANCELLED;
 
                 bidderAgent.setWithinBiddingTimeFrame(false);
-                bidderAgent.setCastBid(false);
+                bidderAgent.setAnswerBid(false);
             }
             else
             {
@@ -128,21 +134,21 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                         RunningAuctionBidderFSMBehaviour.TRANSITION_RECEIVED_AUCTION_OVER;
 
                 bidderAgent.setWithinBiddingTimeFrame(false);
-                bidderAgent.setCastBid(false);
+                bidderAgent.setAnswerBid(false);
             }
         }
 
         //is bidding allowed ?
-        if (bidderAgent.isWithinBiddingTimeFrame())
+        if (bidderAgent.isWithinBiddingTimeFrame() && !this.isWaitingNewAnnounce)
         {
             //is bidding handled automatically ?
-            if (bidderAgent.bidsAutomatically() && !bidderAgent.castBid())
+            if (bidderAgent.bidsAutomatically() && !bidderAgent.answerBid())
             {
                 //is price over our limit ?
                 if (bidderAgent.getBiddingPrice() <= bidderAgent.getMaxPrice())
                 {
                     //no
-                    bidderAgent.setCastBid(true);
+                    bidderAgent.setAnswerBid(true);
                     //wàit random time so first auto bid agent doesn't always win
                     Random rand = new Random();
                     long range =
@@ -150,11 +156,31 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                     long waitTime = (long)
                             (rand.nextDouble() * range) +
                             AUTO_BID_RANDOM_MIN_TIME_LIMIT;
+                    bidderAgent.displayBidInformation(
+                            "(Waiting at least " + waitTime + "ms" +
+                            " before bid)"
+                    );
 
                     block(waitTime);
                 }
+                else
+                {
+                    String priceTooHigh = String.format(
+                            AUCTION_PRICE_TOO_HIGH,
+                            bidderAgent.getBiddingPrice(),
+                            bidderAgent.getMaxPrice()
+                    );
+                    bidderAgent.displayBidInformation(priceTooHigh);
+
+                    this.isWaitingNewAnnounce = true;
+
+                    this.transition =
+                            RunningAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
+
+                    this.myFSM.block();
+                }
             }
-            else if (bidderAgent.castBid())
+            else if (bidderAgent.answerBid())
             {
                 //Send bid
                 ACLMessage bid = this.lastMessage.createReply();
@@ -169,7 +195,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
                 //user interacted
                 bidderAgent.setWithinBiddingTimeFrame(false);
-                bidderAgent.setCastBid(false);
+                bidderAgent.setAnswerBid(false);
 
                 bidderAgent.displayBidInformation(AUCTION_BID_SENT);
 

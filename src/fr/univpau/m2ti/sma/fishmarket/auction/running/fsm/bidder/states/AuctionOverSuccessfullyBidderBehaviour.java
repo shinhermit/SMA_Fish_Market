@@ -34,6 +34,6 @@ public class AuctionOverSuccessfullyBidderBehaviour extends OneShotBehaviour
         System.out.println("Thanks for the fish");
 
         ((BidderAgent)myAgent).displayBidInformation(AUCTION_SUCCESS);
-        ((BidderAgent)myAgent).restoreInitialViewState();
+        ((BidderAgent)myAgent).auctionOver();
     }
 }

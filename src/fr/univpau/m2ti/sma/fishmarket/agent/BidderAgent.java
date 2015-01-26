@@ -45,7 +45,7 @@ public class BidderAgent extends Agent
 	private float biddingPrice;
 
 	private boolean withinBiddingTimeFrame = false;
-	public boolean castBid = false;
+	public boolean answerBid = false;
 
 
 
@@ -56,15 +56,15 @@ public class BidderAgent extends Agent
 		super.setup();
 
 		//find new auction
-		//this.createAuctionFinderFSM();
 		this.bidderView = new BidderView(this);
-		this.bidderView.prepare();
 		this.bidderView.display();
 	}
 
 	@Override
 	protected void takeDown()
 	{
+		this.bidderView.dispose();
+
 		// Cancel auction
 		super.takeDown();
 	}
@@ -86,6 +86,9 @@ public class BidderAgent extends Agent
 		this.runningAuctionFSM = new RunningAuctionBidderFSMBehaviour(this);
 
 		this.addBehaviour(this.runningAuctionFSM);
+
+		//Disable find auction buttons
+		this.bidderView.auctionState();
 	}
 
 	public void createAuctionFinderFSM()
@@ -102,9 +105,9 @@ public class BidderAgent extends Agent
 
 	}
 
-	public void restoreInitialViewState()
+	public void auctionOver()
 	{
-		this.bidderView.initialState();
+		this.bidderView.findAuctionState();
 	}
 
 	public void displayAlert(String message)
@@ -173,15 +176,7 @@ public class BidderAgent extends Agent
 	 */
 	public void takeUserBidIntoAccount()
 	{
-//		//notify behaviour by sending a message
-//		ACLMessage userBidMessage = new ACLMessage(FishMarket.Performatives.TO_BID);
-//		userBidMessage.addReceiver(
-//				RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC
-//		);
-//		userBidMessage.addReceiver(this.getAID());
-//
-//		this.send(userBidMessage);
-		this.castBid = true;
+		this.answerBid = true;
 	}
 
 	public boolean isWithinBiddingTimeFrame()
@@ -194,14 +189,14 @@ public class BidderAgent extends Agent
 		this.withinBiddingTimeFrame = withinBiddingTimeFrame;
 	}
 
-	public boolean castBid()
+	public boolean answerBid()
 	{
-		return castBid;
+		return answerBid;
 	}
 
-	public void setCastBid(boolean castBid)
+	public void setAnswerBid(boolean answerBid)
 	{
-		this.castBid = castBid;
+		this.answerBid = answerBid;
 	}
 
 	/**
@@ -294,4 +289,5 @@ public class BidderAgent extends Agent
 
 		return marketAgent;
 	}
+
 }
