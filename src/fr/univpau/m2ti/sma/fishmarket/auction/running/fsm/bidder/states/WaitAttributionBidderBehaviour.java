@@ -1,5 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionBidderFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.SubscribeToAuctionMarketFSMBehaviour;
@@ -47,6 +48,10 @@ public class WaitAttributionBidderBehaviour extends OneShotBehaviour
 
         ACLMessage message = myAgent.receive(MESSAGE_FILTER);
 
+        BidderAgent bidderAgent =
+                (BidderAgent) super.myAgent;
+
+        bidderAgent.updateAuctionStatus(getBehaviourName());
 
         if (message != null)
         {

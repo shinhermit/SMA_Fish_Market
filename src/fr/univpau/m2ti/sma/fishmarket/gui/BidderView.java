@@ -6,12 +6,12 @@ import fr.univpau.m2ti.sma.fishmarket.data.Auction;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  */
@@ -22,11 +22,15 @@ public class BidderView
     private JPanel auctionPane;
     private JLabel subscriptionPaneTitle;
     private JList auctionList;
+    private JTable auctionTable;
     private JButton subscribeButton;
     private JButton refreshButton;
     private JButton bidButton;
     private JList bidList;
     private JLabel bidListLabel;
+    private JLabel currentAuctionSupply;
+    private JLabel currentAuctionReference;
+    private JLabel currentAuctionStatus;
     private JCheckBox autoBidCheckBox;
     private JTextField maximumPriceTextField;
 
@@ -45,9 +49,13 @@ public class BidderView
 
     private DefaultListModel<String> bidListModel;
 
+    private AuctionTableModel auctionTableModel;
+
     private BidderAgent bidderAgent;
 
     private Map<String, Auction> auctions = new HashMap<String, Auction>();
+
+    private java.util.ArrayList<java.util.ArrayList<String>> auctionTab = new java.util.ArrayList<java.util.ArrayList<String>>();
 
     public BidderView(BidderAgent bidderAgent)
     {
@@ -65,7 +73,6 @@ public class BidderView
         this.panel1.setLayout(
                 new BoxLayout(this.panel1, BoxLayout.LINE_AXIS)
         );
-        this.panel1.setPreferredSize(new Dimension(600, 450));
         this.panel1.add(this.subscriptionPane);
         this.panel1.add(this.auctionPane);
 
@@ -86,36 +93,50 @@ public class BidderView
         this.currentFrame.dispose();
     }
 
-    private static int PANE_WIDTH = 150;
+    private static int PANE_WIDTH = 175;
     private static int PANE_HEIGHT = 450;
     private static int JSCROLL_PANE_WIDTH = 130;
-    private static int JSCROLL_PANE_HEIGHT = 350;
+    private static int JSCROLL_PANE_HEIGHT = 340;
 
     private void createSubscriptionPane()
     {
         this.subscriptionPane = new JPanel();
         this.subscriptionPane.setLayout(
-                new BoxLayout(this.subscriptionPane, BoxLayout.PAGE_AXIS)
+                new BorderLayout(10, 10)
         );
-        this.subscriptionPane.setPreferredSize(new Dimension(PANE_WIDTH,PANE_HEIGHT));
+// ;this.subscriptionPane.setLayout(
+//                new BoxLayout(this.subscriptionPane, BoxLayout.PAGE_AXIS)
+//        );
+        this.subscriptionPane.setPreferredSize(
+                new Dimension(PANE_WIDTH, PANE_HEIGHT)
+        );
 
         this.subscriptionPaneTitle = new JLabel("Pick an auction");
-        this.subscriptionPane.add(this.subscriptionPaneTitle);
-        //to add
-        JScrollPane listScroll = new JScrollPane();
-        listScroll.setPreferredSize(new Dimension(JSCROLL_PANE_WIDTH, JSCROLL_PANE_HEIGHT));
-        this.auctionList = new JList();
-        this.auctionListModel = new DefaultListModel<String>();
-        this.auctionList.setModel(this.auctionListModel);
-        listScroll.setViewportView(this.auctionList);
-        this.subscriptionPane.add(listScroll);
+        this.subscriptionPane.add(this.subscriptionPaneTitle, BorderLayout.PAGE_START);
+//        this.subscriptionPane.add(this.subscriptionPaneTitle);
 
+
+        this.auctionTableModel = new AuctionTableModel();
+        this.auctionTable = new JTable(this.auctionTableModel);
+        this.subscriptionPane.add(
+                new JScrollPane(this.auctionTable),
+                BorderLayout.CENTER
+        );
+//        this.subscriptionPane.add(
+//                new JScrollPane(this.auctionTable)
+//        );
+
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new GridLayout(2,1));
         this.subscribeButton = new JButton("Subscribe");
         this.subscribeButton.setEnabled(false);
-        this.subscriptionPane.add(this.subscribeButton);
+        buttonsPanel.add(this.subscribeButton);
 
         this.refreshButton = new JButton("Refresh");
-        this.subscriptionPane.add(this.refreshButton);
+        buttonsPanel.add(this.refreshButton);
+
+        this.subscriptionPane.add(buttonsPanel, BorderLayout.PAGE_END);
+//        this.subscriptionPane.add(buttonsPanel);
     }
 
     private void createAuctionPane()
@@ -124,34 +145,128 @@ public class BidderView
         this.auctionPane.setLayout(
                 new BoxLayout(this.auctionPane, BoxLayout.PAGE_AXIS)
         );
-        this.auctionPane.setPreferredSize(new Dimension(PANE_WIDTH,PANE_HEIGHT));
-
-        this.bidListLabel = new JLabel();
+        this.auctionPane.setPreferredSize(new Dimension(2 * PANE_WIDTH,PANE_HEIGHT));
+        this.bidListLabel = new JLabel("Running auction");
         this.auctionPane.add(this.bidListLabel);
 
+        JPanel currentAuctionStatus = new JPanel();
+        currentAuctionStatus.setLayout(new FlowLayout(FlowLayout.CENTER));
+        this.currentAuctionSupply = new JLabel();
+        currentAuctionStatus.add(this.currentAuctionSupply);
+        this.currentAuctionReference = new JLabel();
+        currentAuctionStatus.add(this.currentAuctionReference);
+        this.currentAuctionStatus = new JLabel();
+        currentAuctionStatus.add(this.currentAuctionStatus);
+
+        this.auctionPane.add(currentAuctionStatus);
+
         JScrollPane listScroll = new JScrollPane();
-        listScroll.setPreferredSize(new Dimension(JSCROLL_PANE_WIDTH, JSCROLL_PANE_HEIGHT));
+        listScroll.setPreferredSize(new Dimension(2 * JSCROLL_PANE_WIDTH, JSCROLL_PANE_HEIGHT));
         this.bidList = new JList();
         this.bidListModel = new DefaultListModel<String>();
         this.bidList.setModel(this.bidListModel);
         listScroll.setViewportView(this.bidList);
         this.auctionPane.add(listScroll);
 
-        this.bidButton = new JButton("Bid");
 
-        this.auctionPane.add(this.bidButton);
-
-        JPanel autoBidPane = new JPanel();
-        autoBidPane.setLayout(
-                new BoxLayout(autoBidPane, BoxLayout.LINE_AXIS)
+        JPanel bidPane = new JPanel();
+        bidPane.setLayout(
+                new GridLayout(1, 3)
         );
+
         this.autoBidCheckBox = new JCheckBox("Auto-bid");
-        autoBidPane.add(this.autoBidCheckBox);
-        this.maximumPriceTextField = new JTextField();
-        autoBidPane.add(this.maximumPriceTextField);
+        bidPane.add(this.autoBidCheckBox);
+        this.maximumPriceTextField = new JTextField("800");
 
-        this.auctionPane.add(autoBidPane);
+        bidPane.add(this.maximumPriceTextField);
 
+        this.bidButton = new JButton("Bid");
+        bidPane.add(this.bidButton);
+
+        this.auctionPane.add(bidPane);
+
+    }
+
+    private static class AuctionTableModel extends AbstractTableModel{
+        private final String[] columnNames = {"Product", "Price"};
+
+        private List<Auction> auctions;
+
+        public AuctionTableModel()
+        {
+            this.auctions = new ArrayList<Auction>();
+        }
+
+        public void refreshAuctions(HashSet<Auction> auctions)
+        {
+            this.auctions.clear();
+            this.auctions.addAll(auctions);
+            this.fireTableDataChanged();
+        }
+
+        public Auction getAuctionAt (int rowIndex)
+        {
+            return this.auctions.get(rowIndex);
+
+        }
+
+        public void removeAuction(Auction a)
+        {
+            this.auctions.remove(a);
+            this.fireTableDataChanged();
+        }
+
+        @Override
+        public int getColumnCount()
+        {
+            return columnNames.length;
+        }
+
+        @Override
+        public int getRowCount()
+        {
+            return auctions.size();
+        }
+
+        @Override
+        public String getColumnName(int columnIndex)
+        {
+            return columnNames[columnIndex];
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex)
+        {
+            Object o = null;
+
+            switch (columnIndex)
+            {
+                case 0:
+                    o = auctions.get(rowIndex).getAuctionName();
+                    break;
+                case 1 :
+                    o = auctions.get(rowIndex).getCurrentPrice();
+            }
+
+            return o;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex)
+        {
+            Class<?> colClass = null;
+
+            switch (columnIndex)
+            {
+                case 0:
+                    colClass = String.class;
+                    break;
+                case 1:
+                    colClass = Float.class;
+            }
+
+            return colClass;
+        }
     }
 
     public void prepare()
@@ -205,31 +320,26 @@ public class BidderView
                 }
         );
 
-        this.auctionList.addListSelectionListener(
-                new ListSelectionListener()
-                {
-                    @Override
-                    public void valueChanged(
-                            ListSelectionEvent listSelectionEvent
-                    )
-                    {
-                        //enable Subscribe button
-                        subscribeButton.setEnabled(true);
-                    }
-                }
-        );
+        this.auctionTable
+                .getSelectionModel()
+                .addListSelectionListener(
+                        new ListSelectionListener()
+                        {
+                            public void valueChanged(ListSelectionEvent e) {
+                                //enable subscribe butt
+                                subscribeButton.setEnabled(true);
+                            }
+                        }
+                );
+
         this.subscribeButton.addActionListener(
                 new ActionListener()
                 {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent)
                     {
-                        int selectedAuctionIndex =
-                                auctionList.getSelectedIndex();
-                        String selectedAuctionName =
-                                (String) auctionList.getSelectedValue();
                         Auction selectedAuction =
-                                auctions.get(selectedAuctionName);
+                                auctionTableModel.getAuctionAt(auctionTable.getSelectedRow());
 
                         bidderAgent.subscribeToAuction(selectedAuction);
 
@@ -305,15 +415,21 @@ public class BidderView
 
     public void displayAuctionList(HashSet<Auction> auctions)
     {
-        this.auctionListModel.clear();
+        //this.auctionListModel.clear();
 
         this.auctions.clear();
 
         for (Auction a : auctions)
         {
-            this.auctionListModel.addElement(a.getID());
             this.auctions.put(a.getID(), a);
         }
+
+        this.auctionTableModel.refreshAuctions(auctions);
+    }
+
+    public void updateRunningAuctionStatus(String status)
+    {
+        this.currentAuctionStatus.setText("["+status+"]");
     }
 
     public void clearBidList()
@@ -329,14 +445,18 @@ public class BidderView
     public void initBidList(Auction auction)
     {
         this.clearBidList();
-        this.bidListLabel.setText(auction.getAuctionName());
+        //this.bidListLabel.setText(auction.getAuctionName());
+
+        this.currentAuctionSupply.setText("["+auction.getAuctionName()+"]");
+        this.currentAuctionReference.setText("["+auction.getID()+"]");
+        this.updateRunningAuctionStatus("STARTING");
 
         //Remove auction from list of subscribable auctions
-        this.auctionListModel.removeElement(auction.getID());
+        this.auctionTableModel.removeAuction(auction);
         this.auctions.remove(auction);
 
         //Remove focus from list element
-        this.auctionList.clearSelection();
+        this.auctionTable.clearSelection();
     }
 
     public void addBidInformation(String information)

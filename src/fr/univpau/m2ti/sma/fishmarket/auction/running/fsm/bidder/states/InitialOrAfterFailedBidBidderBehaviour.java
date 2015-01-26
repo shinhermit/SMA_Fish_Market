@@ -73,6 +73,7 @@ public class InitialOrAfterFailedBidBidderBehaviour extends OneShotBehaviour
         BidderAgent bidderAgent =
                 (BidderAgent) super.myAgent;
 
+        bidderAgent.updateAuctionStatus(getBehaviourName());
 
         ACLMessage mess = bidderAgent.receive(MESSAGE_FILTER);
 

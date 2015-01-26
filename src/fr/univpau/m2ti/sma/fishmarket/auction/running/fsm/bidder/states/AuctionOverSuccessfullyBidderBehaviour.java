@@ -32,8 +32,12 @@ public class AuctionOverSuccessfullyBidderBehaviour extends OneShotBehaviour
         System.out.println("action => " + getBehaviourName());
 
         System.out.println("Thanks for the fish");
+        BidderAgent bidderAgent =
+                (BidderAgent) super.myAgent;
 
-        ((BidderAgent)myAgent).displayBidInformation(AUCTION_SUCCESS);
-        ((BidderAgent)myAgent).auctionOver();
+        bidderAgent.updateAuctionStatus(getBehaviourName());
+
+        bidderAgent.displayBidInformation(AUCTION_SUCCESS);
+        bidderAgent.auctionOver();
     }
 }

@@ -1,7 +1,9 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states.*;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
 
@@ -137,11 +139,6 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 		this.registerLastState(
 				new OtherBidderWonBidderBehaviour(a, this),
 				STATE_OTHER_BIDDER_WON
-		);
-
-		this.registerLastState(
-				new WithdrawFromAuctionBidderBehaviour(a, this),
-				STATE_AUCTION_WITHDRAWAL
 		);
 
 		// Transitions
@@ -284,6 +281,12 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 	public void setRequest(ACLMessage request)
 	{
 		this.request = request;
+	}
+
+	@Override
+	protected void handleStateEntered(Behaviour state)
+	{
+		((BidderAgent)myAgent).updateAuctionStatus(getBehaviourName());
 	}
 
 	@Override

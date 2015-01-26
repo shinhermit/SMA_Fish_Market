@@ -35,7 +35,12 @@ public class OtherBidderWonBidderBehaviour extends OneShotBehaviour
 
         System.out.println("Other bidder won.");
 
-        ((BidderAgent)myAgent).displayBidInformation(OTHER_BIDDER_WON);
-        ((BidderAgent)myAgent).auctionOver();
+        BidderAgent bidderAgent =
+                (BidderAgent) super.myAgent;
+
+        bidderAgent.updateAuctionStatus(getBehaviourName());
+
+        bidderAgent.displayBidInformation(OTHER_BIDDER_WON);
+        bidderAgent.auctionOver();
     }
 }

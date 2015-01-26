@@ -45,6 +45,11 @@ public class PaymentBidderBehaviour extends OneShotBehaviour
     public void action() {
         System.out.println("action => " + getBehaviourName());
 
+        BidderAgent bidderAgent =
+                (BidderAgent) super.myAgent;
+
+        bidderAgent.updateAuctionStatus(getBehaviourName());
+
         ACLMessage mess = this.myFSM.getRequest();
 
         if (mess != null)
@@ -56,17 +61,17 @@ public class PaymentBidderBehaviour extends OneShotBehaviour
             payment.setConversationId(mess.getConversationId());
             payment.clearAllReceiver();
             payment.addReceiver(
-                    ((BidderAgent) super.myAgent).getMarketAgentAID()
+                    bidderAgent.getMarketAgentAID()
             );
             payment.addReceiver(RunningAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
             payment.setPerformative(FishMarket.Performatives.TO_PAY);
             payment.setContent(
                     String.valueOf(
-                            ((BidderAgent) super.myAgent).getBiddingPrice()
+                            bidderAgent.getBiddingPrice()
                     )
             );
 
-            super.myAgent.send(payment);
+            bidderAgent.send(payment);
 
             //wait for payment acknowledgement (auction_over)
             this.myFSM.block();
@@ -75,7 +80,7 @@ public class PaymentBidderBehaviour extends OneShotBehaviour
         }
         else
         {
-            mess = myAgent.receive(MESSAGE_FILTER);
+            mess = bidderAgent.receive(MESSAGE_FILTER);
 
             if (mess != null)
             {

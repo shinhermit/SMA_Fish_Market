@@ -74,6 +74,8 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
         BidderAgent bidderAgent = (BidderAgent)myAgent;
 
+        bidderAgent.updateAuctionStatus(getBehaviourName());
+
         // read price from last announce
         ACLMessage mess = this.myFSM.getRequest();
         float price;

@@ -63,6 +63,8 @@ public class BidderAgent extends Agent
 	@Override
 	protected void takeDown()
 	{
+		this.bidderView.hide();
+
 		this.bidderView.dispose();
 
 		// Cancel auction
@@ -256,6 +258,12 @@ public class BidderAgent extends Agent
 			//enable bid button
 			this.bidderView.enableBidButton();
 		}
+	}
+
+
+	public void updateAuctionStatus(String status)
+	{
+		this.bidderView.updateRunningAuctionStatus(status);
 	}
 
 	public AID getMarketAgentAID()

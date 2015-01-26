@@ -1,6 +1,7 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.bidder.states;
 
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionBidderFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.auction.running.fsm.RunningAuctionMarketFSMBehaviour;
 import fr.univpau.m2ti.sma.fishmarket.protocol.FishMarket;
@@ -59,6 +60,11 @@ public class WaitBidResultBidderBehaviour extends OneShotBehaviour
     @Override
     public void action() {
         System.out.println("action => " + getBehaviourName());
+
+        BidderAgent bidderAgent =
+                (BidderAgent) super.myAgent;
+
+        bidderAgent.updateAuctionStatus(getBehaviourName());
 
        // waiting for bid results.
 
