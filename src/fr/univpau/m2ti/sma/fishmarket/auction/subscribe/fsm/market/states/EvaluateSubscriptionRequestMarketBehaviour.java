@@ -143,8 +143,13 @@ public class EvaluateSubscriptionRequestMarketBehaviour extends OneShotBehaviour
 		reply.setPerformative(
 				FishMarket.Performatives.TO_REFUSE);
 		
+		// Set refuse status code
 		reply.setContent(
 				String.valueOf(this.status));
+		
+		// Set topic
+		reply.addReceiver(
+				SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
 		super.myAgent.send(reply);
 		

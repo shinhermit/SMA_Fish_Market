@@ -48,6 +48,20 @@ public class ProvideAuctionListMarketBehaviour extends OneShotBehaviour
 	@Override
 	public void action()
 	{
+		// Filter auctions
+		HashSet<Auction> runninAuctions =
+				new HashSet<Auction>();
+		
+		for(Auction auction : ((MarketAgent)myAgent).getRegisteredAuctions())
+		{
+			if(auction.getStatus() != Auction.STATUS_OVER
+					&& auction.getStatus() != Auction.STATUS_CANCELLED)
+			{
+				runninAuctions.add(auction);
+			}
+		}
+		
+		// Provide auction list
 		ACLMessage reply =
 				this.myFSM.getRequest().createReply();
 		
@@ -57,11 +71,10 @@ public class ProvideAuctionListMarketBehaviour extends OneShotBehaviour
 		// Add topic
 		reply.addReceiver(SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
 		
+		// Set content and send
 		try
 		{
-			reply.setContentObject(
-					(HashSet<Auction>)
-					((MarketAgent)myAgent).getRegisteredAuctions());
+			reply.setContentObject(runninAuctions);
 			
 			myAgent.send(reply);
 		}
