@@ -55,7 +55,14 @@ public class BidderView
 
     private Map<String, Auction> auctions = new HashMap<String, Auction>();
 
-    private java.util.ArrayList<java.util.ArrayList<String>> auctionTab = new java.util.ArrayList<java.util.ArrayList<String>>();
+
+    /**
+     * Almost useless.
+     */
+    private static int PANE_WIDTH = 175;
+    private static int PANE_HEIGHT = 450;
+    private static int JSCROLL_PANE_WIDTH = 130;
+    private static int JSCROLL_PANE_HEIGHT = 340;
 
     public BidderView(BidderAgent bidderAgent)
     {
@@ -93,27 +100,20 @@ public class BidderView
         this.currentFrame.dispose();
     }
 
-    private static int PANE_WIDTH = 175;
-    private static int PANE_HEIGHT = 450;
-    private static int JSCROLL_PANE_WIDTH = 130;
-    private static int JSCROLL_PANE_HEIGHT = 340;
-
     private void createSubscriptionPane()
     {
         this.subscriptionPane = new JPanel();
         this.subscriptionPane.setLayout(
                 new BorderLayout(10, 10)
         );
-// ;this.subscriptionPane.setLayout(
-//                new BoxLayout(this.subscriptionPane, BoxLayout.PAGE_AXIS)
-//        );
+
         this.subscriptionPane.setPreferredSize(
                 new Dimension(PANE_WIDTH, PANE_HEIGHT)
         );
 
         this.subscriptionPaneTitle = new JLabel("Pick an auction");
         this.subscriptionPane.add(this.subscriptionPaneTitle, BorderLayout.PAGE_START);
-//        this.subscriptionPane.add(this.subscriptionPaneTitle);
+
 
 
         this.auctionTableModel = new AuctionTableModel();
@@ -122,9 +122,6 @@ public class BidderView
                 new JScrollPane(this.auctionTable),
                 BorderLayout.CENTER
         );
-//        this.subscriptionPane.add(
-//                new JScrollPane(this.auctionTable)
-//        );
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new GridLayout(2,1));
@@ -136,7 +133,6 @@ public class BidderView
         buttonsPanel.add(this.refreshButton);
 
         this.subscriptionPane.add(buttonsPanel, BorderLayout.PAGE_END);
-//        this.subscriptionPane.add(buttonsPanel);
     }
 
     private void createAuctionPane()

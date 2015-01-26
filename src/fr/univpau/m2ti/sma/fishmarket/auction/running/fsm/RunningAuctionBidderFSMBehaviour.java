@@ -47,26 +47,34 @@ public class RunningAuctionBidderFSMBehaviour extends FSMBehaviour
 	/** Return code which activates the transition confirming that our subscription was accepted. */
 	public static final int TRANSITION_RECEIVED_REP_BID_NOK;
 
+	/** Return code which activates the transition instructing us to go get our fish. */
 	public static final int TRANSITION_GO_GET_FISH;
 
+	/** Return code which activates the transition to payment state. */
 	public static final int TRANSITION_TO_PAYMENT;
 
-	/** Return code which activates the transition confirming that our subscription was accepted. */
+	/** Return code which activates a transition that leads to au unsuccessful end (auction cancelled). */
 	public static final int TRANSITION_RECEIVED_AUCTION_CANCELLED;
 
-	/** Return code which activates the transition confirming that our subscription was accepted. */
+	/** Return code which activates a transition that leads to au unsuccessful end (other bidder won). */
 	public static final int TRANSITION_RECEIVED_AUCTION_OVER;
 
+	/** Cycling on payment state waiting for payment acknowledgment.. */
 	public static final int TRANSITION_WAIT_AUCTION_OVER;
 
+	/** Cycling on first state, waiting for first announce. */
 	public static final int TRANSITION_WAIT_FIRST_ANNOUNCE;
 
+	/** Cycling on post bid state, waiting for bid result. */
 	public static final int TRANSITION_WAIT_BID_RESULT;
 
+	/** Cycling on wait attribution state. */
 	public static final int TRANSITION_WAIT_ATTRIBUTION;
 
+	/** Cycling on wait fish state. */
 	public static final int TRANSITION_WAIT_FISH;
 
+	/** Cycling on about to bid state. */
 	public static final int TRANSITION_WAIT_USER_CHOICE;
 
 	static
