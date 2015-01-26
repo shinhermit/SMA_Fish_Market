@@ -45,7 +45,8 @@ public class BidderAgent extends Agent
 	private float biddingPrice;
 
 	private boolean withinBiddingTimeFrame = false;
-	public boolean answerBid = false;
+	private boolean answerBid = false;
+	private boolean auctionSelected = false;
 
 
 
@@ -151,6 +152,16 @@ public class BidderAgent extends Agent
 		return this.bidsAutomatically;
 	}
 
+	public void setAuctionSelected(boolean auctionSelected)
+	{
+		this.auctionSelected = auctionSelected;
+	}
+
+	public boolean hasAuctionSelected()
+	{
+		return auctionSelected;
+	}
+
 	/**
 	 * Called by BidderView when an auction is selected and the suscribe
 	 * button is used.
@@ -160,12 +171,13 @@ public class BidderAgent extends Agent
 	public void subscribeToAuction(Auction selectedAuction)
 	{
 		this.selectedAuction = selectedAuction;
+		this.auctionSelected = true;
 
-		//notify behaviour by sending a message
-		ACLMessage unblockMessage = new ACLMessage(FishMarket.Performatives.TO_ANNOUNCE);
-		unblockMessage.addReceiver(SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
-		unblockMessage.addReceiver(this.getAID());
-		this.send(unblockMessage);
+//		//notify behaviour by sending a message
+//		ACLMessage unblockMessage = new ACLMessage(FishMarket.Performatives.TO_ANNOUNCE);
+//		unblockMessage.addReceiver(SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC);
+//		unblockMessage.addReceiver(this.getAID());
+//		this.send(unblockMessage);
 	}
 
 	public Auction getSubscribedAuction()

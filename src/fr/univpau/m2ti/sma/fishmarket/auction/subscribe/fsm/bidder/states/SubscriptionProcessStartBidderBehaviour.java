@@ -55,7 +55,7 @@ public class SubscriptionProcessStartBidderBehaviour extends OneShotBehaviour
             ((BidderAgent)myAgent).alertNoMarket();
 
             this.transition =
-                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS;
+                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_TERMINATE_FAILURE;
         }
         // transition to next step
 

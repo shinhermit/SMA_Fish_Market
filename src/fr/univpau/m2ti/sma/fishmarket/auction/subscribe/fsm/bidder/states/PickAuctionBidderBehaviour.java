@@ -35,6 +35,8 @@ public class PickAuctionBidderBehaviour extends OneShotBehaviour
 
     private int transition;
 
+    private ACLMessage lastAuctionListMessage = null;
+
     private static final MessageTemplate MESSAGE_FILTER =
             MessageTemplate.and(
                     SubscribeToAuctionMarketFSMBehaviour.MESSAGE_FILTER,
@@ -63,32 +65,31 @@ public class PickAuctionBidderBehaviour extends OneShotBehaviour
     {
         System.out.println("action => " + getBehaviourName());
 
-        //Handling new list
+        BidderAgent bidderAgent = (BidderAgent)  myAgent;
 
         ACLMessage mess = this.myFSM.getRequest();
-        boolean requestNewList = false;
 
-        HashSet<Auction> auctionList =
-                this.extractAuctionsFromMessage(mess);
-
-        ((BidderAgent)myAgent).displayAuctionList(auctionList);
-
-        //Waiting unblock message
-        ACLMessage unblockMessage = myAgent.receive(
-                PickAuctionBidderBehaviour.UNBLOCK_FILTER
-        );
-
-        if (unblockMessage != null)
+        if (mess != null)
         {
-            this.transition =
-                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+            //Handling new list
+            this.myFSM.setRequest(null);
+            this.lastAuctionListMessage = mess;
 
-            Auction selectedAuction = ((BidderAgent) myAgent).getSubscribedAuction();
+            //Extract auction list
+            HashSet<Auction> auctionList =
+                    this.extractAuctionsFromMessage(mess);
 
-            ACLMessage subscription = mess.createReply();
-            subscription.setPerformative(
-                    FishMarket.Performatives.TO_SUBSCRIBE
-            );
+            bidderAgent.displayAuctionList(auctionList);
+        }
+
+        if (bidderAgent.hasAuctionSelected())
+        {
+            //Auction has been picked by user
+            Auction selectedAuction = bidderAgent.getSubscribedAuction();
+
+            ACLMessage subscription = this.lastAuctionListMessage.createReply();
+            subscription.setPerformative(FishMarket.Performatives.TO_SUBSCRIBE);
+
 
             subscription.addReceiver(
                     SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC
@@ -96,15 +97,71 @@ public class PickAuctionBidderBehaviour extends OneShotBehaviour
 
             subscription.setContent(selectedAuction.getID());
 
-            myAgent.send(subscription);
+            bidderAgent.send(subscription);
+
+            //Reset state
+            bidderAgent.setAuctionSelected(false);
+
+            this.transition =
+                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
         }
         else
         {
-            this.myFSM.block();
+            //wait some more
+            this.myFSM.block(500);
+
             this.transition =
                     SubscribeToAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
         }
     }
+    // Old method.
+// @Override
+//    public void action ()
+//    {
+//        System.out.println("action => " + getBehaviourName());
+//
+//        //Handling new list
+//
+//        ACLMessage mess = this.myFSM.getRequest();
+//        boolean requestNewList = false;
+//
+//        HashSet<Auction> auctionList =
+//                this.extractAuctionsFromMessage(mess);
+//
+//        ((BidderAgent)myAgent).displayAuctionList(auctionList);
+//
+//        //Waiting unblock message
+//        ACLMessage unblockMessage = myAgent.receive(
+//                PickAuctionBidderBehaviour.UNBLOCK_FILTER
+//        );
+//
+//        if (unblockMessage != null)
+//        {
+//            this.transition =
+//                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
+//
+//            Auction selectedAuction = ((BidderAgent) myAgent).getSubscribedAuction();
+//
+//            ACLMessage subscription = mess.createReply();
+//            subscription.setPerformative(
+//                    FishMarket.Performatives.TO_SUBSCRIBE
+//            );
+//
+//            subscription.addReceiver(
+//                    SubscribeToAuctionMarketFSMBehaviour.MESSAGE_TOPIC
+//            );
+//
+//            subscription.setContent(selectedAuction.getID());
+//
+//            myAgent.send(subscription);
+//        }
+//        else
+//        {
+//            this.myFSM.block();
+//            this.transition =
+//                    SubscribeToAuctionBidderFSMBehaviour.TRANSITION_WAIT_USER_CHOICE;
+//        }
+//    }
 
 
     private HashSet<Auction> extractAuctionsFromMessage(ACLMessage message)
@@ -137,89 +194,6 @@ public class PickAuctionBidderBehaviour extends OneShotBehaviour
 
         return auctionList;
     }
-
-//    @Override
-//    public void action() {
-//        System.out.println("action => " + getBehaviourName());
-//
-//        BidderAgent bidderAgent =
-//                (BidderAgent) super.myAgent;
-//
-//        ACLMessage mess = this.myFSM.getRequest();
-//        Object content = null;
-//        boolean requestNewList = false;
-//
-//        if (mess != null)
-//        {
-//            try
-//            {
-//                content = mess.getContentObject();
-//            }
-//            catch (UnreadableException e)
-//            {
-//                PickAuctionBehaviour.LOGGER.log(Level.SEVERE, null, e);
-//            }
-//
-//            if (content != null)
-//            {
-//                HashSet<Auction> auctionList = (HashSet<Auction>) content;
-//
-//                if (auctionList.size() > 0)
-//                {
-//                    // pick a random auction
-//                    String selectedAuction =
-//                            this.pickRandomAuctionSeller(auctionList);
-//
-//
-//                    if (selectedAuction != null)
-//                    {
-//                        //an auction has been found
-//                        ACLMessage reply = mess.createReply();
-//                        reply.setPerformative(
-//                                FishMarket.Performatives.TO_SUBSCRIBE
-//                        );
-//
-//                        reply.addReceiver(
-//                        		BidderSubscriptionMarketFSMBehaviour.MESSAGE_TOPIC
-//                        );
-//
-//                        this.transition =
-//                                SubscribeToAuctionBehaviour.TRANSITION_REQUEST_SUBSCRIPTION;
-//
-//                        reply.setContent(selectedAuction);
-//
-//                        bidderAgent.send(reply);
-//                    }
-//                    else
-//                    {
-//                        requestNewList = true;
-//                    }
-//                }
-//                else
-//                {
-//                    requestNewList = true;
-//                }
-//            }
-//            else
-//            {
-//                requestNewList = true;
-//            }
-//
-//            if (requestNewList)
-//            {
-//                // could not select item
-//                this.transition =
-//                        SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
-//            }
-//
-//        }
-//        else
-//        {
-//
-//        }
-//        // transition to next step
-//
-//    }
 
     @Override
     public int onEnd()

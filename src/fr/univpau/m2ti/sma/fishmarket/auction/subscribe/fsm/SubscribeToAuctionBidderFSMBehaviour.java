@@ -1,12 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm;
 
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.CreateBidderFSMBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.PickAuctionBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.SubscriptionProcessEndBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.SubscriptionProcessStartBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.WaitAuctionListBidderBehaviour;
-import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.WaitSubscriptionReplyBidderBehaviour;
-import jade.core.AID;
+import fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states.*;
 import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -27,8 +21,10 @@ public class SubscribeToAuctionBidderFSMBehaviour extends FSMBehaviour
 			"STATE_WAIT_SUBSCRIPTION_REPLY";
 	private static final String STATE_CREATE_BIDDER_FSM =
 			"STATE_CREATE_BIDDER_FSM";
-	private static final String STATE_SUBSCRIPTION_PROCESS_END =
-			"STATE_SUBSCRIPTION_PROCESS_END";
+	private static final String STATE_TERMINATE_FAILURE =
+			"STATE_TERMINATE_FAILURE";
+private static final String STATE_TERMINATE_SUCCESS =
+			"STATE_TERMINATE_SUCCESS";
 
 	/**
 	 * Return code which activates the transition to wait for an auction list.
@@ -56,20 +52,35 @@ public class SubscribeToAuctionBidderFSMBehaviour extends FSMBehaviour
 	public static final int TRANSITION_SUBSCRIPTION_REFUSED;
 
 	/**
-	 * Return code which activates the transition to the exit state of this FSM.
+	 * Return code which activates the transition to the exit with failure state of this fsm.
 	 */
-	public static final int TRANSITION_EXIT_SUBSCRIPTION_PROCESS;
+	public static final int TRANSITION_TERMINATE_FAILURE;
+
+	/**
+	 * Return code which activates the transition to the exit with success state of this fsm.
+	 */
+	public static final int TRANSITION_TERMINATE_SUCCESS;
 
 	/**
 	 * Return code which activates the transition to the start state of this FSM.
 	 */
 	public static final int TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START;
 
+	/**
+	 * Stay on the wait auction list state.
+	 */
 	public static final int TRANSITION_WAIT_AUCTION_LIST;
 
+	/**
+	 * Stay on the wait subscription result state.
+	 */
 	public static final int TRANSITION_WAIT_SUBSCRIPTION_RESULT;
 
+	/**
+	 * Stay on pick auction while user chooses an auction.
+	 */
 	public static final int TRANSITION_WAIT_USER_CHOICE;
+
 	/**
 	 * An empty auction list has been received.
 	 */
@@ -92,7 +103,8 @@ public class SubscribeToAuctionBidderFSMBehaviour extends FSMBehaviour
 		TRANSITION_REQUEST_SUBSCRIPTION = ++start;
 		TRANSITION_SUBSCRIPTION_ACCEPTED = ++start;
 		TRANSITION_SUBSCRIPTION_REFUSED = ++start;
-		TRANSITION_EXIT_SUBSCRIPTION_PROCESS = ++start;
+		TRANSITION_TERMINATE_FAILURE = ++start;
+		TRANSITION_TERMINATE_SUCCESS = ++start;
 		TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START = ++start;
 		TRANSITION_WAIT_AUCTION_LIST = ++start;
 		TRANSITION_WAIT_SUBSCRIPTION_RESULT = ++start;
@@ -148,12 +160,20 @@ public class SubscribeToAuctionBidderFSMBehaviour extends FSMBehaviour
 				STATE_CREATE_BIDDER_FSM
 		);
 
-		SubscriptionProcessEndBidderBehaviour subscriptionProcessEndBehaviour =
-				new SubscriptionProcessEndBidderBehaviour(a);
+		TerminateFailureBidderBehaviour terminateFailureBidderBehaviour =
+				new TerminateFailureBidderBehaviour(a);
 
 		this.registerLastState(
-				subscriptionProcessEndBehaviour,
-				STATE_SUBSCRIPTION_PROCESS_END
+				terminateFailureBidderBehaviour,
+				STATE_TERMINATE_FAILURE
+		);
+
+		TerminateSuccessBidderBehaviour terminateSuccessBidderBehaviour =
+				new TerminateSuccessBidderBehaviour(a);
+
+		this.registerLastState(
+				terminateSuccessBidderBehaviour,
+				STATE_TERMINATE_SUCCESS
 		);
 
 		// Transitions
@@ -212,35 +232,28 @@ public class SubscribeToAuctionBidderFSMBehaviour extends FSMBehaviour
 				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_SUBSCRIPTION_REFUSED
 		);
 
-//		this.registerTransition(
-//				STATE_CREATE_BIDDER_FSM,
-//				STATE_SUBSCRIPTION_PROCESS_START,
-//				SubscribeToAuctionBehaviour.TRANSITION_RETURN_TO_SUBSCRIPTION_PROCESS_START
-//		);
-
-		//TODO : where do we go after subscribing to an auction
 		this.registerDefaultTransition(
 				STATE_CREATE_BIDDER_FSM,
-				STATE_SUBSCRIPTION_PROCESS_END
+				STATE_TERMINATE_SUCCESS
 		);
 
 		//transitions to subscription process end
 		this.registerTransition(
 				STATE_SUBSCRIPTION_PROCESS_START,
-				STATE_SUBSCRIPTION_PROCESS_END,
-				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				STATE_TERMINATE_FAILURE,
+				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_TERMINATE_FAILURE
 		);
 
 		this.registerTransition(
 				STATE_WAIT_AUCTION_LIST,
-				STATE_SUBSCRIPTION_PROCESS_END,
-				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				STATE_TERMINATE_FAILURE,
+				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_TERMINATE_FAILURE
 		);
 
 		this.registerTransition(
 				STATE_PICK_AUCTION,
-				STATE_SUBSCRIPTION_PROCESS_END,
-				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_EXIT_SUBSCRIPTION_PROCESS
+				STATE_TERMINATE_FAILURE,
+				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_TERMINATE_FAILURE
 		);
 
 	}

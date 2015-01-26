@@ -2,18 +2,19 @@ package fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states;
 
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+
 import java.util.logging.Logger;
 
 /**
  *
  */
-public class SubscriptionProcessEndBidderBehaviour extends OneShotBehaviour
+public class TerminateSuccessBidderBehaviour extends OneShotBehaviour
 {
     /** Logging. */
     private static final Logger LOGGER =
-            Logger.getLogger(SubscriptionProcessEndBidderBehaviour.class.getName());
+            Logger.getLogger(TerminateSuccessBidderBehaviour.class.getName());
 
-    public SubscriptionProcessEndBidderBehaviour(Agent a)
+    public TerminateSuccessBidderBehaviour(Agent a)
     {
         super(a);
     }
@@ -21,5 +22,6 @@ public class SubscriptionProcessEndBidderBehaviour extends OneShotBehaviour
     @Override
     public void action() {
         System.out.println("action => " + getBehaviourName());
+        System.out.println("Subscribed successfully to auction.");
     }
 }
