@@ -152,13 +152,13 @@ private static final String STATE_TERMINATE_SUCCESS =
 				STATE_WAIT_SUBSCRIPTION_REPLY
 		);
 
-		CreateBidderFSMBehaviour createBidderFSMBehaviour =
-				new CreateBidderFSMBehaviour(a, this);
-
-		this.registerState(
-				createBidderFSMBehaviour,
-				STATE_CREATE_BIDDER_FSM
-		);
+//		CreateBidderFSMBehaviour createBidderFSMBehaviour =
+//				new CreateBidderFSMBehaviour(a, this);
+//
+//		this.registerState(
+//				createBidderFSMBehaviour,
+//				STATE_CREATE_BIDDER_FSM
+//		);
 
 		TerminateFailureBidderBehaviour terminateFailureBidderBehaviour =
 				new TerminateFailureBidderBehaviour(a);
@@ -222,7 +222,7 @@ private static final String STATE_TERMINATE_SUCCESS =
 
 		this.registerTransition(
 				STATE_WAIT_SUBSCRIPTION_REPLY,
-				STATE_CREATE_BIDDER_FSM,
+				STATE_TERMINATE_SUCCESS,
 				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_SUBSCRIPTION_ACCEPTED
 		);
 
@@ -232,10 +232,10 @@ private static final String STATE_TERMINATE_SUCCESS =
 				SubscribeToAuctionBidderFSMBehaviour.TRANSITION_SUBSCRIPTION_REFUSED
 		);
 
-		this.registerDefaultTransition(
-				STATE_CREATE_BIDDER_FSM,
-				STATE_TERMINATE_SUCCESS
-		);
+//		this.registerDefaultTransition(
+//				STATE_CREATE_BIDDER_FSM,
+//				STATE_TERMINATE_SUCCESS
+//		);
 
 		//transitions to subscription process end
 		this.registerTransition(

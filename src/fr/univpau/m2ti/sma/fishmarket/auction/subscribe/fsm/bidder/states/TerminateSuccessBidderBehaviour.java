@@ -1,5 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
@@ -23,5 +24,9 @@ public class TerminateSuccessBidderBehaviour extends OneShotBehaviour
     public void action() {
         System.out.println("action => " + getBehaviourName());
         System.out.println("Subscribed successfully to auction.");
+
+        BidderAgent bidderAgent = (BidderAgent) super.myAgent;
+
+        bidderAgent.createBidderFSM();
     }
 }

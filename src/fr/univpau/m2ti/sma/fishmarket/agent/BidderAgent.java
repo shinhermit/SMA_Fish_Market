@@ -75,16 +75,13 @@ public class BidderAgent extends Agent
 	/**
 	 * Called at the end of the auction subscription process.
 	 *
-	 * @param maxPrice
+	 * Creates a FSM that manages the bidding process.
 	 */
-	public void createBidderFSM(float maxPrice)
+	public void createBidderFSM()
 	{
 		this.bidderView.initBidList(this.getSubscribedAuction());
 
-		if (this.runningAuctionFSM != null)
-		{
-			this.removeBehaviour(this.runningAuctionFSM);
-		}
+		this.removeAllFSMBehaviours();
 
 		this.runningAuctionFSM = new RunningAuctionBidderFSMBehaviour(this);
 
@@ -94,13 +91,12 @@ public class BidderAgent extends Agent
 		this.bidderView.auctionState();
 	}
 
+	/**
+	 * Creates a FSM that manages auction subscription for bidders.
+	 */
 	public void createAuctionFinderFSM()
 	{
-		if (this.subscribeToAuctionFSM != null)
-		{
-			this.removeBehaviour(this.subscribeToAuctionFSM);
-		}
-
+		this.removeAllFSMBehaviours();
 
 		this.subscribeToAuctionFSM = new SubscribeToAuctionBidderFSMBehaviour(this);
 		// Register behaviour
@@ -108,6 +104,27 @@ public class BidderAgent extends Agent
 
 	}
 
+	/**
+	 * Removes currently attached behaviours.
+	 */
+	private void removeAllFSMBehaviours()
+	{
+
+		if (this.subscribeToAuctionFSM != null)
+		{
+			this.removeBehaviour(this.subscribeToAuctionFSM);
+		}
+
+		if (this.runningAuctionFSM != null)
+		{
+			this.removeBehaviour(this.runningAuctionFSM);
+		}
+
+	}
+
+	/**
+	 * Called by RunningAuctionBidderFSMBehaviour end states.
+	 */
 	public void auctionOver()
 	{
 		this.bidderView.findAuctionState();

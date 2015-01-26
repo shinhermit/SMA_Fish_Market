@@ -25,7 +25,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
 
     private static String AUCTION_BID_SENT = "Bid sent.";
     private static String AUCTION_PRICE_TOO_HIGH =
-            "Price is too high. Announce price is %f, our limit is %f.";
+            "Skipping : price = %.2f ; limit = %.2f.";
 
 
     private boolean isWaitingNewAnnounce = false;
@@ -158,10 +158,7 @@ public class AboutToBidBidderBehaviour extends OneShotBehaviour
                     long waitTime = (long)
                             (rand.nextDouble() * range) +
                             AUTO_BID_RANDOM_MIN_TIME_LIMIT;
-                    bidderAgent.displayBidInformation(
-                            "(Waiting at least " + waitTime + "ms" +
-                            " before bid)"
-                    );
+                    bidderAgent.displayBidInformation("(Waiting random time)");
 
                     block(waitTime);
                 }

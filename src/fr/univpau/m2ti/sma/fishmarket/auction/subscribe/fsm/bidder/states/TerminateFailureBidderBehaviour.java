@@ -1,5 +1,6 @@
 package fr.univpau.m2ti.sma.fishmarket.auction.subscribe.fsm.bidder.states;
 
+import fr.univpau.m2ti.sma.fishmarket.agent.BidderAgent;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import java.util.logging.Logger;

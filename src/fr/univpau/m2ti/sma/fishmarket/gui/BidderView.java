@@ -339,6 +339,10 @@ public class BidderView
 
                         bidderAgent.subscribeToAuction(selectedAuction);
 
+                        //remove auction from collecitons
+                        auctions.remove(selectedAuction);
+                        auctionTableModel.removeAuction(selectedAuction);
+
                         subscribeButton.setEnabled(false);
                     }
                 }
@@ -446,10 +450,6 @@ public class BidderView
         this.currentAuctionSupply.setText("["+auction.getAuctionName()+"]");
         this.currentAuctionReference.setText("["+auction.getID()+"]");
         this.updateRunningAuctionStatus("STARTING");
-
-        //Remove auction from list of subscribable auctions
-        this.auctionTableModel.removeAuction(auction);
-        this.auctions.remove(auction);
 
         //Remove focus from list element
         this.auctionTable.clearSelection();

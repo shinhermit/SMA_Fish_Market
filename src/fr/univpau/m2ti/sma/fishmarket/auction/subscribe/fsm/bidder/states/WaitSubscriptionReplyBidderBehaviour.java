@@ -79,6 +79,9 @@ public class WaitSubscriptionReplyBidderBehaviour extends OneShotBehaviour
                 this.transition =
                         SubscribeToAuctionBidderFSMBehaviour
                                 .TRANSITION_SUBSCRIPTION_REFUSED;
+
+                bidderAgent.displayBidInformation("Subscription refused.");
+
             }
         }
         else
