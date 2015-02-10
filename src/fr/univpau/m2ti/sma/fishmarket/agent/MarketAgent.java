@@ -84,10 +84,16 @@ public class MarketAgent extends Agent
         this.myView = new MarketView(this);
         this.myView.setVisible(true);
         
-        // DEBUG
-		this.createMarketUsers(2, 4);
+        // Start seller and bidder, if requested.
+        this.handleStartUpParameters();
 	}
 
+	/**
+	 * Requests the creation of seller and bidders.
+	 * 
+	 * @param numSellers the number of seller agents to be created.
+	 * @param numBidders the number of bidder agents to be created.
+	 */
 	private void createMarketUsers(int numSellers, int numBidders)
 	{
 		AgentContainer container =
@@ -429,5 +435,34 @@ public class MarketAgent extends Agent
         
         dfd.addServices(sd);
         DFService.register(this, dfd);
+    }
+    
+    /**
+     * Checks whether or not the some values where passed in order to create seller and bidder agents.
+     * 
+     * <p>If parameters are present, creates the requested agents.</p>
+     */
+    private void handleStartUpParameters()
+    {
+    	int sellerCount = 0;
+    	int bidderCount = 0;
+    	
+    	Object [] parameters = this.getArguments();
+    	
+    	if(parameters != null)
+    	{
+    		if(parameters.length > 0)
+    		{
+    			sellerCount = Integer.valueOf((String)parameters[0]);
+    		}
+    		
+    		if(parameters.length > 1)
+    		{
+    			bidderCount = Integer.valueOf((String)parameters[1]);
+    		}
+    	}
+    	
+    	this.createMarketUsers(
+    			sellerCount, bidderCount);
     }
 }
